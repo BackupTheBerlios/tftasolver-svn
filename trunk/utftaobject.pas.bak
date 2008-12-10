@@ -128,6 +128,7 @@ type
     
   public
     function  Add(Item: TTFTAObject): Integer;
+    procedure Clear;
     function  DeleteAllCopies : boolean;
     function  DeleteAllCopiesOfObject(theItem : TTFTAObject) : boolean;
     function  Extract(Item: TTFTAObject):TTFTAObject;
@@ -830,12 +831,12 @@ begin
     begin
       self.DEBUGMemo.Append(thestring);
       self.DEBUGMemo.Append('Update: ' + PointerAddrStr(eventlist[self.PosInEventList]) +
-                            ' ::: ' + eventlist[self.PosInEventList].TemporalExpr );
+                            ' ::: ' + self.TemporalExpr );
     end else
     begin
       self.DEBUGMemo.Append(thestring);
       self.DEBUGMemo.Append('New   : ' + PointerAddrStr(eventlist[self.PosInEventList]) +
-                            ' ::: ' + eventlist[self.PosInEventList].TemporalExpr ) ;
+                            ' ::: ' + self.TemporalExpr ) ;
     end;
   eventlist.pointerToApplication.ProcessMessages;
 end;
@@ -869,6 +870,14 @@ end;
 procedure TTFTAList.Assign(Obj: TTFTAList);
 begin
   inherited Assign(Obj);
+end;
+
+procedure TTFTAList.Clear;
+var
+  i: longword;
+begin
+  for i := 0 to self.Count - 1 do
+    self.Extract(self[i]);
 end;
 
 { Delete all copies within list}
@@ -959,6 +968,8 @@ begin
   Result := TTFTAObject(inherited Items[Index]);
   if Assigned(Result) and Result.NeedsToBeUpdated then
   begin
+    Result.DEBUGMemo.Append(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(Result.PointerToUpdateObject);
+    writeln(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(Result.PointerToUpdateObject);
     self[Index] := Result.PointerToUpdateObject;
     Result := self[Index];
   end;

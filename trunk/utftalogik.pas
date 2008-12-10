@@ -67,16 +67,16 @@ begin
   if (currentTerm.EventType = tftaEventTypeAND) then
   begin
     i := 0;
+    currentTerm.DEBUGPrint(true,eventlist,'ANDFalse 2');
     repeat
-      if currentTerm[i].IsFalse then
+      if currentTerm[i] = eventList.TheFALSEElement then
         AtLeastOneIsFalse := True ;
       inc(i);
-    until ( i = (currentTerm.Count) ) or
-          ( AtLeastOneIsFalse ) ;
+    until ( i = (currentTerm.Count) ) or ( AtLeastOneIsFalse ) ;
 
     if ( AtLeastOneIsFalse ) then
     begin
-      GenericUpdateObject(currentTerm,eventlist.TheFALSEElement,eventlist,theParent,theIndex,'ANDFalse');
+      GenericUpdateObject(currentTerm,eventlist.theFALSEElement,eventlist,theParent,theIndex,'ANDFalse 1');
       Result := True;
     end;
   end;

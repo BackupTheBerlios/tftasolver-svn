@@ -831,12 +831,12 @@ begin
     begin
       self.DEBUGMemo.Append(thestring);
       self.DEBUGMemo.Append('Update: ' + PointerAddrStr(eventlist[self.PosInEventList]) +
-                            ' ::: ' + eventlist[self.PosInEventList].TemporalExpr );
+                            ' ::: ' + self.TemporalExpr );
     end else
     begin
       self.DEBUGMemo.Append(thestring);
       self.DEBUGMemo.Append('New   : ' + PointerAddrStr(eventlist[self.PosInEventList]) +
-                            ' ::: ' + eventlist[self.PosInEventList].TemporalExpr ) ;
+                            ' ::: ' + self.TemporalExpr ) ;
     end;
   eventlist.pointerToApplication.ProcessMessages;
 end;
@@ -968,6 +968,8 @@ begin
   Result := TTFTAObject(inherited Items[Index]);
   if Assigned(Result) and Result.NeedsToBeUpdated then
   begin
+    Result.DEBUGMemo.Append(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(Result.PointerToUpdateObject));
+    writeln(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(Result.PointerToUpdateObject));
     self[Index] := Result.PointerToUpdateObject;
     Result := self[Index];
   end;
