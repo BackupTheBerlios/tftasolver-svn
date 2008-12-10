@@ -1,0 +1,9 @@
+
+function  Extract(Item: TTFTAObject):TTFTAObject;
+
+function  First: TTFTAObject;
+
+function  Last: TTFTAObject;
+
+function  GetItem(Index: longword): TTFTAObject;
+

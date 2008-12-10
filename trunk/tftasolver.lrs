@@ -1,0 +1,7 @@
+{ Das ist eine automatisch erzeugte Lazarus-Ressourcendatei }
+
+LazarusResources.Add('THauptfenster','FORMDATA',[
+  'TPF0'#13'THauptfenster'#12'Hauptfenster'#4'Left'#3#252#1#6'Height'#3','#1#3
+  +'Top'#3#231#1#5'Width'#3#144#1#18'HorzScrollBar.Page'#3#143#1#18'VertScrollB'
+  +'ar.Page'#3'+'#1#7'Caption'#6#12'Hauptfenster'#0#0
+]);

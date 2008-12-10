@@ -1,0 +1,24 @@
+object FormDebugMeldungen: TFormDebugMeldungen
+  Left = 964
+  Height = 800
+  Top = 180
+  Width = 400
+  HorzScrollBar.Page = 399
+  VertScrollBar.Page = 799
+  ActiveControl = MemoAusgabebereich
+  Caption = 'TFTASolver - Debugmeldungen'
+  ClientHeight = 800
+  ClientWidth = 400
+  object MemoAusgabebereich: TMemo
+    Height = 800
+    Width = 400
+    Color = 12255231
+    Font.Height = -10
+    Lines.Strings = (
+      ''
+    )
+    ReadOnly = True
+    ScrollBars = ssAutoVertical
+    TabOrder = 0
+  end
+end

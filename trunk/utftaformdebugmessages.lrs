@@ -1,0 +1,11 @@
+{ Das ist eine automatisch erzeugte Lazarus-Ressourcendatei }
+
+LazarusResources.Add('TFormDebugMeldungen','FORMDATA',[
+  'TPF0'#19'TFormDebugMeldungen'#18'FormDebugMeldungen'#4'Left'#3#196#3#6'Heigh'
+  +'t'#3' '#3#3'Top'#3#180#0#5'Width'#3#144#1#18'HorzScrollBar.Page'#3#143#1#18
+  +'VertScrollBar.Page'#3#31#3#13'ActiveControl'#7#18'MemoAusgabebereich'#7'Cap'
+  +'tion'#6#27'TFTASolver - Debugmeldungen'#12'ClientHeight'#3' '#3#11'ClientWi'
+  +'dth'#3#144#1#0#5'TMemo'#18'MemoAusgabebereich'#6'Height'#3' '#3#5'Width'#3
+  +#144#1#5'Color'#4#255#255#186#0#11'Font.Height'#2#246#13'Lines.Strings'#1#6#0
+  +#0#8'ReadOnly'#9#10'ScrollBars'#7#14'ssAutoVertical'#8'TabOrder'#2#0#0#0#0
+]);
