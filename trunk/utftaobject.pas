@@ -60,10 +60,10 @@ type
 
   TTFTAEventLookupList = class(TFPObjectList)
   private
-    VtheDUMMY : TTFTAObject;
     VtheFALSE : TTFTAObject;
     VtheTRUE  : TTFTAObject;
     VDEBUGMemo: TMemo;
+    VmyApplication : TApplication;
 
     function  NewItemPrivate(EventType               : TTFTAOperatorType;
                             IsBasicEvent            : boolean;
@@ -77,7 +77,6 @@ type
                             PointerToUpdateObject   : TTFTAObject;
                             TemporalExpr            : ansistring) : TTFTAObject;
 
-  protected
     function  GetItem(Index: Integer): TTFTAObject;
     procedure SetItem(Index: Integer; Item: TTFTAObject);
 
@@ -115,9 +114,7 @@ type
                   		      TemporalExpr            : ansistring) : TTFTAObject;
     property  TheFALSEElement : TTFTAObject read VtheFALSE;
     property  TheTRUEElement : TTFTAObject read VtheTRUE;
-    property  TheDUMMYElement : TTFTAObject read VtheDUMMY;
-
-    pointerToApplication : TApplication;
+    property  pointerToApplication : TApplication read VmyApplication write VmyApplication;
 
   end;
 
@@ -1015,20 +1012,6 @@ begin
   self.DEBUGMemo  := pointerToDebugMemo;
   self.OwnsObjects:= true; { the EventLookupList owns objects (the objects.children - list does not! }
 
-  { create the DUMMY event }
-  self.VtheDUMMY := self.NewItem( tftaEventTypeBASIC,
-                                  true,  {IsBasicEvent}
-                                  true,  {IsCoreEvent}
-                                  false, {IsEventSequence}
-                                  true,  {IsNegated}
-                                  false, {IsNotCompletelyBuildYet}
-                                  false, {IsDisjunct}
-                                  false, {IsExtendedSequence}
-                                  NIL,   {LogicalValue}
-                                  false, {NeedsToBeUpdatedfalse}
-                                  NIL,   {PointerToUpdateObject}
-                                  'THEDUMMY'  { temporal Expression }
-                                 );
   { create the FALSE event }
   self.VtheFALSE := self.NewItem( tftaEventTypeBASIC,
                                   true,  {IsBasicEvent}
@@ -1040,7 +1023,7 @@ begin
                                   false, {IsExtendedSequence}
                                   false, {LogicalValue}
                                   false, {NeedsToBeUpdatedfalse}
-                                  self.VtheDUMMY,   {PointerToUpdateObject}
+                                  NIL,   {PointerToUpdateObject}
                                   BoolToString(false)  { temporal Expression }
                                  );
   { create the TRUE event }
@@ -1054,7 +1037,7 @@ begin
                                 false, {IsExtendedSequence}
                                 true,  {LogicalValue}
                                 false, {NeedsToBeUpdatedfalse}
-                                self.VtheDUMMY,   {PointerToUpdateObject}
+                                NIL,   {PointerToUpdateObject}
                                 BoolToString(true)  { temporal Expression }
                                );
 end;
@@ -1077,7 +1060,7 @@ begin
                   false,  {IsExtendedSequence        }
                   NIL,    {LogicalValue              }
                   false,  {NeedsToBeUpdated          }
-                  self.VtheDUMMY,    {PointerToUpdateObject     }
+                  NIL,    {PointerToUpdateObject     }
                   'DUMMY' {TemporalExpr              }
                  );
 end;
