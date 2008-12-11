@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<CONFIG>
-  <Compiler Value="/usr/bin/ppc386" Date="1219188162"/>
-  <Params Value=" -MObjFPC -Scgi -O1 -gl -WG -vewnhi -l -Fu../../../../../../../../usr/lib/lazarus/lcl/units/i386-linux/ -Fu../../../../../../../../usr/lib/lazarus/lcl/units/i386-linux/gtk/ -Fu../../../../../../../../usr/lib/lazarus/packager/units/i386-linux/ -Fu. -otftasolver -dLCL -dLCLgtk tftasolver.lpr"/>
-</CONFIG>
