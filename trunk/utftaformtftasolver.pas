@@ -74,13 +74,12 @@ type
     { private declarations }
     vDEBUGFenster : TFormDebugMeldungen;
     vDEBUGLevel : integer;
-    function HoleDEBUGLevel : integer;
     procedure SetzeDEBUGLevel(Parameter : integer);
   public
     { public declarations }
     TemporalExpression : TTFTAExpression;
     pointerToApplication : TApplication;
-    property DEBUGLevel : integer read HoleDEBUGLevel write SetzeDEBUGLevel;
+    property DEBUGLevel : integer read vDEBUGLevel write SetzeDEBUGLevel;
     procedure SchreibeDEBUGMeldung(Parameter: ansistring);
   end; 
 
@@ -104,28 +103,25 @@ implementation
 
 { TTFTAMainWindow }
 
-{------------------------------------------------------------------------------
-  Lese Property vDEBUGLevel
-------------------------------------------------------------------------------}
-function TTFTAMainWindow.HoleDEBUGLevel : integer;
-begin
-  HoleDEBUGLevel := vDEBUGLevel;
-end;
+
 {------------------------------------------------------------------------------
   Schreibe Property vDEBUGLevel
 ------------------------------------------------------------------------------}
 procedure TTFTAMainWindow.SetzeDEBUGLevel(Parameter : integer);
 begin
   vDEBUGLevel := Parameter;
-  if vDEBUGFenster = Nil then
-  begin
-    vDEBUGFenster:= TFormDebugMeldungen.Create(Application);
-    vDEBUGFenster.Show;
-  end;
   if DEBUGLevel>0 then
   begin
+    if not Assigned(vDEBUGFenster) then
+    begin
+      vDEBUGFenster:= TFormDebugMeldungen.Create(Application);
+      vDEBUGFenster.Show;
+    end;
     SchreibeDEBUGMeldung('Bis auf Weiteres herrscht DebugLevel '+IntToStr(DEBUGLevel));
     MemoDEBUG := vDEBUGFenster.MemoAusgabebereich;
+  end else
+  begin
+    MemoDEBUG := NIL;
   end;
 end;
 {------------------------------------------------------------------------------
@@ -133,7 +129,7 @@ end;
 ------------------------------------------------------------------------------}
 procedure TTFTAMainWindow.SchreibeDEBUGMeldung(Parameter : ansistring);
 begin
-  if vDEBUGFenster <> Nil then vDEBUGFenster.SchreibeMeldung(Parameter);
+  if Assigned(vDEBUGFenster) then vDEBUGFenster.SchreibeMeldung(Parameter);
 end;
 
 { ##############################################################################
@@ -273,13 +269,17 @@ procedure TTFTAMainWindow.BitBtnCalculateClick(Sender: TObject);
 
   end;  { function ablauf }
 
+var theTempTerm : TTFTAObject;
+
 begin
 
   self.BitBtnCalculate.Enabled:=false;
 
-  ablauf(TemporalExpression.TemporalTerm.GetFirstChild, TemporalExpression.TemporalTerm.Children, 0);
-  
-  MemoOutputString.Text := TemporalExpression.TemporalTerm.GetFirstChild.TemporalExpr;
+  theTempTerm := TemporalExpression.TemporalTerm;
+  ablauf(theTempTerm[0], theTempTerm.Children, 0);
+
+  theTempTerm := TemporalExpression.TemporalTerm; { reload, could / should  have changed }
+  MemoOutputString.Text := theTempTerm[0].TemporalExpr;
 
   { now build OutputTree from TemporalTerm.GetFirstChild }
   TreeViewOutputStructure.Items.Clear;

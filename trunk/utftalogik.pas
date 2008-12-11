@@ -143,7 +143,7 @@ begin
       isdone via the EventList. }
     { get event.Temporalexpression, modify it and check wether a similar object
       already exists }
-    s1 := term.GetLastChild.TemporalExpr ;
+    s1 := term[term.Count-1].TemporalExpr ;
     s2 := term.TemporalExpr;
     i := Length(s1);   { how many chars to delete in order to modify }
     inc(i); { three is always a "]" in term.TemporalExpr after the term.GetLastChild.TemporalExpr }
@@ -671,7 +671,7 @@ begin
       if (pandTerm.HasChildren) and (pandTerm.Count > 2) then
       begin
         restOfPand := pandTerm.Clone(eventlist);
-        pandTermLastChild := restOfPand.GetLastChild;
+        pandTermLastChild := restOfPand[restOfPand.Count-1];
         restOfPand.Children.OwnsObjects:=false;
         restOfPand.DeleteChild(restOfPand.Count-1);
         { if restOfPand already exists at another place, then take this instead }

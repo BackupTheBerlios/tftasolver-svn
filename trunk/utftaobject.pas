@@ -60,11 +60,12 @@ type
 
   TTFTAEventLookupList = class(TFPObjectList)
   private
-    VtheFALSE : TTFTAObject;
-    VtheTRUE  : TTFTAObject;
     VDEBUGMemo: TMemo;
     VmyApplication : TApplication;
+    VtheFALSE : TTFTAObject;
+    VtheTRUE  : TTFTAObject;
 
+    function  GetItem(Index: Integer): TTFTAObject;
     function  NewItemPrivate(EventType               : TTFTAOperatorType;
                             IsBasicEvent            : boolean;
                             IsCoreEvent             : boolean;
@@ -76,17 +77,12 @@ type
                             NeedsToBeUpdated        : boolean;
                             PointerToUpdateObject   : TTFTAObject;
                             TemporalExpr            : ansistring) : TTFTAObject;
-
-    function  GetItem(Index: Integer): TTFTAObject;
     procedure SetItem(Index: Integer; Item: TTFTAObject);
 
   public
     constructor Create(pointerToDebugMemo : TMemo);
-
     function  Add(Item: TTFTAObject): Integer;
     function  ListHoldsObjectAt(Text : ansistring) : TTFTAObject;
-    property  DEBUGMemo : TMemo read VDEBUGMemo write VDEBUGMemo;
-    property  Items[Index: Integer]: TTFTAObject read GetItem write SetItem; default;
     function  NewItem: TTFTAObject;
     function  NewItem(      EventType               : TTFTAOperatorType;
                   		      IsBasicEvent            : boolean;
@@ -112,9 +108,12 @@ type
                   		      NeedsToBeUpdated        : boolean;
                   		      PointerToUpdateObject   : TTFTAObject;
                   		      TemporalExpr            : ansistring) : TTFTAObject;
+
+    property  DEBUGMemo : TMemo read VDEBUGMemo write VDEBUGMemo;
+    property  Items[Index: Integer]: TTFTAObject read GetItem write SetItem; default;
+    property  pointerToApplication : TApplication read VmyApplication write VmyApplication;
     property  TheFALSEElement : TTFTAObject read VtheFALSE;
     property  TheTRUEElement : TTFTAObject read VtheTRUE;
-    property  pointerToApplication : TApplication read VmyApplication write VmyApplication;
 
   end;
 
@@ -127,22 +126,22 @@ type
     
   public
     function  Add(Item: TTFTAObject): Integer;
-    procedure Clear;
-    procedure Delete(Index : Integer);
     function  DeleteAllCopies : boolean;
     function  DeleteAllCopiesOfObject(theItem : TTFTAObject) : boolean;
     function  Extract(Item: TTFTAObject):TTFTAObject;
     function  FindNextAfter(theItem : TTFTAObject; StartAfter : Integer) : Integer;
-    function  IndexOf(Item: TTFTAObject): Integer;
-    function  Remove(Item: TTFTAObject): Integer;
     function  GetItem(Index: Integer): TTFTAObject;
     function  GetPlainItem(Index: Integer): TTFTAObject;
-    procedure SetItem(Index: Integer; Item: TTFTAObject);
+    function  IndexOf(Item: TTFTAObject): Integer;
+    function  Remove(Item: TTFTAObject): Integer;
     procedure Assign(Obj: TTFTAList);
+    procedure Clear;
+    procedure Delete(Index : Integer);
     procedure Insert(Index: Integer; Item: TTFTAObject);
+    procedure SetItem(Index: Integer; Item: TTFTAObject);
     property  Items[Index: Integer]: TTFTAObject read GetItem write SetItem; default;
-    property  OwnsObjects: Boolean read VOwnsObjects write VOwnsObjects;
     property  Owner : TTFTAObject read VOwner write VOwner;
+    property  OwnsObjects: Boolean read VOwnsObjects write VOwnsObjects;
 
   end;
   
@@ -151,11 +150,11 @@ type
   TTFTAObject = class(TObject)
 
   private
+
     VChildren : TTFTAList;        { list of all my descendants (children) }
     VDEBUGMemo : TMemo;
     VExpr : ansistring;           { if I'm a BasicEvent, I have to carry my event name }
     VIsBasicEvent : boolean;
-    VIsSorted : boolean;
     VIsCoreEvent : boolean;
     VIsDisjunct : boolean ;
     VIsEventSequence : boolean ;
@@ -163,6 +162,7 @@ type
     VIsMinimal : boolean;
     VIsNegated : boolean;
     VIsNotCompletelyBuildYet : boolean; { during built-up of an object (from InputString) no TempExpr checking must be performed }
+    VIsSorted : boolean;
     VIsTrueFalse : integer;
     VNeedsToBeUpdated : boolean;  { true, if before an identical event was modified, then a update to this identical object is needed }
     VPointerToUpdateObject : TTFTAObject; { this points to the object the current object shall be updated to }
@@ -172,23 +172,13 @@ type
     function  CheckLogicFalse : boolean;
     function  CheckLogicTrue : boolean;
     function  GetChildrenBasicState : boolean;
-    function  GetIsBasicEvent : boolean;
-    function  GetIsCoreEvent : boolean;
-    function  GetIsDisjunct : boolean;
-    function  GetIsEventSequence : boolean;
-    function  GetIsExtendedSequence : boolean;
-    function  GetIsNegated : boolean;
     function  GetTempExpr : ansistring;
 
     procedure CheckForCoreEvent;
     procedure CheckForDisjunctEvent;
     procedure CheckForEventSequenceEvent;
     procedure CheckForExtendedSequenceEvent;
-    procedure SetIsCoreEvent (Parameter : boolean);
-    procedure SetIsDisjunct (Parameter : boolean);
-    procedure SetIsEventSequence (Parameter : boolean);
-    procedure SetIsExtendedSequence (Parameter : boolean);
-    procedure SetIsNegated (Parameter : boolean);
+    procedure SetIsBasicEvent (Parameter : boolean);
     procedure SetTempExpr(theExpr : ansistring);
     procedure SetVType(Parameter : TTFTAOperatorType);
 
@@ -201,38 +191,36 @@ type
     function  EventTypeToString : string;
     function  ExtractChild(Item: TTFTAObject):TTFTAObject;
     function  GetChild(Index: Integer): TTFTAObject;
-    function  GetFirstChild: TTFTAObject;
-    function  GetLastChild: TTFTAObject;
     function  HasChildren : boolean;
     function  RemoveChild(Item : TTFTAObject) : Integer;
     function  WriteStatus(indent:integer = 0)  : ansistring;
 
     procedure AssignChildren(Obj: TTFTAList);
-    procedure AssignObject(theObject : TTFTAObject);
+    // procedure AssignObject(theObject : TTFTAObject);
     procedure CheckTermProperties;
     procedure DEBUGPrint(isUpdate : boolean; eventlist : TTFTAEventLookupList; thestring : ansistring = '');
     procedure DeleteChild(Index: Integer);
     procedure InsertChild(Index: Integer; Item: TTFTAObject);
     procedure SetChild(Index: Integer; Item: TTFTAObject);
-    procedure SetIsBasicEvent (Parameter : boolean);
     procedure SetLogicalValue (Parameter : boolean);
     procedure SetLogicalValue (Parameter : pointer);
+
 
     property  Children : TTFTAList read VChildren write VChildren;
     property  DEBUGMemo : TMemo read VDEBUGMemo write VDEBUGMemo;
     property  EventType : TTFTAOperatorType read VType write SetVType;
     property  IsAllChildrenAreBasic : boolean read GetChildrenBasicState;
-    property  IsBasicEvent : boolean read GetIsBasicEvent write SetIsBasicEvent;
-    property  IsCoreEvent : boolean read GetIsCoreEvent write SetIsCoreEvent;
-    property  IsEventSequence : boolean read GetIsEventSequence write SetIsEventSequence;
-    property  IsNegated : boolean read GetIsNegated  write SetIsNegated ;
-    property  IsNotCompletelyBuildYet : boolean read VIsNotCompletelyBuildYet write VIsNotCompletelyBuildYet;
-    property  LogicLevel : integer read VIsTrueFalse;
-    property  IsDisjunct : boolean read GetIsDisjunct write SetIsDisjunct ;
+    property  IsBasicEvent : boolean read VIsBasicEvent write SetIsBasicEvent;
+    property  IsCoreEvent : boolean read VIsCoreEvent write VIsCoreEvent;
+    property  IsDisjunct : boolean read VIsDisjunct write VIsDisjunct ;
+    property  IsEventSequence : boolean read VIsEventSequence write VIsEventSequence;
+    property  IsExtendedSequence : boolean read VIsExtendedSequence write VIsExtendedSequence  ;
     property  IsFalse : boolean read CheckLogicFalse;
+    property  IsNegated : boolean read VIsNegated  write VIsNegated ;
+    property  IsNotCompletelyBuildYet : boolean read VIsNotCompletelyBuildYet write VIsNotCompletelyBuildYet;
     property  IsTrue : boolean read CheckLogicTrue;
-    property  IsExtendedSequence : boolean read GetIsExtendedSequence write SetIsExtendedSequence  ;
     property  Items[Index: Integer]: TTFTAObject read GetChild write SetChild; default;
+    property  LogicLevel : integer read VIsTrueFalse;
     property  NeedsToBeUpdated : boolean read VNeedsToBeUpdated write VNeedsToBeUpdated;
     property  PointerToUpdateObject : TTFTAObject read VPointerToUpdateObject write VPointerToUpdateObject;
     property  PosInEventList : Integer read VPosInEventList write VPosInEventList;
@@ -251,7 +239,7 @@ implementation
 constructor TTFTAObject.Create;
 begin
 
-  inherited;
+  inherited Create;
   self.Children := TTFTAList.Create;
   self.Children.OwnsObjects:=False;     { the EventLookupList owns objects
                                          (the objects.children - list does not! }
@@ -321,13 +309,13 @@ end;
 {------------------------------------------------------------------------------
   Returns first child
 ------------------------------------------------------------------------------}
-function TTFTAObject.GetFirstChild :TTFTAObject;
-begin
-  if Assigned(self.Children) then
-    Result := self.Children[0]
-  else
-    Result := NIL;
-end;
+//function TTFTAObject.GetFirstChild :TTFTAObject;
+//begin
+  //if Assigned(self.Children) then
+    //Result := self.Children[0]
+  //else
+    //Result := NIL;
+//end;
 {------------------------------------------------------------------------------
   Returns child nr. Index
 ------------------------------------------------------------------------------}
@@ -354,13 +342,13 @@ end;
 {------------------------------------------------------------------------------
   Returns last child
 ------------------------------------------------------------------------------}
-function TTFTAObject.GetLastChild :TTFTAObject;
-begin
-  if Assigned(self.Children) then
-    Result := self.Children[self.Count-1]
-  else
-    Result := NIL;
-end;
+//function TTFTAObject.GetLastChild :TTFTAObject;
+//begin
+  //if Assigned(self.Children) then
+    //Result := self.Children[self.Count-1]
+  //else
+    //Result := NIL;
+//end;
 {------------------------------------------------------------------------------
   Set child nr. Index to Item
 ------------------------------------------------------------------------------}
@@ -379,36 +367,6 @@ begin
     Result := 0;
 end;
 
-function TTFTAObject.GetIsBasicEvent : boolean;
-begin
-  GetIsBasicEvent := self.VIsBasicEvent;
-end;
-
-function TTFTAObject.GetIsDisjunct : boolean;
-begin
-  GetIsDisjunct := self.VIsDisjunct;
-end;
-
-function TTFTAObject.GetIsEventSequence : boolean;
-begin
-  GetIsEventSequence := self.VIsEventSequence;
-end;
-
-function TTFTAObject.GetIsExtendedSequence : boolean;
-begin
-  GetIsExtendedSequence := self.VIsExtendedSequence;
-end;
-
-function TTFTAObject.GetIsCoreEvent : boolean;
-begin
-  GetIsCoreEvent := self.VIsCoreEvent;
-end;
-
-function TTFTAObject.GetIsNegated : boolean;
-begin
-  GetIsNegated := self.VIsNegated;
-end;
-
 procedure TTFTAObject.SetIsBasicEvent (Parameter : boolean);
 begin
   self.VIsBasicEvent := Parameter;
@@ -418,31 +376,6 @@ begin
     self.IsEventSequence:=true;
     self.VType := tftaEventTypeBASIC;
   end;
-end;
-
-procedure TTFTAObject.SetIsDisjunct (Parameter : boolean);
-begin
-  self.VIsDisjunct := Parameter;
-end;
-
-procedure TTFTAObject.SetIsEventSequence (Parameter : boolean);
-begin
-  self.VIsEventSequence := Parameter;
-end;
-
-procedure TTFTAObject.SetIsExtendedSequence (Parameter : boolean);
-begin
-  self.VIsExtendedSequence := Parameter;
-end;
-
-procedure TTFTAObject.SetIsCoreEvent (Parameter : boolean);
-begin
-  self.VIsCoreEvent := Parameter;
-end;
-
-procedure TTFTAObject.SetIsNegated (Parameter : boolean);
-begin
-  self.VIsNegated := Parameter;
 end;
 
 procedure TTFTAObject.SetLogicalValue (Parameter : boolean);
@@ -468,9 +401,9 @@ begin
   else
     self.SetIsBasicEvent(false);
   if self.VType = tftaEventTypeNOT then
-    self.SetIsNegated(true)
+    self.IsNegated := true
   else
-    self.SetIsNegated(false);
+    self.IsNegated := false;
 end;
 
 {------------------------------------------------------------------------------
@@ -579,18 +512,18 @@ end;
 {------------------------------------------------------------------------------
   Assigns theObject to TTFTAobjectœ
 ------------------------------------------------------------------------------}
-procedure TTFTAObject.AssignObject(theObject : TTFTAObject);
-begin
-  self.IsCoreEvent:=theObject.IsCoreEvent;
-  self.EventType:=theObject.EventType;
-  self.IsBasicEvent:=theObject.IsBasicEvent;
-  self.IsEventSequence:=theObject.IsEventSequence;
-  self.IsNegated:=theObject.IsNegated;
-  IsDisjunct:=theObject.IsDisjunct;
-  self.IsExtendedSequence:= theObject.IsExtendedSequence;
-  self.Children := theObject.Children;
-  self.TemporalExpr:=theObject.TemporalExpr;
-end;
+//procedure TTFTAObject.AssignObject(theObject : TTFTAObject);
+//begin
+  //self.IsCoreEvent:=theObject.IsCoreEvent;
+  //self.EventType:=theObject.EventType;
+  //self.IsBasicEvent:=theObject.IsBasicEvent;
+  //self.IsEventSequence:=theObject.IsEventSequence;
+  //self.IsNegated:=theObject.IsNegated;
+  //IsDisjunct:=theObject.IsDisjunct;
+  //self.IsExtendedSequence:= theObject.IsExtendedSequence;
+  //self.Children := theObject.Children;
+  //self.TemporalExpr:=theObject.TemporalExpr;
+//end;
 {------------------------------------------------------------------------------
 ------------------------------------------------------------------------------}
 function TTFTAObject.CheckLogicFalse : boolean;
