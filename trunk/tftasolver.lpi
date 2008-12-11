@@ -181,27 +181,27 @@
         <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/custommemo.inc"/>
         <CursorPos X="1" Y="67"/>
         <TopLine Value="47"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit17>
       <Unit18>
         <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/control.inc"/>
         <CursorPos X="1" Y="2096"/>
         <TopLine Value="2075"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="19"/>
       </Unit18>
       <Unit19>
         <Filename Value="../../../../../../../usr/share/fpcsrc/2.2.2/packages/fcl-base/src/contnrs.pp"/>
         <UnitName Value="contnrs"/>
         <CursorPos X="1" Y="502"/>
         <TopLine Value="482"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="5"/>
       </Unit19>
       <Unit20>
         <Filename Value="utftaeventlookuplist.pas"/>
         <UnitName Value="utftaeventlookuplist"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="20"/>
       </Unit20>
       <Unit21>
         <Filename Value="../../../../../../../../usr/lib/lazarus/lcl/include/custommemo.inc"/>
