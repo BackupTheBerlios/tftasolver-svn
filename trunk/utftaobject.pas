@@ -131,6 +131,7 @@ type
   public
     function  Add(Item: TTFTAObject): Integer;
     procedure Clear;
+    procedure Delete(Index : Integer);
     function  DeleteAllCopies : boolean;
     function  DeleteAllCopiesOfObject(theItem : TTFTAObject) : boolean;
     function  Extract(Item: TTFTAObject):TTFTAObject;
@@ -880,6 +881,11 @@ begin
     self.Extract(self[i]);
 end;
 
+procedure TTFTAList.Delete(Index : Integer);
+begin
+  self.List.Delete(Index);
+end;
+
 { Delete all copies within list}
 function TTFTAList.DeleteAllCopies : boolean;
 var i : Integer;
@@ -954,7 +960,9 @@ begin
 end;
 
 function TTFTAList.GetItem(Index: Integer): TTFTAObject;
-var tempObject : TTFTAObject;
+var tempObject,t2 : TTFTAObject;
+    b : boolean;
+    i : integer;
 begin
   Result := TTFTAObject(inherited Items[Index]);
   if Assigned(Result) and Result.NeedsToBeUpdated then
@@ -965,7 +973,10 @@ begin
       Result.DEBUGMemo.Append(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(tempObject));
       writeln(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(tempObject));
     end;
-    inherited Delete(Index);
+    i := self.Count;
+    i := self.Capacity;
+    b := self.OwnsObjects;
+    Delete(Index);
     Insert(Index,tempObject);
     Result := self.GetItem(Index);
   end;
