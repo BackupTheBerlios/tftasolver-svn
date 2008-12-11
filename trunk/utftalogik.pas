@@ -33,35 +33,35 @@ uses
   Classes, SysUtils, Dialogs, ComCtrls, StdCtrls, strutils, utftaobject,
     sjspointertools;
   
-  function  ANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
-  function  ANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
-  function  ANDTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
-  function  GenericSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList; theType : TTFTAOperatorType) : boolean;
-  procedure GenericUpdateObject(oldTerm : TTFTAObject; newTerm : TTFTAObject; eventlist : TTFTAEventLookupList; parentList : TTFTAList; oldObjectListIndex : longword; callString : ansistring = '');
-  function  LawOfCompleteness(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  LawOfIdempotency(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  NOTFalseTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  NOTNOT(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  ORSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  ORXORFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  ORXORTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  PANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  PANDMultiples(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  PANDPANDTransform(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  PANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  SANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  SANDPANDTransform(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  SANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
-  function  XORSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
+  function  ANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+  function  ANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+  function  ANDTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+  function  GenericSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; theType : TTFTAOperatorType) : boolean;
+  procedure GenericUpdateObject(oldTerm : TTFTAObject; newTerm : TTFTAObject; eventlist : TTFTAEventLookupList; parentList : TTFTAList; oldObjectListIndex : Integer; callString : ansistring = '');
+  function  LawOfCompleteness(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  LawOfIdempotency(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  NOTFalseTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  NOTNOT(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  ORSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  ORXORFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  ORXORTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  PANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  PANDMultiples(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  PANDPANDTransform(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  PANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  SANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  SANDPANDTransform(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  SANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  XORSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
 
 implementation
 
 {------------------------------------------------------------------------------
   transform and[ ... False ... ] to False
 ------------------------------------------------------------------------------}
-function ANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function ANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 var AtLeastOneIsFalse : boolean = False;
-    i : longword;
+    i : Integer;
 begin
   Result := False;
   if (currentTerm.EventType = tftaEventTypeAND) then
@@ -85,7 +85,7 @@ end;
 {------------------------------------------------------------------------------
   split AND with more than two operands
 ------------------------------------------------------------------------------}
-function ANDSplit( term :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function ANDSplit( term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := GenericSplit(term,theParent,theIndex,eventlist,tftaEventTypeAND);
 end;
@@ -93,7 +93,7 @@ end;
 {------------------------------------------------------------------------------
   transform and[ ... True ... ] to and[ ... ]
 ------------------------------------------------------------------------------}
-function ANDTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function ANDTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := False;
   if (currentTerm.EventType = tftaEventTypeAND) then
@@ -122,9 +122,9 @@ end;
   Generic split of terms with more than two operands
   Called by PANDSplit, SANDSplit, ANDSPlit, ORSplit, XORSplit
 ------------------------------------------------------------------------------}
-function GenericSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList; theType : TTFTAOperatorType) : boolean;
+function GenericSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; theType : TTFTAOperatorType) : boolean;
 var op1  : TTFTAObject;
-    i    : longword;
+    i    : Integer;
     s1,s2,
     expr,overallexpr : ansistring;
 begin
@@ -213,40 +213,30 @@ end;
 
 
 procedure GenericUpdateObject(oldTerm : TTFTAObject; newTerm : TTFTAObject; eventList : TTFTAEventLookupList;
-                              parentList : TTFTAList; oldObjectListIndex : longword; callString : ansistring = '');
+                              parentList : TTFTAList; oldObjectListIndex : Integer; callString : ansistring = '');
 begin
-  //s := 'Eintritt: ' + callString + ' ::: ' + oldTerm.TemporalExpr + sLineBreak +
-       //'       AlterTerm: ' + PointerAddrStr(oldTerm) + ' ::: ' + oldTerm.TemporalExpr + sLineBreak +
-       //'       NeuerTerm: ' + PointerAddrStr(newTerm) + ' ::: ' + newTerm.TemporalExpr + sLineBreak +
-       //'       Parent   : ' + PointerAddrStr(parentList) + ' ::: ' + parentList.Owner.TemporalExpr + sLineBreak;
 
   oldTerm.PointerToUpdateObject:=newTerm;
   oldTerm.NeedsToBeUpdated:=true;
+
+  oldterm := parentList[oldObjectListIndex];
+
   { next calling of parentList[oldObjectListIndex] should be redirected to new term }
-  if parentList[oldObjectListIndex] = newTerm then
+  if oldterm = newTerm then
   begin
     parentList.Owner.CheckTermProperties;
-    if Assigned(newTerm.DEBUGMemo) then
-      oldTerm.DEBUGPrint(true,eventList,callString);
+    if Assigned(oldterm.DEBUGMemo) then
+      oldterm.DEBUGPrint(true,eventList,callString);
   end else
     ShowMessage('Fatal Error (081210.1221) while processing event ' +
                 PointerAddrStr(oldTerm) + ' ( ' + oldTerm.TemporalExpr + ' ) ' );
 
-  //s := s +
-       //'Austritt: ' + callString + ' ::: ' + parentList.Owner.WriteStatus() + sLineBreak +
-       //'       AlterTerm zeigt auf: ' + PointerAddrStr(oldTerm.PointerToUpdateObject) + ' ::: ' + parentList[oldObjectListIndex].TemporalExpr + sLineBreak +
-       //'       Parent (Liste)   : ' + PointerAddrStr(parentList) + ' ::: ' + parentList.Owner.TemporalExpr + sLineBreak +
-       //oldTerm.PointerToUpdateObject.WriteStatus() + sLineBreak +
-       //' OLDTERM: ' + oldTerm.WriteStatus() + sLineBreak +
-       //parentList[oldObjectListIndex].WriteStatus() + sLineBreak +
-       //'-------------------------------------------';
-  //newTerm.DEBUGMemo.Append(s);
 end;
 
 {------------------------------------------------------------------------------
   law of completeness and[x,y] = pand[x,y] xor pand[y,x] xor sand[x,y]
 ------------------------------------------------------------------------------}
-function LawOfCompleteness(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function LawOfCompleteness(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 var aTerm,bTerm,cTerm,xTerm,yTerm, tempTerm : TTFTAObject;
     aExpr,bExpr,cExpr,xExpr,yExpr,overallexpr : ansistring;
 begin
@@ -333,7 +323,13 @@ begin
       currentTerm.EventType := tftaEventTypeXOR;
       currentTerm.CheckTermProperties;
 
-      currentTerm.DEBUGPrint(true,eventlist,'LawOfCompleteness 4');
+      currentTerm := theParent[theIndex];
+      if currentTerm.TemporalExpr = overallexpr then
+      begin
+        currentTerm.DEBUGPrint(true,eventlist,'LawOfCompleteness 4');
+        theParent.Owner.CheckTermProperties;
+      end else
+        currentTerm.DEBUGPrint(true,eventlist,'LawOfCompleteness 4.5');
     end else
     begin  { overall term does exist }
       GenericUpdateObject(currentTerm,tempTerm,eventlist,theParent,theIndex,'LawOfCompleteness 5');
@@ -344,7 +340,7 @@ end;
 {------------------------------------------------------------------------------
   idempotency for and, or, xor, sand
 ------------------------------------------------------------------------------}
-function LawOfIdempotency(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList ) : boolean;
+function LawOfIdempotency(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList ) : boolean;
 begin
   Result := False;
   { only the term itself may be modified! its children (their instances!) must not be
@@ -374,7 +370,7 @@ end;
 {------------------------------------------------------------------------------
   transform not[False|True] to True|False
 ------------------------------------------------------------------------------}
-function NOTFalseTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function NOTFalseTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := False;
   if (currentTerm.EventType = tftaEventTypeNOT) then
@@ -397,7 +393,7 @@ end;
 {------------------------------------------------------------------------------
   transform not[not[x]] to x
 ------------------------------------------------------------------------------}
-function NOTNOT(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList): boolean;
+function NOTNOT(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
 begin
   Result := False;
   if ( currentTerm.EventType = tftaEventTypeNOT    ) and
@@ -411,7 +407,7 @@ end;
 {------------------------------------------------------------------------------
   split OR with more than two operands
 ------------------------------------------------------------------------------}
-function ORSplit( term :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function ORSplit( term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := GenericSplit(term,theParent,theIndex,eventlist,tftaEventTypeOR);
 end;
@@ -420,7 +416,7 @@ end;
   transform or[ ... False ... ] to or[ ... ]      or
   transform xor[ ... False ... ] to xor[ ... ]
 ------------------------------------------------------------------------------}
-function ORXORFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function ORXORFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := False;
   if (currentTerm.EventType = tftaEventTypeOR) or (currentTerm.EventType = tftaEventTypeXOR) then
@@ -449,9 +445,9 @@ end;
   transform or[ ... True ... ] to False  or
   transform xor[ ... True ... ] to False
 ------------------------------------------------------------------------------}
-function ORXORTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function ORXORTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 var AtLeastOneIsTrue : boolean = False;
-    i : longword;
+    i : Integer;
 begin
   Result := False;
   if (currentTerm.EventType = tftaEventTypeOR) or (currentTerm.EventType = tftaEventTypeXOR) then
@@ -475,7 +471,7 @@ end;
 {------------------------------------------------------------------------------
   transform pand[x,False] or pand[False,x] pand[x,True] to False
 ------------------------------------------------------------------------------}
-function PANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function PANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := False;
   if (currentTerm.EventType = tftaEventTypePAND) and (currentTerm.Count = 2) then
@@ -494,7 +490,7 @@ end;
 {------------------------------------------------------------------------------
   transform pand[x,x] to False
 ------------------------------------------------------------------------------}
-function PANDMultiples(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function PANDMultiples(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := False;
   //currentTerm.DEBUGMemo.Append('PANDMultiples checking on ' + PointerAddrStr(currentTerm) + ' ::: ' + currentTerm.TemporalExpr);
@@ -513,7 +509,7 @@ end;
 {------------------------------------------------------------------------------
   transform pand[x,pand[y,z]] to pand[and[x,y],z]
 ------------------------------------------------------------------------------}
-function PANDPANDTransform(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function PANDPANDTransform(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 var tempTerm,x,y,z : TTFTAObject;
     expr, overallexpr : ansistring;
 begin
@@ -574,7 +570,13 @@ begin
       { set properties for modified object currentTerm }
       currentTerm.CheckTermProperties;
 
-      currentTerm.DEBUGPrint(true,eventlist,'PANDPANDTransform 2');
+      currentTerm := theParent[theIndex];
+      if currentTerm.TemporalExpr = overallexpr then
+      begin
+        currentTerm.DEBUGPrint(true,eventlist,'PANDPANDTransform 2');
+        theParent.Owner.CheckTermProperties;
+      end else
+        currentTerm.DEBUGPrint(true,eventlist,'PANDPANDTransform 2.5');
 
     end else
     begin
@@ -590,7 +592,7 @@ end;
 {------------------------------------------------------------------------------
   split PAND with more than two operands
 ------------------------------------------------------------------------------}
-function PANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function PANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := GenericSplit(term,theParent,theIndex,eventlist,tftaEventTypePAND);
 end;
@@ -601,11 +603,11 @@ end;
   do not touch sand[ < only TRUEs > ]  (those will later be transformed to TRUE
   transform sand[ ... True ... < not TRUE > ] to false
 ------------------------------------------------------------------------------}
-function SANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function SANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 var AtLeastOneIsFalse : boolean = False;
     AtLeastOneIsTrue  : boolean = False;
     AtLeastOneIsNormalEvent : boolean = False;
-    i : longword;
+    i : Integer;
 begin
   Result := False;
   if (currentTerm.EventType = tftaEventTypeSAND) then
@@ -635,13 +637,13 @@ end;
 {------------------------------------------------------------------------------
   transform sand[x,pand[y,z]] to pand[y,sand[x,z]]
 ------------------------------------------------------------------------------}
-function SANDPANDTransform(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function SANDPANDTransform(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 var tempTerm : TTFTAObject;
     pandterm : TTFTAObject;
     pandTermLastChild : TTFTAObject;
     restOfPand : TTFTAObject;
     expr, overallexpr : ansistring;
-    i : longword = 0;
+    i : Integer = 0;
     foundpand : boolean = false;
 begin
   Result := False;
@@ -748,7 +750,7 @@ end;
 {------------------------------------------------------------------------------
   split SAND with more than two operands
 ------------------------------------------------------------------------------}
-function SANDSplit( term :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function SANDSplit( term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := GenericSplit(term,theParent,theIndex,eventlist,tftaEventTypeSAND);
 end;
@@ -757,7 +759,7 @@ end;
 {------------------------------------------------------------------------------
   split XOR with more than two operands
 ------------------------------------------------------------------------------}
-function XORSplit( term :TTFTAObject; theParent : TTFTAList; theIndex : longword; eventlist : TTFTAEventLookupList) : boolean;
+function XORSplit( term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := GenericSplit(term,theParent,theIndex,eventlist,tftaEventTypeXOR);
 end;

@@ -122,8 +122,11 @@ begin
     vDEBUGFenster:= TFormDebugMeldungen.Create(Application);
     vDEBUGFenster.Show;
   end;
-  if DEBUGLevel>0 then SchreibeDEBUGMeldung('Bis auf Weiteres herrscht DebugLevel '+IntToStr(DEBUGLevel));
-  MemoDEBUG := vDEBUGFenster.MemoAusgabebereich;
+  if DEBUGLevel>0 then
+  begin
+    SchreibeDEBUGMeldung('Bis auf Weiteres herrscht DebugLevel '+IntToStr(DEBUGLevel));
+    MemoDEBUG := vDEBUGFenster.MemoAusgabebereich;
+  end;
 end;
 {------------------------------------------------------------------------------
   Schreibt eine Meldung ins DebugFenster
@@ -195,8 +198,8 @@ end;
   #############################################################################}
 procedure TTFTAMainWindow.BitBtnCalculateClick(Sender: TObject);
 
-  function ablauf(theobject :TTFTAObject; theParent : TTFTAList; theIndex : longword) : boolean;
-  var i : longword = 0;
+  function ablauf(theobject :TTFTAObject; theParent : TTFTAList; theIndex : Integer) : boolean;
+  var i : Integer = 0;
       changedSelf : boolean = false;
       changedChildren : boolean = false;
   begin
@@ -243,6 +246,8 @@ procedure TTFTAMainWindow.BitBtnCalculateClick(Sender: TObject);
           Result := true;  { flag that ANY change has happened}
         end;
 
+        self.pointerToApplication.ProcessMessages;
+
       until not changedSelf;
 
       changedChildren := False; { flag for change in children }
@@ -260,7 +265,11 @@ procedure TTFTAMainWindow.BitBtnCalculateClick(Sender: TObject);
         Result := Result or changedChildren; { true, if self changed or child changed }
       end;
 
+      self.pointerToApplication.ProcessMessages;
+
     until not changedChildren;
+
+    self.pointerToApplication.ProcessMessages;
 
   end;  { function ablauf }
 
@@ -302,10 +311,10 @@ end;
   #############################################################################}
 procedure TTFTAMainWindow.BitBtnSaveOutputClick(Sender: TObject);
 var x : TTFTAObject;
-    i : longword;
+    i : Integer;
     
     procedure zaehle(Item : TTFTAObject; iterationlevel : integer);
-    var i : longword;
+    var i : Integer;
     begin
       i:=0;
       repeat

@@ -30,7 +30,7 @@ interface
 uses
   Classes, SysUtils, strutils;
   
-  function PointerAddr(theObject : TObject) : longword;
+  function PointerAddr(theObject : TObject) : Integer;
   function PointerAddrStr(theObject : TObject) : ansistring;
   function BoolToString(b : boolean) : ansistring;
 
@@ -38,12 +38,12 @@ implementation
 
   function PointerAddrStr(theObject : TObject) : ansistring;
   begin
-    Result := IntToHex(PointerAddr(theObject),8);
+    Result := IntToHex(integer(theObject),8);
   end;
   
-  function PointerAddr(theObject : TObject) : longword;
+  function PointerAddr(theObject : TObject) : Integer;
   begin
-    Result := longword(pointer(theObject));
+    Result := Integer(theObject);
   end;
   
   {------------------------------------------------------------------------------

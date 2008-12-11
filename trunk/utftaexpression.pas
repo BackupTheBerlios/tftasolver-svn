@@ -55,11 +55,11 @@ type
     function  MakeNewInputTreeElement(theLevel : TTreeNode; theName : ansistring; theObject : TTFTAObject = NIL) : TTreeNode;
     function  MakeNewOutputTreeElement(theLevel : TTreeNode; theName : ansistring; theObject : TTFTAObject = NIL) : TTreeNode;
     function  AddNewTFTAObject(theObject : TTFTAObject; theType : TTFTAOperatorType) : TTFTAObject;
-    function  ReadCount : longword;
-    function  GetNextSubStringBreak (mytext : ansistring) : longword;
+    function  ReadCount : Integer;
+    function  GetNextSubStringBreak (mytext : ansistring) : Integer;
 
-    procedure InputStringToTemporalExpression(currentObject : TTFTAObject; theString : ansistring; theIteration : longword);
-    procedure TemporalExpressionToTreeNodes(theObjectLevel : TTFTAObject; theTree : TTreeNodes; theTreeLevel : TTreeNode; theIteration : longword);
+    procedure InputStringToTemporalExpression(currentObject : TTFTAObject; theString : ansistring; theIteration : Integer);
+    procedure TemporalExpressionToTreeNodes(theObjectLevel : TTFTAObject; theTree : TTreeNodes; theTreeLevel : TTreeNode; theIteration : Integer);
     property  InputTree : TTreeNodes read VInputTree write VInputTree;
     property  OutputTree : TTreeNodes read VOutputTree write VOutputTree;
 
@@ -72,7 +72,7 @@ type
     procedure BuildTreeNodes(theTree : TTreeNodes);
     procedure SetDEBUGMemo(Parameter : TMemo);
     property  EventList : TTFTAEventLookupList read VEventList write VEventList;
-    property  Count : longword read ReadCount;
+    property  Count : Integer read ReadCount;
     property  InputString : ansistring read VInputString write VInputString;
     property  TemporalTerm : TTFTAObject read VTemporalTerm write VTemporalTerm;
     
@@ -100,7 +100,7 @@ end;
   Vorher (im Moment deaktiviert) wird eine Plausibilisierung der Eingabe
   vorgenommen.
 ------------------------------------------------------------------------------}
-function TTFTAExpression.ReadCount : longword;
+function TTFTAExpression.ReadCount : Integer;
 begin
   Result := TemporalTerm.Children.Count;
 end;
@@ -113,8 +113,7 @@ end;
   vorgenommen.
 ------------------------------------------------------------------------------}
 procedure TTFTAExpression.ParseInput (theTree : TTreeNodes);
-var i            : longword;
-    topTreeLevel : TTreeNode;
+var i            : Integer;
 begin
 
   if ( InputCheck ) then
@@ -291,9 +290,9 @@ end;
   temporal expression.
   Returns the position of the next colon (i.e. break symbol within string)
 ------------------------------------------------------------------------------}
-function TTFTAExpression.GetNextSubStringBreak (mytext : ansistring) : longword;
-var i        : longword;
-    theCount : longword;
+function TTFTAExpression.GetNextSubStringBreak (mytext : ansistring) : Integer;
+var i        : Integer;
+    theCount : Integer;
 begin
 
   theCount := 0;
@@ -323,12 +322,12 @@ end;
 ------------------------------------------------------------------------------}
 procedure TTFTAExpression.InputStringToTemporalExpression(currentObject  : TTFTAObject;
                                                           theString      : ansistring;
-                                                          theIteration   : longword);
+                                                          theIteration   : Integer);
 var
    theNewString           : ansistring;
    theRestString          : ansistring;
    isInfixOperatorThere   : boolean;
-   theNextBreak           : longword;
+   theNextBreak           : Integer;
    theTempObject          : TTFTAObject;
    
 begin
@@ -511,9 +510,9 @@ end;
 procedure TTFTAExpression.TemporalExpressionToTreeNodes(theObjectLevel : TTFTAObject;
                                                         theTree        : TTreeNodes;
                                                         theTreeLevel   : TTreeNode;
-                                                        theIteration   : longword);
+                                                        theIteration   : Integer);
 var
-   i                : longword;
+   i                : Integer;
    theTempLevel     : TTreeNode;
 
 begin

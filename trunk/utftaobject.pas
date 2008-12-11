@@ -60,6 +60,7 @@ type
 
   TTFTAEventLookupList = class(TFPObjectList)
   private
+    VtheDUMMY : TTFTAObject;
     VtheFALSE : TTFTAObject;
     VtheTRUE  : TTFTAObject;
     VDEBUGMemo: TMemo;
@@ -77,8 +78,8 @@ type
                             TemporalExpr            : ansistring) : TTFTAObject;
 
   protected
-    function  GetItem(Index: longword): TTFTAObject;
-    procedure SetItem(Index: longword; Item: TTFTAObject);
+    function  GetItem(Index: Integer): TTFTAObject;
+    procedure SetItem(Index: Integer; Item: TTFTAObject);
 
   public
     constructor Create(pointerToDebugMemo : TMemo);
@@ -86,7 +87,7 @@ type
     function  Add(Item: TTFTAObject): Integer;
     function  ListHoldsObjectAt(Text : ansistring) : TTFTAObject;
     property  DEBUGMemo : TMemo read VDEBUGMemo write VDEBUGMemo;
-    property  Items[Index: longword]: TTFTAObject read GetItem write SetItem; default;
+    property  Items[Index: Integer]: TTFTAObject read GetItem write SetItem; default;
     function  NewItem: TTFTAObject;
     function  NewItem(      EventType               : TTFTAOperatorType;
                   		      IsBasicEvent            : boolean;
@@ -114,6 +115,7 @@ type
                   		      TemporalExpr            : ansistring) : TTFTAObject;
     property  TheFALSEElement : TTFTAObject read VtheFALSE;
     property  TheTRUEElement : TTFTAObject read VtheTRUE;
+    property  TheDUMMYElement : TTFTAObject read VtheDUMMY;
 
     pointerToApplication : TApplication;
 
@@ -133,16 +135,14 @@ type
     function  DeleteAllCopiesOfObject(theItem : TTFTAObject) : boolean;
     function  Extract(Item: TTFTAObject):TTFTAObject;
     function  FindNextAfter(theItem : TTFTAObject; StartAfter : Integer) : Integer;
-    function  First: TTFTAObject;
     function  IndexOf(Item: TTFTAObject): Integer;
-    function  Last: TTFTAObject;
     function  Remove(Item: TTFTAObject): Integer;
-    function  GetItem(Index: longword): TTFTAObject;
-    function  GetPlainItem(Index: longword): TTFTAObject;
-    procedure SetItem(Index: longword; Item: TTFTAObject);
+    function  GetItem(Index: Integer): TTFTAObject;
+    function  GetPlainItem(Index: Integer): TTFTAObject;
+    procedure SetItem(Index: Integer; Item: TTFTAObject);
     procedure Assign(Obj: TTFTAList);
-    procedure Insert(Index: longword; Item: TTFTAObject);
-    property  Items[Index: longword]: TTFTAObject read GetItem write SetItem; default;
+    procedure Insert(Index: Integer; Item: TTFTAObject);
+    property  Items[Index: Integer]: TTFTAObject read GetItem write SetItem; default;
     property  OwnsObjects: Boolean read VOwnsObjects write VOwnsObjects;
     property  Owner : TTFTAObject read VOwner write VOwner;
 
@@ -168,7 +168,7 @@ type
     VIsTrueFalse : integer;
     VNeedsToBeUpdated : boolean;  { true, if before an identical event was modified, then a update to this identical object is needed }
     VPointerToUpdateObject : TTFTAObject; { this points to the object the current object shall be updated to }
-    VPosInEventList : longword;   { allows to reference to my own pointer (within eventlist) }
+    VPosInEventList : Integer;   { allows to reference to my own pointer (within eventlist) }
     VType: TTFTAOperatorType;     { what type am I? }
 
     function  CheckLogicFalse : boolean;
@@ -199,10 +199,10 @@ type
 
     function  AddChild(Item : TTFTAObject) : Integer;
     function  Clone(list : TTFTAEventLookupList) : TTFTAObject;
-    function  Count : Longword;
+    function  Count : Integer;
     function  EventTypeToString : string;
     function  ExtractChild(Item: TTFTAObject):TTFTAObject;
-    function  GetChild(Index: longword): TTFTAObject;
+    function  GetChild(Index: Integer): TTFTAObject;
     function  GetFirstChild: TTFTAObject;
     function  GetLastChild: TTFTAObject;
     function  HasChildren : boolean;
@@ -213,9 +213,9 @@ type
     procedure AssignObject(theObject : TTFTAObject);
     procedure CheckTermProperties;
     procedure DEBUGPrint(isUpdate : boolean; eventlist : TTFTAEventLookupList; thestring : ansistring = '');
-    procedure DeleteChild(Index: longword);
-    procedure InsertChild(Index: longword; Item: TTFTAObject);
-    procedure SetChild(Index: longword; Item: TTFTAObject);
+    procedure DeleteChild(Index: Integer);
+    procedure InsertChild(Index: Integer; Item: TTFTAObject);
+    procedure SetChild(Index: Integer; Item: TTFTAObject);
     procedure SetIsBasicEvent (Parameter : boolean);
     procedure SetLogicalValue (Parameter : boolean);
     procedure SetLogicalValue (Parameter : pointer);
@@ -234,10 +234,10 @@ type
     property  IsFalse : boolean read CheckLogicFalse;
     property  IsTrue : boolean read CheckLogicTrue;
     property  IsExtendedSequence : boolean read GetIsExtendedSequence write SetIsExtendedSequence  ;
-    property  Items[Index: longword]: TTFTAObject read GetChild write SetChild; default;
+    property  Items[Index: Integer]: TTFTAObject read GetChild write SetChild; default;
     property  NeedsToBeUpdated : boolean read VNeedsToBeUpdated write VNeedsToBeUpdated;
     property  PointerToUpdateObject : TTFTAObject read VPointerToUpdateObject write VPointerToUpdateObject;
-    property  PosInEventList : longword read VPosInEventList write VPosInEventList;
+    property  PosInEventList : Integer read VPosInEventList write VPosInEventList;
     property  TemporalExpr : ansistring read GetTempExpr write SetTempExpr;
 
   end;
@@ -277,7 +277,7 @@ end;
   True, if there are entries in Children, false otherwise
 ------------------------------------------------------------------------------}
 function  TTFTAObject.GetChildrenBasicState : boolean;
-var i : longword;
+var i : Integer;
 begin
   Result := True; { Default }
   if self.HasChildren then
@@ -326,22 +326,22 @@ end;
 function TTFTAObject.GetFirstChild :TTFTAObject;
 begin
   if Assigned(self.Children) then
-    Result := self.Children.First
+    Result := self.Children[0]
   else
     Result := NIL;
 end;
 {------------------------------------------------------------------------------
   Returns child nr. Index
 ------------------------------------------------------------------------------}
-function TTFTAObject.GetChild(Index: longword): TTFTAObject;
+function TTFTAObject.GetChild(Index: Integer): TTFTAObject;
 begin
   if Assigned(self.Children) then
-    Result := self.Children.Items[Index]
+    Result := self.Children[Index]
   else
     Result := NIL;
 end;
 
-procedure TTFTAObject.DeleteChild(Index: longword);
+procedure TTFTAObject.DeleteChild(Index: Integer);
 begin
   if Assigned(self.Children) then self.Children.Delete(Index);
 end;
@@ -349,7 +349,7 @@ end;
 {------------------------------------------------------------------------------
   Insert a new child (Item) at pos Index
 ------------------------------------------------------------------------------}
-procedure TTFTAObject.InsertChild(Index: longword; Item: TTFTAObject);
+procedure TTFTAObject.InsertChild(Index: Integer; Item: TTFTAObject);
 begin
   if Assigned(self.Children) then self.Children.Insert(Index, Item);
 end;
@@ -359,21 +359,21 @@ end;
 function TTFTAObject.GetLastChild :TTFTAObject;
 begin
   if Assigned(self.Children) then
-    Result := self.Children.Last
+    Result := self.Children[self.Count-1]
   else
     Result := NIL;
 end;
 {------------------------------------------------------------------------------
   Set child nr. Index to Item
 ------------------------------------------------------------------------------}
-procedure TTFTAObject.SetChild(Index: longword; Item: TTFTAObject);
+procedure TTFTAObject.SetChild(Index: Integer; Item: TTFTAObject);
 begin
   if Assigned(self.Children) then self.Children[Index] := Item;
 end;
 {------------------------------------------------------------------------------
   Number of children
 ------------------------------------------------------------------------------}
-function TTFTAObject.Count : Longword;
+function TTFTAObject.Count : Integer;
 begin
   if Assigned(self.Children) then
     Result := self.Children.Count
@@ -481,7 +481,7 @@ end;
   use with care and as seldom as possible
 ------------------------------------------------------------------------------}
 function TTFTAObject.GetTempExpr : ansistring;
-var i,j : longword;
+var i,j : Integer;
 begin
   if not self.IsBasicEvent then
   begin
@@ -614,7 +614,7 @@ var tempObject          : TTFTAObject;
     StatusNegated       : boolean;
     StatusCoreEvent  : boolean;
     LoopStatus     : boolean;
-    i                   : longword;
+    i                   : Integer;
 begin
   { Ein Ereignis ist genau dann ein Kernereignis (KE), wenn
     - es ein nicht-negiertes Basisereignis ist.
@@ -716,9 +716,9 @@ end;
 procedure TTFTAObject.CheckForEventSequenceEvent;
 var tempObject          : TTFTAObject;
     BreakTheLoop    : boolean;
-    NumberOfNegatedChildren    : longword;
-    NumberOfSequenceChildren  : longword;
-    i                   : longword;
+    NumberOfNegatedChildren    : Integer;
+    NumberOfSequenceChildren  : Integer;
+    i                   : Integer;
 begin
   { eine EReignissequenz ist es genau dann, wenn
     - es ein nicht-negiertes Kernereignis ist.
@@ -874,7 +874,7 @@ end;
 
 procedure TTFTAList.Clear;
 var
-  i: longword;
+  i: Integer;
 begin
   for i := 0 to self.Count - 1 do
     self.Extract(self[i]);
@@ -882,7 +882,7 @@ end;
 
 { Delete all copies within list}
 function TTFTAList.DeleteAllCopies : boolean;
-var i : longword;
+var i : Integer;
 begin
   { outer loop: for each child do... (repeat until because of number of children
     possibly varying during this operation as doublets are deleted from list) }
@@ -892,7 +892,7 @@ begin
     if self.DeleteAllCopiesOfObject(self[i]) then
       Result := true;
     inc(i);
-  until i >= (self.Count - 1);
+  until i >= (Integer(self.Count) - 1);
 end;
 
 { Delete all copies of theItem }
@@ -936,7 +936,7 @@ end;
 { search for theItem in TTFTAList, but only deliver Result, if after StartAfter
   ( 0-based )! If after StartAfter no theItem was found default to Result := 0 }
 function TTFTAList.FindNextAfter(theItem : TTFTAObject; StartAfter : Integer) : Integer;
-var i,j  : longword;
+var i,j  : Integer;
 begin
   Result := 0; {default}
   i := StartAfter + 1;
@@ -953,30 +953,25 @@ begin
   end;
 end;
 
-function TTFTAList.First :TTFTAObject;
-begin
-  Result := TTFTAObject(inherited First);
-  if Assigned(Result) and Result.NeedsToBeUpdated then
-  begin
-    self[0] := Result.PointerToUpdateObject;
-    Result := self[0];
-  end;
-end;
-
-function TTFTAList.GetItem(Index: longword): TTFTAObject;
+function TTFTAList.GetItem(Index: Integer): TTFTAObject;
+var tempObject : TTFTAObject;
 begin
   Result := TTFTAObject(inherited Items[Index]);
   if Assigned(Result) and Result.NeedsToBeUpdated then
   begin
-    Result.DEBUGMemo.Append(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(Result.PointerToUpdateObject));
-    writeln(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(Result.PointerToUpdateObject));
-    self[Index] := Result.PointerToUpdateObject;
-    Result := self[Index];
+    tempObject := Result.PointerToUpdateObject;
+    if Assigned(Result.DEBUGMemo) then
+    begin
+      Result.DEBUGMemo.Append(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(tempObject));
+      writeln(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(tempObject));
+    end;
+    inherited Delete(Index);
+    Insert(Index,tempObject);
+    Result := self.GetItem(Index);
   end;
 end;
 
-function TTFTAList.GetPlainItem(Index: longword): TTFTAObject;
-var s:ansistring;
+function TTFTAList.GetPlainItem(Index: Integer): TTFTAObject;
 begin
   Result := TTFTAObject(inherited Items[Index]);
 end;
@@ -986,19 +981,9 @@ begin
   Result := inherited IndexOf(Item);
 end;
 
-procedure TTFTAList.Insert(Index: longword; Item: TTFTAObject);
+procedure TTFTAList.Insert(Index: Integer; Item: TTFTAObject);
 begin
   inherited Insert(Index, Item);
-end;
-
-function TTFTAList.Last :TTFTAObject;
-begin
-  Result := TTFTAObject(inherited Last);
-  if Assigned(Result) and Result.NeedsToBeUpdated then
-  begin
-    self[self.Count-1] := Result.PointerToUpdateObject;
-    Result := self[self.Count-1];
-  end;
 end;
 
 function TTFTAList.Remove(Item: TTFTAObject): Integer;
@@ -1006,9 +991,9 @@ begin
   Result := inherited Remove(Item);
 end;
 
-procedure TTFTAList.SetItem(Index: longword; Item: TTFTAObject);
+procedure TTFTAList.SetItem(Index: Integer; Item: TTFTAObject);
 begin
-  inherited Items[Index] := Item;
+  inherited Items[Integer(Index)] := Item;
 end;
 
 { ############################################################################ }
@@ -1019,6 +1004,20 @@ begin
   self.DEBUGMemo  := pointerToDebugMemo;
   self.OwnsObjects:= true; { the EventLookupList owns objects (the objects.children - list does not! }
 
+  { create the DUMMY event }
+  self.VtheDUMMY := self.NewItem( tftaEventTypeBASIC,
+                                  true,  {IsBasicEvent}
+                                  true,  {IsCoreEvent}
+                                  false, {IsEventSequence}
+                                  true,  {IsNegated}
+                                  false, {IsNotCompletelyBuildYet}
+                                  false, {IsDisjunct}
+                                  false, {IsExtendedSequence}
+                                  NIL,   {LogicalValue}
+                                  false, {NeedsToBeUpdatedfalse}
+                                  NIL,   {PointerToUpdateObject}
+                                  'THEDUMMY'  { temporal Expression }
+                                 );
   { create the FALSE event }
   self.VtheFALSE := self.NewItem( tftaEventTypeBASIC,
                                   true,  {IsBasicEvent}
@@ -1030,7 +1029,7 @@ begin
                                   false, {IsExtendedSequence}
                                   false, {LogicalValue}
                                   false, {NeedsToBeUpdatedfalse}
-                                  NIL,   {PointerToUpdateObject}
+                                  self.VtheDUMMY,   {PointerToUpdateObject}
                                   BoolToString(false)  { temporal Expression }
                                  );
   { create the TRUE event }
@@ -1044,7 +1043,7 @@ begin
                                 false, {IsExtendedSequence}
                                 true,  {LogicalValue}
                                 false, {NeedsToBeUpdatedfalse}
-                                NIL,   {PointerToUpdateObject}
+                                self.VtheDUMMY,   {PointerToUpdateObject}
                                 BoolToString(true)  { temporal Expression }
                                );
 end;
@@ -1067,7 +1066,7 @@ begin
                   false,  {IsExtendedSequence        }
                   NIL,    {LogicalValue              }
                   false,  {NeedsToBeUpdated          }
-                  NIL,    {PointerToUpdateObject     }
+                  self.VtheDUMMY,    {PointerToUpdateObject     }
                   'DUMMY' {TemporalExpr              }
                  );
 end;
@@ -1123,7 +1122,7 @@ function TTFTAEventLookupList.NewItemPrivate( EventType               : TTFTAOpe
                                               NeedsToBeUpdated        : boolean;
                                               PointerToUpdateObject   : TTFTAObject;
                                               TemporalExpr            : ansistring) : TTFTAObject;
-var posInList: longword = 0;
+var posInList: Integer = 0;
 begin
   posInList := self.Add(TTFTAObject.Create);
   Result := self[posInList];
@@ -1144,18 +1143,18 @@ begin
 
 end;
 
-function TTFTAEventLookupList.GetItem(Index: longword): TTFTAObject;
+function TTFTAEventLookupList.GetItem(Index: Integer): TTFTAObject;
 begin
   Result := TTFTAObject(inherited Items[Index]);
 end;
 
-procedure TTFTAEventLookupList.SetItem(Index: longword; Item: TTFTAObject);
+procedure TTFTAEventLookupList.SetItem(Index: Integer; Item: TTFTAObject);
 begin
   inherited Items[Index] := Item;
 end;
 
 function  TTFTAEventLookupList.ListHoldsObjectAt(Text : ansistring) : TTFTAObject;
-var i : longword;
+var i : Integer;
 begin
   Result := nil;
   for i:= 1 to self.Count do

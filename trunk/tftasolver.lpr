@@ -34,7 +34,7 @@ begin
 
   Application.Initialize;
   Application.CreateForm(TTFTAMainWindow, TFTAMainWindow);
-  TFTAMainWindow.DEBUGLevel:=GlobalDebugLevel;
+  TFTAMainWindow.DEBUGLevel:=5;
   TFTAMainWindow.pointerToApplication := Application;
   Application.Run;
 end.
