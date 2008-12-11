@@ -30,7 +30,7 @@ unit utftaobject;
 interface
 
 uses
-  Forms, Classes, SysUtils, Dialogs, ComCtrls, StdCtrls, strutils, contnrs, sjspointertools;
+  Forms, Classes, SysUtils, Dialogs, ComCtrls, StdCtrls, contnrs, sjspointertools;
 
 const
   cEventTypeStringArray : array[1..9] of string[30] = ('AND','OR','XOR','PAND','SAND','OTHER','TOP','NOT',

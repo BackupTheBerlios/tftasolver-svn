@@ -11,7 +11,7 @@ uses
   { you can add units after this }
   ,
   utftaformtftasolver,
-  utftaexpression, utftalogik, utftalist, utftaobject, sjspointertools, utftaformabout,
+  utftaexpression, utftalogik, utftaobject, sjspointertools, utftaformabout,
   utftaformdebugmessages;
   
 var

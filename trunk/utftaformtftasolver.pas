@@ -26,7 +26,7 @@ uses
   ComCtrls, ExtCtrls , Buttons, strutils,
   { eigene Units }
   utftaexpression, utftaformabout, utftaformdebugmessages, utftaobject,
-   utftalogik, sjspointertools;
+   utftalogik;
 
 { ##############################################################################
   ##############################################################################

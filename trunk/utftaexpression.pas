@@ -49,7 +49,7 @@ type
     VOutputMCSS           : TStrings;
     VOutputTree           : TTreeNodes;
     VTemporalTerm         : TTFTAObject;
-    constructor Create;
+
     function  InputCheck : boolean;
     function  MakeNewGenericTreeElement(theTree : TTreeNodes; theLevel : TTreeNode; theName : ansistring; theObject : TTFTAObject = NIL) : TTreeNode;
     function  MakeNewInputTreeElement(theLevel : TTreeNode; theName : ansistring; theObject : TTFTAObject = NIL) : TTreeNode;
@@ -64,6 +64,7 @@ type
     property  OutputTree : TTreeNodes read VOutputTree write VOutputTree;
 
   public
+    constructor Create;
 
     pointerToApplication : TApplication;
 
@@ -113,7 +114,6 @@ end;
 ------------------------------------------------------------------------------}
 procedure TTFTAExpression.ParseInput (theTree : TTreeNodes);
 var i            : longword;
-    j            : longword;
     topTreeLevel : TTreeNode;
 begin
 
@@ -151,7 +151,6 @@ begin
 
     if Assigned( DEBUGMemo) then DEBUGMemo.Append('TOP Levels created' + sLineBreak +
                      '  @ Address TemporalTerm: ' + PointerAddrStr(TemporalTerm) + sLineBreak +
-                     '  @ Address TOP InputTreeNode: ' + PointerAddrStr(topTreeLevel) + sLineBreak +
                      '  @ Address FALSETerm: ' + PointerAddrStr(EventList.TheFALSEElement) + sLineBreak +
                      '  @ Address TRUETerm: ' + PointerAddrStr(EventList.TheTRUEElement) );
 

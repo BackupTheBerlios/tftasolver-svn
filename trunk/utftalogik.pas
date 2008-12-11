@@ -214,7 +214,6 @@ end;
 
 procedure GenericUpdateObject(oldTerm : TTFTAObject; newTerm : TTFTAObject; eventList : TTFTAEventLookupList;
                               parentList : TTFTAList; oldObjectListIndex : longword; callString : ansistring = '');
-var s : ansistring;
 begin
   //s := 'Eintritt: ' + callString + ' ::: ' + oldTerm.TemporalExpr + sLineBreak +
        //'       AlterTerm: ' + PointerAddrStr(oldTerm) + ' ::: ' + oldTerm.TemporalExpr + sLineBreak +
