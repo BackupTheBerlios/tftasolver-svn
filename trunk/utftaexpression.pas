@@ -31,7 +31,7 @@ interface
 
 uses
   Forms, Classes, SysUtils, Dialogs, ComCtrls, StdCtrls, strutils, utftaobject
-  , sjspointertools;
+  , sjspointertools, utftalogik;
 
 { ############################################################################ }
 { ############################################################################ }
@@ -46,18 +46,18 @@ type
     VEventList            : TTFTAEventLookupList;
     VInputString          : ansistring;
     VInputTree            : TTreeNodes;
-    VOutputMCSS           : TStrings;
     VOutputTree           : TTreeNodes;
+    VpointerToApplication : TApplication;
     VTemporalTerm         : TTFTAObject;
 
+    function  AddNewTFTAObject(theObject : TTFTAObject; theType : TTFTAOperatorType) : TTFTAObject;
+    function  GetNextSubStringBreak (mytext : ansistring) : Integer;
+    function  GetOutputString : ansistring;
     function  InputCheck : boolean;
     function  MakeNewGenericTreeElement(theTree : TTreeNodes; theLevel : TTreeNode; theName : ansistring; theObject : TTFTAObject = NIL) : TTreeNode;
     function  MakeNewInputTreeElement(theLevel : TTreeNode; theName : ansistring; theObject : TTFTAObject = NIL) : TTreeNode;
     function  MakeNewOutputTreeElement(theLevel : TTreeNode; theName : ansistring; theObject : TTFTAObject = NIL) : TTreeNode;
-    function  AddNewTFTAObject(theObject : TTFTAObject; theType : TTFTAOperatorType) : TTFTAObject;
     function  ReadCount : Integer;
-    function  GetNextSubStringBreak (mytext : ansistring) : Integer;
-
     procedure InputStringToTemporalExpression(currentObject : TTFTAObject; theString : ansistring; theIteration : Integer);
     procedure TemporalExpressionToTreeNodes(theObjectLevel : TTFTAObject; theTree : TTreeNodes; theTreeLevel : TTreeNode; theIteration : Integer);
     property  InputTree : TTreeNodes read VInputTree write VInputTree;
@@ -65,18 +65,19 @@ type
 
   public
     constructor Create;
+    destructor  Destroy;
 
-    pointerToApplication : TApplication;
-
-    procedure ParseInput(theTree : TTreeNodes);
     procedure BuildTreeNodes(theTree : TTreeNodes);
+    procedure ParseInput(theTree : TTreeNodes);
+    procedure Reset;
     procedure SetDEBUGMemo(Parameter : TMemo);
     procedure Simplify;
-    property  EventList : TTFTAEventLookupList read VEventList write VEventList;
     property  Count : Integer read ReadCount;
+    property  EventList : TTFTAEventLookupList read VEventList write VEventList;
     property  InputString : ansistring read VInputString write VInputString;
+    property  OutputString : ansistring read GetOutputString;
+    property  pointerToApplication : TApplication read VpointerToApplication write VpointerToApplication;
     property  TemporalTerm : TTFTAObject read VTemporalTerm write VTemporalTerm;
-    
   end;
 
 { ############################################################################ }
@@ -94,6 +95,30 @@ begin
   OutputTree := TTreeNodes.Create(nil);
 end;
 
+{------------------------------------------------------------------------------
+  Class destructor
+------------------------------------------------------------------------------}
+destructor TTFTAExpression.Destroy;
+begin
+
+  inherited Destroy;
+end;
+
+{------------------------------------------------------------------------------
+  Reset Expression's data to defaults
+------------------------------------------------------------------------------}
+procedure TTFTAExpression.Reset;
+begin
+  if assigned(self.InputTree) then
+    self.InputTree.Clear;
+  if assigned(self.OutputTree) then
+    self.OutputTree.Clear;
+  self.TemporalTerm := NIL;
+  self.EventList.Free;
+  self.EventList := NIL;
+  self.InputString:='';
+end;
+
 { ############################################################################ }
 
 {------------------------------------------------------------------------------
@@ -104,6 +129,11 @@ end;
 function TTFTAExpression.ReadCount : Integer;
 begin
   Result := TemporalTerm.Children.Count;
+end;
+
+function TTFTAExpression.GetOutputString : ansistring;
+begin
+  Result := self.TemporalTerm[0].TemporalExpr;
 end;
 
 { ############################################################################ }
@@ -276,13 +306,13 @@ begin
   
 end;
 
-{ ##############################################################################
-  ##############################################################################
-  ##############################################################################
-  #############################################################################}
-procedure TTFTAExpression.Simpilfy(Sender: TObject);
+{------------------------------------------------------------------------------
+  Simplify TemporalTerm according to rules of TFTA
+------------------------------------------------------------------------------}
+procedure TTFTAExpression.Simplify;
 
-  function ablauf(theobject :TTFTAObject; theParent : TTFTAList; theIndex : Integer) : boolean;
+
+  function SimplificationLoop(theobject :TTFTAObject; theParent : TTFTAList; theIndex : Integer) : boolean;
   var i : Integer = 0;
       changedSelf : boolean = false;
       changedChildren : boolean = false;
@@ -293,45 +323,42 @@ procedure TTFTAExpression.Simpilfy(Sender: TObject);
       repeat  { inner loop, continue until no chnage in oneself }
         changedSelf := false; { flag whether in the inner loop a change happend }
 
-        If (not changedSelf) and PANDSplit(theobject, theParent , theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and PANDSplit(theobject, theParent , theIndex, self.EventList) then
           changedSelf := true;
-        If (not changedSelf) and PANDFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and PANDFalse(theobject, theParent, theIndex, self.EventList) then
           changedSelf := true;
-        If (not changedSelf) and ANDFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and ANDFalse(theobject, theParent, theIndex, self.EventList) then
           changedSelf := true;
-        If (not changedSelf) and SANDFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and SANDFalse(theobject, theParent, theIndex, self.EventList) then
           changedSelf := true;
-        If (not changedSelf) and ORXORTrue(theobject, theParent, theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and ORXORTrue(theobject, theParent, theIndex, self.EventList) then
           changedSelf := true;
-        If (not changedSelf) and NOTFalseTrue(theobject, theParent, theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and NOTFalseTrue(theobject, theParent, theIndex, self.EventList) then
           changedSelf := true;
-        If (not changedSelf) and NOTNOT(theobject, theParent , theIndex, TemporalExpression.EventList ) then
+        If (not changedSelf) and NOTNOT(theobject, theParent , theIndex, self.EventList ) then
           changedSelf := true;
-        If (not changedSelf) and ANDTrue(theobject, theParent, theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and ANDTrue(theobject, theParent, theIndex, self.EventList) then
           changedSelf := true;
-        If (not changedSelf) and ORXORFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and ORXORFalse(theobject, theParent, theIndex, self.EventList) then
           changedSelf := true;
-        If (not changedSelf) and PANDMultiples(theobject, theParent , theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and PANDMultiples(theobject, theParent , theIndex, self.EventList) then
           changedSelf := true;
-        If (not changedSelf) and LawOfNonrecurrence(theobject, theParent , theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and LawOfNonrecurrence(theobject, theParent , theIndex, self.EventList) then
           changedSelf := true;
-        If (not changedSelf) and LawOfIdempotency(theobject, theParent , theIndex, TemporalExpression.EventList ) then
+        If (not changedSelf) and LawOfIdempotency(theobject, theParent , theIndex, self.EventList ) then
           changedSelf := true;
-        If (not changedSelf) and LawOfCompleteness(theobject, theParent , theIndex, TemporalExpression.EventList ) then
+        If (not changedSelf) and LawOfCompleteness(theobject, theParent , theIndex, self.EventList ) then
           changedSelf := true;
-        If (not changedSelf) and PANDPANDTransform(theobject, theParent , theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and PANDPANDTransform(theobject, theParent , theIndex, self.EventList) then
           changedSelf := true;
-        If (not changedSelf) and SANDPANDTransform(theobject, theParent , theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and SANDPANDTransform(theobject, theParent , theIndex, self.EventList) then
           changedSelf := true;
 
         If changedSelf then
         begin
           theobject := theParent[theIndex];
-          Result := true;  { flag that ANY change has happened}
+          Result := true;  { Result is flag that ANY change has happened}
         end;
-
-        self.pointerToApplication.ProcessMessages;
-
       until not changedSelf;
 
       changedChildren := False; { flag for change in children }
@@ -339,7 +366,7 @@ procedure TTFTAExpression.Simpilfy(Sender: TObject);
       if theobject.HasChildren then
       begin
         repeat
-          if ablauf( theobject[i] , theobject.Children, i) then
+          if SimplificationLoop( theobject[i] , theobject.Children, i) then
           begin
             changedChildren := true; { flag, that at least one child was changed }
             //theobject[i] := theobject.Children[i];
@@ -348,21 +375,12 @@ procedure TTFTAExpression.Simpilfy(Sender: TObject);
         until (i>=theobject.Count);
         Result := Result or changedChildren; { true, if self changed or child changed }
       end;
-
-      self.pointerToApplication.ProcessMessages;
-
     until not changedChildren;
-
-    self.pointerToApplication.ProcessMessages;
-
   end;  { function ablauf }
-
-var theTempTerm : TTFTAObject;
 
 begin
 
-  theTempTerm := self.TemporalTerm;
-  ablauf(theTempTerm[0], theTempTerm.Children, 0);
+  SimplificationLoop(self.TemporalTerm[0], self.TemporalTerm.Children, 0);
 
 end;
 

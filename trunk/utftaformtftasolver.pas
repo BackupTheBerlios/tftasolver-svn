@@ -25,8 +25,7 @@ uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ComCtrls, ExtCtrls , Buttons, strutils,
   { eigene Units }
-  utftaexpression, utftaformabout, utftaformdebugmessages, utftaobject,
-   utftalogik;
+  utftaexpression, utftaformabout, utftaformdebugmessages, utftaobject;
 
 { ##############################################################################
   ##############################################################################
@@ -35,9 +34,6 @@ uses
   ##############################################################################
   #############################################################################}
 type
-
-  TTFTAObject2 = class
-  end;
 
   { TFTAMainWindow, das was man als Nutzer vom PRogramm primaer sieht. }
   { ######################################################################## }
@@ -158,23 +154,20 @@ begin
 
   { create an initial TemporalExpression }
   if assigned(TemporalExpression) then
-    TemporalExpression.Destroy;
-    
-  TemporalExpression := TTFTAExpression.Create;
+    //TemporalExpression.Reset
+  else
+    TemporalExpression := TTFTAExpression.Create;
   
   TemporalExpression.SetDEBUGMemo(MemoDEBUG);
-
   { give input string to TemporalExpression }
   TemporalExpression.InputString := s  ;
-
-  TreeViewInputStructure.Items.Clear ;
-
   TemporalExpression.pointerToApplication := pointerToApplication;
-
+  TreeViewInputStructure.Items.Clear ;
+  TreeViewOutputStructure.Items.Clear;
+  self.MemoOutputString.Clear;
   { start building the TermporalTerm and the corresponding TreeView from the
     input string }
   TemporalExpression.ParseInput(TreeViewInputStructure.Items);
-
   self.BitBtnCalculate.Enabled:=true;
 
 end;
@@ -199,7 +192,9 @@ begin
 
   TemporalExpression.Simplify;
 
-  MemoOutputString.Text := TemporalExpression.TemporalTerm.TemporalExpr;
+  { TemporalExpression.TemporalTerm = the TOP event, thus we start with its
+    first - and only - child }
+  MemoOutputString.Text := TemporalExpression.OutputString;
 
   { now build OutputTree from TemporalTerm.GetFirstChild }
   TreeViewOutputStructure.Items.Clear;

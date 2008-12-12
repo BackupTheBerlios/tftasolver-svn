@@ -1,5 +1,5 @@
 object TFTAMainWindow: TTFTAMainWindow
-  Left = 235
+  Left = 239
   Height = 700
   Top = 321
   Width = 1000
@@ -965,7 +965,8 @@ object TFTAMainWindow: TTFTAMainWindow
     Height = 417
     Top = 248
     Width = 490
-    BackgroundColor = 11796403
+    AutoExpand = True
+    BackgroundColor = 16764108
     BorderStyle = bsNone
     BorderWidth = 2
     Color = clWhite
@@ -974,6 +975,7 @@ object TFTAMainWindow: TTFTAMainWindow
     ScrollBars = ssAutoBoth
     TabOrder = 7
     Visible = False
+    Options = [tvoAutoExpand, tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips]
   end
   object BitBtnSaveOutput: TBitBtn
     Left = 755

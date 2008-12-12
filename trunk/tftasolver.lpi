@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value="./"/>
       <TargetFileExt Value=""/>
-      <ActiveEditorIndexAtStart Value="3"/>
+      <ActiveEditorIndexAtStart Value="5"/>
     </General>
     <VersionInfo>
       <ProjectVersion Value=""/>
@@ -31,7 +31,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="20">
+    <Units Count="21">
       <Unit0>
         <Filename Value="tftasolver.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -82,8 +82,8 @@
         <Filename Value="utftaexpression.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="utftaexpression"/>
-        <CursorPos X="1" Y="366"/>
-        <TopLine Value="340"/>
+        <CursorPos X="27" Y="115"/>
+        <TopLine Value="95"/>
         <EditorIndex Value="3"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -114,8 +114,8 @@
         <ResourceBaseClass Value="Form"/>
         <ResourceFilename Value="utftaformtftasolver.lrs"/>
         <UnitName Value="utftaformtftasolver"/>
-        <CursorPos X="59" Y="202"/>
-        <TopLine Value="186"/>
+        <CursorPos X="31" Y="167"/>
+        <TopLine Value="145"/>
         <EditorIndex Value="5"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -174,149 +174,159 @@
       <Unit16>
         <Filename Value="utftaformtftasolver.lfm"/>
         <IsPartOfProject Value="True"/>
+        <CursorPos X="1" Y="979"/>
+        <TopLine Value="957"/>
         <UsageCount Value="301"/>
-        <SyntaxHighlighter Value="Text"/>
+        <SyntaxHighlighter Value="LFM"/>
       </Unit16>
       <Unit17>
         <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/control.inc"/>
         <CursorPos X="1" Y="2096"/>
         <TopLine Value="2075"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="12"/>
       </Unit17>
       <Unit18>
         <Filename Value="utftaeventlookuplist.pas"/>
         <UnitName Value="utftaeventlookuplist"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
-        <UsageCount Value="14"/>
+        <UsageCount Value="13"/>
       </Unit18>
       <Unit19>
         <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/application.inc"/>
         <CursorPos X="1" Y="285"/>
         <TopLine Value="265"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit19>
+      <Unit20>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <CursorPos X="1" Y="2204"/>
+        <TopLine Value="2183"/>
+        <EditorIndex Value="6"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit20>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="247" Column="1" TopLine="227"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="2204" Column="1" TopLine="2144"/>
       </Position1>
       <Position2>
-        <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="249" Column="1" TopLine="229"/>
+        <Filename Value="utftaexpression.pas"/>
+        <Caret Line="112" Column="1" TopLine="92"/>
       </Position2>
       <Position3>
-        <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="250" Column="1" TopLine="230"/>
+        <Filename Value="utftaexpression.pas"/>
+        <Caret Line="113" Column="1" TopLine="93"/>
       </Position3>
       <Position4>
-        <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="251" Column="1" TopLine="231"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="1834" Column="1" TopLine="1814"/>
       </Position4>
       <Position5>
-        <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="254" Column="1" TopLine="234"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="2196" Column="1" TopLine="2176"/>
       </Position5>
       <Position6>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="324" Column="1" TopLine="304"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="2203" Column="1" TopLine="2183"/>
       </Position6>
       <Position7>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="325" Column="1" TopLine="305"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="2204" Column="1" TopLine="2184"/>
       </Position7>
       <Position8>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="326" Column="1" TopLine="306"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="2207" Column="1" TopLine="2187"/>
       </Position8>
       <Position9>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="896" Column="1" TopLine="876"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="2208" Column="1" TopLine="2188"/>
       </Position9>
       <Position10>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="897" Column="1" TopLine="877"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="2197" Column="1" TopLine="2177"/>
       </Position10>
       <Position11>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="898" Column="1" TopLine="878"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="2198" Column="1" TopLine="2178"/>
       </Position11>
       <Position12>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="913" Column="1" TopLine="893"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="1835" Column="1" TopLine="1815"/>
       </Position12>
       <Position13>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="328" Column="1" TopLine="308"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="1836" Column="1" TopLine="1816"/>
       </Position13>
       <Position14>
-        <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="270" Column="1" TopLine="250"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="1837" Column="1" TopLine="1817"/>
       </Position14>
       <Position15>
-        <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="206" Column="1" TopLine="186"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="1839" Column="1" TopLine="1819"/>
       </Position15>
       <Position16>
-        <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="208" Column="1" TopLine="188"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="1842" Column="1" TopLine="1822"/>
       </Position16>
       <Position17>
-        <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="210" Column="1" TopLine="190"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="1843" Column="1" TopLine="1823"/>
       </Position17>
       <Position18>
-        <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="212" Column="1" TopLine="192"/>
+        <Filename Value="utftaexpression.pas"/>
+        <Caret Line="114" Column="1" TopLine="94"/>
       </Position18>
       <Position19>
-        <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="214" Column="1" TopLine="194"/>
+        <Filename Value="utftaexpression.pas"/>
+        <Caret Line="115" Column="1" TopLine="95"/>
       </Position19>
       <Position20>
-        <Filename Value="utftalogik.pas"/>
-        <Caret Line="449" Column="18" TopLine="414"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="1834" Column="1" TopLine="1814"/>
       </Position20>
       <Position21>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="326" Column="1" TopLine="306"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="2196" Column="1" TopLine="2176"/>
       </Position21>
       <Position22>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="865" Column="27" TopLine="798"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="2203" Column="1" TopLine="2183"/>
       </Position22>
       <Position23>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="846" Column="54" TopLine="800"/>
+        <Filename Value="utftaformtftasolver.pas"/>
+        <Caret Line="59" Column="27" TopLine="48"/>
       </Position23>
       <Position24>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="255" Column="1" TopLine="232"/>
+        <Filename Value="utftaformtftasolver.pas"/>
+        <Caret Line="165" Column="25" TopLine="145"/>
       </Position24>
       <Position25>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="802" Column="49" TopLine="854"/>
+        <Filename Value="utftaformtftasolver.pas"/>
+        <Caret Line="168" Column="55" TopLine="148"/>
       </Position25>
       <Position26>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="993" Column="32" TopLine="976"/>
+        <Filename Value="utftaformtftasolver.pas"/>
+        <Caret Line="157" Column="7" TopLine="140"/>
       </Position26>
       <Position27>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="261" Column="1" TopLine="244"/>
+        <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="2204" Column="1" TopLine="2183"/>
       </Position27>
       <Position28>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="835" Column="19" TopLine="804"/>
+        <Filename Value="utftaformtftasolver.pas"/>
+        <Caret Line="165" Column="1" TopLine="145"/>
       </Position28>
       <Position29>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="264" Column="3" TopLine="244"/>
+        <Filename Value="utftaformtftasolver.pas"/>
+        <Caret Line="166" Column="1" TopLine="146"/>
       </Position29>
       <Position30>
-        <Filename Value="utftaobject.pas"/>
-        <Caret Line="1016" Column="3" TopLine="996"/>
+        <Filename Value="utftaformtftasolver.pas"/>
+        <Caret Line="169" Column="1" TopLine="149"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
@@ -334,6 +344,12 @@
     </Other>
   </CompilerOptions>
   <Debugging>
+    <BreakPoints Count="1">
+      <Item1>
+        <Source Value="utftaexpression.pas"/>
+        <Line Value="112"/>
+      </Item1>
+    </BreakPoints>
     <Watches Count="3">
       <Item1>
         <Expression Value="VExpr"/>
