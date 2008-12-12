@@ -123,91 +123,55 @@ end;
   Called by PANDSplit, SANDSplit, ANDSPlit, ORSplit, XORSplit
 ------------------------------------------------------------------------------}
 function GenericSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; theType : TTFTAOperatorType) : boolean;
-var op1  : TTFTAObject;
-    i    : Integer;
-    s1,s2,
-    expr,overallexpr : ansistring;
+var tempObject     : TTFTAObject = NIL;
+    currentOperand : TTFTAObject = NIL;
+    nextOperand    : TTFTAObject = NIL;
+    nextIndex      : Integer = 1;
+    termCount      : Integer;
+    s1   : ansistring;
+    s2   : ansistring;
+    expr : ansistring;
 begin
   Result := False;
   { only the term itself may be modified! its children (their instances!) must not be
     touched, therefore a new object is to be created }
   //term.DEBUGMemo.Append('GenericSplit with ' + cEventTypeStringArray[ord(theType)]);
   //term.DEBUGMemo.Append('   checking on ' + PointerAddrStr(term) + ' ::: ' + term.TemporalExpr);
-
-  if (term.EventType = theType) and (term.Count > 2) then
+  termCount := term.Count;
+  if (term.EventType = theType) and (termCount > 2) then
   begin
     Result := True;
     { check wether a new object is really needed to be created or wether there
       already is an object like the one that needs to be created. In the latter
       case do not create a new one but link the existing one. Checking and linking
       isdone via the EventList. }
-    { get event.Temporalexpression, modify it and check wether a similar object
-      already exists }
-    s1 := term[term.Count-1].TemporalExpr ;
-    s2 := term.TemporalExpr;
-    i := Length(s1);   { how many chars to delete in order to modify }
-    inc(i); { three is always a "]" in term.TemporalExpr after the term.GetLastChild.TemporalExpr }
-    inc(i); { three is always a "," in term.TemporalExpr before the term.GetLastChild.TemporalExpr }
-    expr := AnsiLeftStr(s2,Length(s2)-i);
-    expr := expr + ']'; { add the final "]" again }
-    { expr now holds the TemporalExpression of the newly to be created object;
-      now check wether a) there is the overall to be created object already existing (listed in eventlist)
-      b) only an object as described in expr already exists }
-    overallexpr := cEventTypeStringArray[ord(theType)] + '[' + expr + ',' + s1 + ']';
-    op1 := eventlist.ListHoldsObjectAt(overallexpr);
-    if not Assigned(op1) then
-    begin
-      { overall term does not exist }
-      op1 := eventlist.ListHoldsObjectAt(expr);
-      if not Assigned(op1) then
+    currentOperand := term[0]; { get first child }
+    s1 := currentOperand.TemporalExpr;
+    nextIndex := 1;
+    repeat
+      nextOperand := term[nextIndex]; { get second child }
+      s2 := nextOperand.TemporalExpr;
+      expr := cEventTypeStringArray[ord(theType)] + '[' + s1 + ',' + s2 + ']';
+      tempObject := eventlist.ListHoldsObjectAt(expr);
+      if not Assigned(tempObject) then
       begin
         { create new xxx object }
-        op1 := eventlist.NewItem;
-        //term.DEBUGMemo.Append('GenericSplit with ' + cEventTypeStringArray[ord(theType)] + ' on ' + PointerAddrStr(term) + ' ::: ' + term.TemporalExpr);
-        //term.DEBUGMemo.Append('   op1 does not exist -> creating new event ' + PointerAddrStr(op1));
-        op1.EventType := theType;
-        { extract all children but the last from term and put them to op1 }
-        for i := 2 to term.Count do
-        begin
-          { as for each loop pass the first child is extracted (i.e. missing in term),
-            the next child is (in the following loop pass) again child no. 0 }
-          op1.AddChild(term.ExtractChild(term[0]));
-        end;
-        { set properties for object op1 }
-        op1.CheckTermProperties;
-
-        op1.DEBUGPrint(false,eventlist,'Split '+cEventTypeStringArray[ord(theType)]+' 1');
-      end else
-      begin
-        { object op1 exists, but overall object (aka "term") does not exist -->
-          from term.Children remove everything except the last child ...}
-        //term.DEBUGMemo.Append('GenericSplit with ' + cEventTypeStringArray[ord(theType)] + ' on ' + PointerAddrStr(term) + ' ::: ' + term.TemporalExpr);
-        //term.DEBUGMemo.Append('   op1 does exist at ' + PointerAddrStr(op1) + ' ::: ' + op1.TemporalExpr);
-
-        for i := 2 to term.Count do
-        begin
-          { as for each loop pass the first child is extracted (i.e. missing in term),
-            the next child is (in the following loop pass) again child no. 0 }
-          term.ExtractChild(term[0]);
-        end;
+        tempObject := eventlist.NewItem;
+        tempObject.EventType := theType;
+        tempObject.AddChild(currentOperand);
+        tempObject.AddChild(nextOperand);
+        tempObject.CheckTermProperties;
       end;
-      { ...  add op1 as new first child to term }
-      term.InsertChild(0,op1);
-      { we do not need to add term to eventlist again, as it already resides in it;
-        the modified term.TempoalExpression is automatically accessable for seeks in
-        eventlist, as eventlist[i].text just points to the TemporalExpression of i }
-      { set properties for modified object term }
-      term.CheckTermProperties;
+      { else take existing object = do nothing }
 
-      term.DEBUGPrint(true,eventlist,'Split '+cEventTypeStringArray[ord(theType)]+' 2');
-    end else
-    begin
-      { overall term does indeed exist already (= op1); therefore: old object NeedsToBeUpdated = true and
-        PointerToUpdateObject is set to op1 (so that all other copies of term do not need to
-        do all the checking again but can directly get pointed to the simplification);
-        then the pointer of parent to old object is repointed to op1 }
-      GenericUpdateObject(term,op1,eventlist,theParent,theIndex,'GenericSplit called from ' + cEventTypeStringArray[ord(theType)]);
-    end;
+      { for next loop }
+      currentOperand := tempObject;
+      s1 := expr;
+      inc(nextIndex);
+
+    until nextIndex = termCount;
+    { modify term }
+    GenericUpdateObject(term,currentOperand,eventlist,theParent,theIndex,'GenericSplit called from ' + cEventTypeStringArray[ord(theType)]);
   end;
 end;
 
