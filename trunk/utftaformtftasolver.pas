@@ -193,93 +193,13 @@ end;
   ##############################################################################
   #############################################################################}
 procedure TTFTAMainWindow.BitBtnCalculateClick(Sender: TObject);
-
-  function ablauf(theobject :TTFTAObject; theParent : TTFTAList; theIndex : Integer) : boolean;
-  var i : Integer = 0;
-      changedSelf : boolean = false;
-      changedChildren : boolean = false;
-  begin
-    Result := false;
-    repeat { outer loop, continue until neither change in oneself nor in children }
-
-      repeat  { inner loop, continue until no chnage in oneself }
-        changedSelf := false; { flag whether in the inner loop a change happend }
-
-        If (not changedSelf) and PANDSplit(theobject, theParent , theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and PANDFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and ANDFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and SANDFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and ORXORTrue(theobject, theParent, theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and NOTFalseTrue(theobject, theParent, theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and NOTNOT(theobject, theParent , theIndex, TemporalExpression.EventList ) then
-          changedSelf := true;
-        If (not changedSelf) and ANDTrue(theobject, theParent, theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and ORXORFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and PANDMultiples(theobject, theParent , theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and LawOfNonrecurrence(theobject, theParent , theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and LawOfIdempotency(theobject, theParent , theIndex, TemporalExpression.EventList ) then
-          changedSelf := true;
-        If (not changedSelf) and LawOfCompleteness(theobject, theParent , theIndex, TemporalExpression.EventList ) then
-          changedSelf := true;
-        If (not changedSelf) and PANDPANDTransform(theobject, theParent , theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and SANDPANDTransform(theobject, theParent , theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-
-        If changedSelf then
-        begin
-          theobject := theParent[theIndex];
-          Result := true;  { flag that ANY change has happened}
-        end;
-
-        self.pointerToApplication.ProcessMessages;
-
-      until not changedSelf;
-
-      changedChildren := False; { flag for change in children }
-      i := 0;
-      if theobject.HasChildren then
-      begin
-        repeat
-          if ablauf( theobject[i] , theobject.Children, i) then
-          begin
-            changedChildren := true; { flag, that at least one child was changed }
-            //theobject[i] := theobject.Children[i];
-          end;
-          inc(i);
-        until (i>=theobject.Count);
-        Result := Result or changedChildren; { true, if self changed or child changed }
-      end;
-
-      self.pointerToApplication.ProcessMessages;
-
-    until not changedChildren;
-
-    self.pointerToApplication.ProcessMessages;
-
-  end;  { function ablauf }
-
-var theTempTerm : TTFTAObject;
-
 begin
 
   self.BitBtnCalculate.Enabled:=false;
 
-  theTempTerm := TemporalExpression.TemporalTerm;
-  ablauf(theTempTerm[0], theTempTerm.Children, 0);
+  TemporalExpression.Simplify;
 
-  theTempTerm := TemporalExpression.TemporalTerm; { reload, could / should  have changed }
-  MemoOutputString.Text := theTempTerm[0].TemporalExpr;
+  MemoOutputString.Text := TemporalExpression.TemporalTerm.TemporalExpr;
 
   { now build OutputTree from TemporalTerm.GetFirstChild }
   TreeViewOutputStructure.Items.Clear;
