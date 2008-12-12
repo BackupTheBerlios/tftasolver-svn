@@ -207,23 +207,25 @@ procedure TTFTAMainWindow.BitBtnCalculateClick(Sender: TObject);
 
         If (not changedSelf) and PANDSplit(theobject, theParent , theIndex, TemporalExpression.EventList) then
           changedSelf := true;
-        If (not changedSelf) and ANDFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and ORXORFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
         If (not changedSelf) and PANDFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
+          changedSelf := true;
+        If (not changedSelf) and ANDFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
           changedSelf := true;
         If (not changedSelf) and SANDFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
           changedSelf := true;
+        If (not changedSelf) and ORXORTrue(theobject, theParent, theIndex, TemporalExpression.EventList) then
+          changedSelf := true;
         If (not changedSelf) and NOTFalseTrue(theobject, theParent, theIndex, TemporalExpression.EventList) then
+          changedSelf := true;
+        If (not changedSelf) and NOTNOT(theobject, theParent , theIndex, TemporalExpression.EventList ) then
           changedSelf := true;
         If (not changedSelf) and ANDTrue(theobject, theParent, theIndex, TemporalExpression.EventList) then
           changedSelf := true;
-        If (not changedSelf) and ORXORTrue(theobject, theParent, theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and ORXORFalse(theobject, theParent, theIndex, TemporalExpression.EventList) then
           changedSelf := true;
         If (not changedSelf) and PANDMultiples(theobject, theParent , theIndex, TemporalExpression.EventList) then
           changedSelf := true;
-        If (not changedSelf) and PANDFalse(theobject, theParent , theIndex, TemporalExpression.EventList) then
+        If (not changedSelf) and LawOfNonrecurrence(theobject, theParent , theIndex, TemporalExpression.EventList) then
           changedSelf := true;
         If (not changedSelf) and LawOfIdempotency(theobject, theParent , theIndex, TemporalExpression.EventList ) then
           changedSelf := true;
@@ -232,8 +234,6 @@ procedure TTFTAMainWindow.BitBtnCalculateClick(Sender: TObject);
         If (not changedSelf) and PANDPANDTransform(theobject, theParent , theIndex, TemporalExpression.EventList) then
           changedSelf := true;
         If (not changedSelf) and SANDPANDTransform(theobject, theParent , theIndex, TemporalExpression.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and NOTNOT(theobject, theParent , theIndex, TemporalExpression.EventList ) then
           changedSelf := true;
 
         If changedSelf then

@@ -81,6 +81,8 @@ type
 
   public
     constructor Create(pointerToDebugMemo : TMemo);
+    destructor  Destroy;
+
     function  Add(Item: TTFTAObject): Integer;
     function  ListHoldsObjectAt(Text : ansistring) : TTFTAObject;
     function  NewItem: TTFTAObject;
@@ -125,6 +127,9 @@ type
     VOwner : TTFTAObject;
     
   public
+    constructor Create;
+    destructor  Destroy;
+
     function  Add(Item: TTFTAObject): Integer;
     function  DeleteAllCopies : boolean;
     function  DeleteAllCopiesOfObject(theItem : TTFTAObject) : boolean;
@@ -184,6 +189,7 @@ type
 
   public
     constructor Create;
+    destructor  Destroy;
 
     function  AddChild(Item : TTFTAObject) : Integer;
     function  Clone(list : TTFTAEventLookupList) : TTFTAObject;
@@ -250,6 +256,15 @@ begin
   self.IsNotCompletelyBuildYet := false;
   self.VExpr:='NIL';                    { dummy value in order to not get exceptions }
 
+end;
+
+{------------------------------------------------------------------------------
+  Class-Destructor
+------------------------------------------------------------------------------}
+destructor TTFTAObject.Destroy;
+begin
+  // nothing specific yet...
+  inherited Destroy;
 end;
 
 {------------------------------------------------------------------------------
@@ -804,11 +819,17 @@ begin
 end;
 
 procedure TTFTAList.Clear;
-var
-  i: Integer;
 begin
-  for i := 0 to self.Count - 1 do
-    self.Extract(self[i]);
+  self.List.Clear;
+end;
+
+{------------------------------------------------------------------------------
+  Class-Constructor
+------------------------------------------------------------------------------}
+constructor TTFTAList.Create;
+begin
+  // nothing specific yet...
+  inherited Create;
 end;
 
 procedure TTFTAList.Delete(Index : Integer);
@@ -858,6 +879,12 @@ begin
       self.Insert(posOfObject,tempObject);
     end;
   end;
+end;
+
+destructor TTFTAList.Destroy;
+begin
+  self.Clear;
+  inherited Destroy;
 end;
 
 function TTFTAList.Extract(Item: TTFTAObject):TTFTAObject;
@@ -978,6 +1005,15 @@ end;
 function TTFTAEventLookupList.Add(Item: TTFTAObject): Integer;
 begin
   Result := inherited Add(Item);
+end;
+
+{------------------------------------------------------------------------------
+  Class-Destructor
+------------------------------------------------------------------------------}
+destructor TTFTAEventLookupList.Destroy;
+begin
+  // nothing specific yet ...
+  inherited Destroy;
 end;
 
 function TTFTAEventLookupList.NewItem: TTFTAObject;

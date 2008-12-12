@@ -40,6 +40,7 @@ uses
   procedure GenericUpdateObject(oldTerm : TTFTAObject; newTerm : TTFTAObject; eventlist : TTFTAEventLookupList; parentList : TTFTAList; oldObjectListIndex : Integer; callString : ansistring = '');
   function  LawOfCompleteness(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
   function  LawOfIdempotency(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
+  function  LawOfNonrecurrence(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList ) : boolean;
   function  NOTFalseTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
   function  NOTNOT(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
   function  ORSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
@@ -328,6 +329,124 @@ begin
       GenericUpdateObject(currentTerm,currentTerm[0],eventlist,theParent,theIndex,'LawOfIdempotency 2');
       Result := True;
     end;
+  end;
+end;
+
+{------------------------------------------------------------------------------
+  check that events that already occured at a specific time within the term
+  do not need to occur again later
+------------------------------------------------------------------------------}
+function LawOfNonrecurrence(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList ) : boolean;
+var op1 : TTFTAObject;
+    op2 : TTFTAObject;
+    AList : TTFTAList;
+
+
+    { iteratively scans the op1 (first operand) and adds subterms according to their
+      operators, goes down to basic event level or level where an OR / XOR is encountered }
+    procedure ScanAndAddToA(theObject : TTFTAObject);
+    var i : integer = 0;
+        numberChildren : integer;
+    begin
+      if (theObject.EventType = tftaEventTypePAND) or
+         (theObject.EventType = tftaEventTypeAND) or
+         (theObject.EventType = tftaEventTypeSAND) then
+      begin
+        numberChildren := theObject.Count;
+        { add theObject to Alist and continue for all children of theObject, then return }
+        AList.Add(theObject);
+        repeat
+          ScanAndAddToA(theObject[i]);
+          inc(i);
+        until i = numberChildren;
+      end else
+      begin
+        if (theObject.EventType = tftaEventTypeOR) or
+           (theObject.EventType = tftaEventTypeXOR) or
+           (theObject.EventType = tftaEventTypeBASIC) then
+        begin
+          { add theObject to Alist and return }
+          AList.Add(theObject);
+        end else
+        begin
+          { just return }
+        end;
+      end;
+    end;
+
+    { iteratively scans the op2 (second operand); goes down to basic event level
+      or level where an OR / XOR is encountered;
+      also checks each new (sub)term for being also included in AList and returns False, if first
+      such hit is found; returns true, if no hit is found }
+    function ScanAndSearchForHits(theObject : TTFTAObject) : boolean;
+    var i : integer = 0;
+        numberChildren : integer;
+    begin
+      Result := True;
+      if (theObject.EventType = tftaEventTypePAND) then
+      begin
+        { check if theObject ist not already listed in AList }
+        if AList.IndexOf(theObject) = -1 then
+          { continue for last child of theObject, then return }
+          Result := Result and ScanAndSearchForHits(theObject[theObject.Count-1])
+        else
+          Result := false;
+      end else  { not PAND }
+      begin
+        if (theObject.EventType = tftaEventTypeAND) or
+           (theObject.EventType = tftaEventTypeSAND) then
+        begin
+          { check if theObject is not already listed in AList }
+          if AList.IndexOf(theObject) = -1 then
+          begin
+            { continue for all children of theObject, then return }
+            numberChildren := theObject.Count;
+            repeat
+              Result := Result and ScanAndSearchForHits(theObject[i]);
+              inc(i);
+            until (not Result) or (i = numberChildren);
+          end else
+          begin
+            Result := false;
+          end;
+        end else { neither PAND nor AND nor SAND }
+        begin
+          if (theObject.EventType = tftaEventTypeOR) or
+             (theObject.EventType = tftaEventTypeXOR) or
+             (theObject.EventType = tftaEventTypeBASIC) then
+          begin
+            { check if theObject is listed in AList }
+            Result := (AList.IndexOf(theObject) = -1); { True if not listed, False if listed }
+          end else { neither one of PAND, SAND, AND, XOR, OR, BASIC }
+          begin
+            { just return, i.e. Result := True and another function in TFTALogic shall handle the situation }
+          end;
+        end;
+      end;
+    end;
+
+begin
+  Result := False;
+  if (currentTerm.EventType = tftaEventTypePAND) and (currentTerm.Count = 2) then
+  begin
+    { create A- and B-lists }
+    AList := TTFTAList.Create;
+    AList.OwnsObjects:=False;
+
+    op1 := currentTerm[0];
+    op2 := currentTerm[1];
+
+    ScanAndAddToA(op1);
+    { if ScanAndSearchForHits(op2) yields True, then there are no recurrences
+      and thus no need for a change; if it yields False, then there is a
+      recurrence and thus the term needs to be updated to theFALSEElement }
+    if not ScanAndSearchForHits(op2) then
+    begin
+      Result := True;
+      GenericUpdateObject(currentTerm,eventlist.TheFALSEElement,eventlist,theParent,theIndex,'LawOfNonrecurrence');
+    end;
+
+    AList.Destroy;
   end;
 end;
 
