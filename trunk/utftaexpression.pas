@@ -310,78 +310,9 @@ end;
   Simplify TemporalTerm according to rules of TFTA
 ------------------------------------------------------------------------------}
 procedure TTFTAExpression.Simplify;
-
-
-  function SimplificationLoop(theobject :TTFTAObject; theParent : TTFTAList; theIndex : Integer) : boolean;
-  var i : Integer = 0;
-      changedSelf : boolean = false;
-      changedChildren : boolean = false;
-  begin
-    Result := false;
-    repeat { outer loop, continue until neither change in oneself nor in children }
-
-      repeat  { inner loop, continue until no chnage in oneself }
-        changedSelf := false; { flag whether in the inner loop a change happend }
-
-        If (not changedSelf) and PANDSplit(theobject, theParent , theIndex, self.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and PANDFalse(theobject, theParent, theIndex, self.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and ANDFalse(theobject, theParent, theIndex, self.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and SANDFalse(theobject, theParent, theIndex, self.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and ORXORTrue(theobject, theParent, theIndex, self.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and NOTFalseTrue(theobject, theParent, theIndex, self.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and NOTNOT(theobject, theParent , theIndex, self.EventList ) then
-          changedSelf := true;
-        If (not changedSelf) and ANDTrue(theobject, theParent, theIndex, self.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and ORXORFalse(theobject, theParent, theIndex, self.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and PANDMultiples(theobject, theParent , theIndex, self.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and LawOfNonrecurrence(theobject, theParent , theIndex, self.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and LawOfIdempotency(theobject, theParent , theIndex, self.EventList ) then
-          changedSelf := true;
-        If (not changedSelf) and LawOfCompleteness(theobject, theParent , theIndex, self.EventList ) then
-          changedSelf := true;
-        If (not changedSelf) and PANDPANDTransform(theobject, theParent , theIndex, self.EventList) then
-          changedSelf := true;
-        If (not changedSelf) and SANDPANDTransform(theobject, theParent , theIndex, self.EventList) then
-          changedSelf := true;
-
-        If changedSelf then
-        begin
-          theobject := theParent[theIndex];
-          Result := true;  { Result is flag that ANY change has happened}
-        end;
-      until not changedSelf;
-
-      changedChildren := False; { flag for change in children }
-      i := 0;
-      if theobject.HasChildren then
-      begin
-        repeat
-          if SimplificationLoop( theobject[i] , theobject.Children, i) then
-          begin
-            changedChildren := true; { flag, that at least one child was changed }
-            //theobject[i] := theobject.Children[i];
-          end;
-          inc(i);
-        until (i>=theobject.Count);
-        Result := Result or changedChildren; { true, if self changed or child changed }
-      end;
-    until not changedChildren;
-  end;  { function ablauf }
-
 begin
-
-  SimplificationLoop(self.TemporalTerm[0], self.TemporalTerm.Children, 0);
-
+  // SimplificationLoop is part of uTFTALogic
+  SimplificationLoop(self.TemporalTerm[0], self.TemporalTerm.Children, 0, self.EventList);
 end;
 
 {------------------------------------------------------------------------------
