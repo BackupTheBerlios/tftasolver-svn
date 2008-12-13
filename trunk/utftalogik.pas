@@ -754,7 +754,7 @@ begin
       { create new "restofpand" object }
       if (pandTerm.HasChildren) and (pandTerm.Count > 2) then
       begin
-        restOfPand := pandTerm.Clone(eventlist);
+        restOfPand := pandTerm.Clone(eventlist); { pandTerm may still exist unchanged at another position }
         pandTermLastChild := restOfPand[restOfPand.Count-1];
         restOfPand.Children.OwnsObjects:=false;
         restOfPand.DeleteChild(restOfPand.Count-1);

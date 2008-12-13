@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value="./"/>
       <TargetFileExt Value=""/>
-      <ActiveEditorIndexAtStart Value="5"/>
+      <ActiveEditorIndexAtStart Value="0"/>
     </General>
     <VersionInfo>
       <ProjectVersion Value=""/>
@@ -36,7 +36,7 @@
         <Filename Value="tftasolver.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="tftasolver"/>
-        <CursorPos X="51" Y="7"/>
+        <CursorPos X="27" Y="9"/>
         <TopLine Value="1"/>
         <EditorIndex Value="0"/>
         <UsageCount Value="301"/>
@@ -58,7 +58,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="sjspointertools"/>
         <CursorPos X="66" Y="27"/>
-        <TopLine Value="18"/>
+        <TopLine Value="10"/>
         <EditorIndex Value="1"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -83,7 +83,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="utftaexpression"/>
         <CursorPos X="89" Y="315"/>
-        <TopLine Value="547"/>
+        <TopLine Value="539"/>
         <EditorIndex Value="3"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -115,7 +115,7 @@
         <ResourceFilename Value="utftaformtftasolver.lrs"/>
         <UnitName Value="utftaformtftasolver"/>
         <CursorPos X="31" Y="167"/>
-        <TopLine Value="272"/>
+        <TopLine Value="264"/>
         <EditorIndex Value="5"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -131,8 +131,8 @@
         <Filename Value="utftalogik.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="utftalogik"/>
-        <CursorPos X="24" Y="101"/>
-        <TopLine Value="880"/>
+        <CursorPos X="108" Y="757"/>
+        <TopLine Value="836"/>
         <EditorIndex Value="4"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -142,7 +142,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="utftaobject"/>
         <CursorPos X="44" Y="378"/>
-        <TopLine Value="1094"/>
+        <TopLine Value="1086"/>
         <EditorIndex Value="2"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -183,29 +183,29 @@
         <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/control.inc"/>
         <CursorPos X="1" Y="2096"/>
         <TopLine Value="2075"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit17>
       <Unit18>
         <Filename Value="utftaeventlookuplist.pas"/>
         <UnitName Value="utftaeventlookuplist"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="10"/>
       </Unit18>
       <Unit19>
         <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/application.inc"/>
         <CursorPos X="1" Y="285"/>
         <TopLine Value="265"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit19>
       <Unit20>
         <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
         <CursorPos X="1" Y="2204"/>
         <TopLine Value="2183"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit20>
     </Units>
-    <JumpHistory Count="17" HistoryIndex="16">
+    <JumpHistory Count="19" HistoryIndex="18">
       <Position1>
         <Filename Value="utftaexpression.pas"/>
         <Caret Line="112" Column="1" TopLine="92"/>
@@ -274,10 +274,23 @@
         <Filename Value="utftaobject.pas"/>
         <Caret Line="236" Column="82" TopLine="228"/>
       </Position17>
+      <Position18>
+        <Filename Value="tftasolver.lpr"/>
+        <Caret Line="7" Column="51" TopLine="1"/>
+      </Position18>
+      <Position19>
+        <Filename Value="tftasolver.lpr"/>
+        <Caret Line="8" Column="7" TopLine="1"/>
+      </Position19>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="8"/>
+    <Parsing>
+      <SyntaxOptions>
+        <CStyleOperator Value="False"/>
+      </SyntaxOptions>
+    </Parsing>
     <Linking>
       <Options>
         <Win32>
