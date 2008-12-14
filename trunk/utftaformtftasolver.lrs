@@ -1,7 +1,7 @@
 { Das ist eine automatisch erzeugte Lazarus-Ressourcendatei }
 
 LazarusResources.Add('TTFTAMainWindow','FORMDATA',[
-  'TPF0'#15'TTFTAMainWindow'#14'TFTAMainWindow'#4'Left'#3#243#0#6'Height'#3#188
+  'TPF0'#15'TTFTAMainWindow'#14'TFTAMainWindow'#4'Left'#3''#251#6'Height'#3#188
   +#2#3'Top'#3'A'#1#5'Width'#3#232#3#13'ActiveControl'#7#22'TreeViewInputStruct'
   +'ure'#11'BorderIcons'#11#12'biSystemMenu'#10'biMinimize'#0#11'BorderStyle'#7
   +#8'bsDialog'#7'Caption'#6'.TFTA Solver --- V0.1 --- 2008 SJS --- Freeware'#12

@@ -30,7 +30,8 @@ unit utftaobject;
 interface
 
 uses
-  Forms, Classes, SysUtils, Dialogs, ComCtrls, StdCtrls, contnrs, sjspointertools;
+  Forms, Classes, SysUtils, Dialogs, ComCtrls, StdCtrls,
+  StrUtils, contnrs, sjspointertools;
 
 const
   cEventTypeStringArray : array[1..9] of string[30] = ('AND','OR','XOR','PAND','SAND','OTHER','TOP','NOT',
@@ -85,6 +86,8 @@ type
 
     function  Add(Item: TTFTAObject): Integer;
     function  ListHoldsObjectAt(Text : ansistring) : TTFTAObject;
+    function  Extract(Item: TTFTAObject):TTFTAObject;
+    procedure Insert(Index: Integer; Item: TTFTAObject);
     function  NewItem: TTFTAObject;
     function  NewItem(      EventType               : TTFTAOperatorType;
                   		      IsBasicEvent            : boolean;
@@ -144,6 +147,7 @@ type
     procedure Delete(Index : Integer);
     procedure Insert(Index: Integer; Item: TTFTAObject);
     procedure SetItem(Index: Integer; Item: TTFTAObject);
+    procedure Sort;
     property  Items[Index: Integer]: TTFTAObject read GetItem write SetItem; default;
     property  Owner : TTFTAObject read VOwner write VOwner;
     property  OwnsObjects: Boolean read VOwnsObjects write VOwnsObjects;
@@ -158,6 +162,7 @@ type
 
     VChildren : TTFTAList;        { list of all my descendants (children) }
     VDEBUGMemo : TMemo;
+    VEventLookupList : TTFTAEventLookuplist;
     VExpr : ansistring;           { if I'm a BasicEvent, I have to carry my event name }
     VIsBasicEvent : boolean;
     VIsCoreEvent : boolean;
@@ -209,11 +214,12 @@ type
     procedure SetChild(Index: Integer; Item: TTFTAObject);
     procedure SetLogicalValue (Parameter : boolean);
     procedure SetLogicalValue (Parameter : pointer);
-
+    procedure SortChildren;
 
     property  Children : TTFTAList read VChildren write VChildren;
     property  DEBUGMemo : TMemo read VDEBUGMemo write VDEBUGMemo;
     property  EventType : TTFTAOperatorType read VType write SetVType;
+    property  EventLookupList : TTFTAEventLookuplist read VEventLookupList write VEventLookupList;
     property  IsAllChildrenAreBasic : boolean read GetChildrenBasicState;
     property  IsBasicEvent : boolean read VIsBasicEvent write SetIsBasicEvent;
     property  IsCoreEvent : boolean read VIsCoreEvent write VIsCoreEvent;
@@ -228,6 +234,7 @@ type
     property  Items[Index: Integer]: TTFTAObject read GetChild write SetChild; default;
     property  LogicLevel : integer read VIsTrueFalse;
     property  NeedsToBeUpdated : boolean read VNeedsToBeUpdated write VNeedsToBeUpdated;
+    property  PlainTemporalExpr : ansistring read VExpr;
     property  PointerToUpdateObject : TTFTAObject read VPointerToUpdateObject write VPointerToUpdateObject;
     property  PosInEventList : Integer read VPosInEventList write VPosInEventList;
     property  TemporalExpr : ansistring read GetTempExpr write SetTempExpr;
@@ -235,6 +242,31 @@ type
   end;
 
 implementation
+
+{ the follwoing is defined by OpenPascal for the TFPObjectList.Sort
+  type TListSortCompare = function(Item1: Pointer;Item2: Pointer):Integer;
+  now we need a function like this which actually compares two objects of
+  type TTFTAObject for TTFTAList.Sort (by comparing their TemporalExpr, of course) }
+function CompareTwoTTFTAObjects(Item1: Pointer; Item2: Pointer) : Integer;
+begin
+  if Assigned(Item1) then
+  begin
+    if Assigned(Item2) then
+      { Item1 <> NIL, Item2 <> NIL --> compare TemporalExpr's }
+      Result := AnsiCompareStr(TTFTAObject(Item1).PlainTemporalExpr,TTFTAObject(Item2).PlainTemporalExpr)
+    else
+      { Item1 <> NIL, Item2 = NIL --> return 1 (Item1 after Item2) }
+      Result := 1;
+  end else
+  begin
+    if Assigned(Item2) then
+      { Item1 = NIL, Item2 <> NIL --> return -1 (Item2 after Item1) }
+      Result := -1
+    else
+      { Item1 = NIL, Item2 = NIL --> return 0 (Item1 same as Item2) }
+      Result := 0;
+  end;
+end;
 
 
 { ############################################################################ }
@@ -421,6 +453,18 @@ begin
     self.IsNegated := false;
 end;
 
+procedure TTFTAObject.SortChildren;
+begin
+  { sort is only relevant for commutative operators (AND, OR, SAND, XOR) }
+  if (self.EventType = tftaEventTypeAND) or
+     (self.EventType = tftaEventTypeSAND) or
+     (self.EventType = tftaEventTypeOR) or
+     (self.EventType = tftaEventTypeXOR) then
+  begin
+    self.Children.Sort;
+  end;
+end;
+
 {------------------------------------------------------------------------------
   Provides the logical expression represented by the term / object
   Scanns through all descendants, which is time consuming
@@ -428,7 +472,8 @@ end;
 ------------------------------------------------------------------------------}
 function TTFTAObject.GetTempExpr : ansistring;
 var i,j : Integer;
-    b   : boolean = True;
+    tempObject : TTFTAObject;
+    doubleObject : TTFTAObject;
 begin
 
   { for all parts concerning the scanning and changing of TTFTAObject.IsSorted
@@ -440,35 +485,72 @@ begin
       if self.HasChildren then
       begin
         j := self.Count;
-        Result := self.EventTypeToString + '[' ;
+        Result := '';
         if j > 1 then  { and, or, xor, pand, sand operators }
         begin
           for i:=0 to j-2 do
           begin
             Result := Result + self[i].TemporalExpr + ',';
-            b := b and self[i].IsSorted;
           end;
-          Result := Result + self[i+1].TemporalExpr + ']';
-          b := b and self[i+1].IsSorted;
+          Result := Result + self[i+1].TemporalExpr;
+          //{ now check whether a change has taken place,
+            //if yes, we need to resort, if no, we need to do nothing;
+            //for this compare the prestored string with the one derived from the childern }
+          //If not AnsiMatchStr(Result,self.PlainTemporalExpr) then
+          //begin
+            //self.SortChildren;
+            //Result := '';
+            //{ for each child (all children are already sorted after passing
+              //the iterative scan from before) get the prestored TemporalExpr
+              //(directly from Child.VExpr) }
+            //for i:=0 to j-2 do
+            //begin
+              //Result := Result + self[i].PlainTemporalExpr + ',';
+            //end;
+            //Result := Result + self[i+1].PlainTemporalExpr;
+            //{ set own prestored value to the new string derived from the children}
+            //self.VExpr := Result;
+            //{ it can be, that after a sort a formerly "different" term suddely is identical
+              //to another term already listed in TTFTAEventLookupList. In this case link the
+              //former to the latter... }
+            //tempObject := self.EventLookupList.Extract(self);
+            //doubleObject := self.EventLookupList.ListHoldsObjectAt(Result);
+            //self.EventLookupList.Insert(self.PosInEventList,tempObject);
+            //if Assigned(doubleObject) then
+            //begin
+              //self.PointerToUpdateObject := doubleObject;
+              //self.NeedsToBeUpdated := true;
+              //Result := doubleObject.TemporalExpr;
+            //end;
+
+          //end else
+          //begin
+            //{ do nothing, Result and VExpr are already the same, i.e.
+              //all children are sorted (by passing down iteratively, see above)
+              //and oneself has not changed either, thus is also sorted... }
+          //end;
         end else  { not operator or one of the above in rare cases, where
                     transformation results in only single parameter }
         begin
-          Result := Result + self[0].TemporalExpr + ']';
-          b := b and self[0].IsSorted;
+          Result := self[0].TemporalExpr;
+          { set own prestored value to the new string derived from the children}
+          self.VExpr := Result;
+          { no sort necessary, as only one child }
         end;
+        Result := self.EventTypeToString + '[' + Result + ']';
       end else
-      begin
+      begin { no basic event, build completely but no children ?! }
         Result := '###ERROR11241###' ;
       end;
-     end else
-     begin
-       Result := ''; { if object is just in built-up then it has no TempExpr (because it is still changing) }
-     end;
+    end else
+    begin
+     Result := ''; { if object is just in built-up then it has no TempExpr (because it is still changing) }
+    end;
   end else
   begin;
-    Result := self.VExpr;
+    Result := self.PlainTemporalExpr; { name is stored in VExpr at creation of basic event }
   end;
-  self.IsSorted := b;
+
 end;
 {------------------------------------------------------------------------------
   Sets the logical expression represented by the term / object
@@ -911,9 +993,7 @@ begin
 end;
 
 function TTFTAList.GetItem(Index: Integer): TTFTAObject;
-var tempObject,t2 : TTFTAObject;
-    b : boolean;
-    i : integer;
+var tempObject : TTFTAObject;
 begin
   Result := TTFTAObject(inherited Items[Index]);
   if Assigned(Result) and Result.NeedsToBeUpdated then
@@ -924,9 +1004,6 @@ begin
       Result.DEBUGMemo.Append(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(tempObject));
       writeln(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(tempObject));
     end;
-    i := self.Count;
-    i := self.Capacity;
-    b := self.OwnsObjects;
     Delete(Index);
     Insert(Index,tempObject);
     Result := self.GetItem(Index);
@@ -956,6 +1033,19 @@ end;
 procedure TTFTAList.SetItem(Index: Integer; Item: TTFTAObject);
 begin
   inherited Items[Integer(Index)] := Item;
+end;
+
+procedure TTFTAList.Sort;
+begin
+  { it is necessary to differentiate between FPC compiler mode
+    and "other" compiler mode (Delphi TurboPAscal etc.), as FPC has a
+    different syntax for using function types...
+    see: http://www.daniweb.com/forums/post740838-10.html }
+  {$ifdef FPC}
+    inherited Sort(@CompareTwoTTFTAObjects);
+  {$else}
+    inherited Sort(CompareTwoTTFTAObjects);
+  {$endif}
 end;
 
 { ############################################################################ }
@@ -1008,6 +1098,20 @@ destructor TTFTAEventLookupList.Destroy;
 begin
   // nothing specific yet ...
   inherited Destroy;
+end;
+
+function TTFTAEventLookupList.Extract(Item: TTFTAObject):TTFTAObject;
+begin
+  Result := TTFTAObject(inherited Extract(TObject(Item)));
+  if Assigned(Result) and Result.NeedsToBeUpdated then
+  begin
+    Result := Result.PointerToUpdateObject;
+  end;
+end;
+
+procedure TTFTAEventLookupList.Insert(Index: Integer; Item: TTFTAObject);
+begin
+  inherited Insert(Index, Item);
 end;
 
 function TTFTAEventLookupList.NewItem: TTFTAObject;
@@ -1083,6 +1187,7 @@ var posInList: Integer = 0;
 begin
   posInList := self.Add(TTFTAObject.Create);
   Result := self[posInList];
+  Result.EventLookupList := self;
 
   Result.EventType                  :=  EventType                 ;
   Result.DEBUGMemo                  :=  self.DEBUGMemo            ;

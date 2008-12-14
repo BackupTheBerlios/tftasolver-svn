@@ -311,6 +311,10 @@ end;
 ------------------------------------------------------------------------------}
 procedure TTFTAExpression.Simplify;
 begin
+  { first step of simplification is to sort all commutative terms; all such terms
+    which are created during simplification are then again sorted (see uTFTALogic) }
+  SortOperands(self.TemporalTerm[0], self.TemporalTerm.Children, 0, self.EventList);
+
   // SimplificationLoop is part of uTFTALogic
   SimplificationLoop(self.TemporalTerm[0], self.TemporalTerm.Children, 0, self.EventList);
 end;
@@ -475,6 +479,10 @@ begin
     end;
     { at this point, currentObject is completed and thus may from now on have a TempExpr }
     currentObject.IsNotCompletelyBuildYet := false;
+    { now, currentObject needs to be initially sorted! (all further sortings
+      will take place if any of the children changes and will be initiated by
+      TTFTAObject.TemporalExpr }
+    //currentObject.SortChildren;
     { next, set properties of the current node /treelevel according to the
       properties of its children (if any) }
     currentObject.CheckTermProperties;

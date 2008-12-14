@@ -908,70 +908,79 @@ begin
   until not changedChildren;
 end;  { function SimplificationLoop }
 
-
-{ 1.Check if given term is of type SAND or AND or XOR or OR; if not then exit.
- 2.For each operand of given term with flag “sorted” not set do the following:
-(a)if operand has flag “sorted” set, then continue with next operand.
-(b)if operand is not of type SAND or AND or XOR or OR, then continue with next operand.
-(c)Call SortOperands for this operand (iteratively go down in linked lists).
- 3.Sort all operands of given term alphabetically according to their TTFTAObject.TemporalExpr.
- 4.Set flag m. }
-
 {------------------------------------------------------------------------------
   sort the operands of commutative terms (AND, OR, XOR, SAND)
 ------------------------------------------------------------------------------}
-function SortOperands(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
-
+function SortOperands(tT :TTFTAObject; tP : TTFTAList; tI : Integer; tEL : TTFTAEventLookupList) : boolean;
+var somethingChanged : boolean = false;  { set within ScanChildrenSorting if any changes occur }
+    { a separate function is needed for the iterative walkdown, as the return
+      type for this needs to be ansistring (carrying the TemporalExpr of
+      the descendant (thus eliminating the need for a separate walkdown to get
+      Child.TemporalExpr)) while the return type for SortOperands needs to be
+      boolean in order to notify the calling instance whether any changes have
+      taken place. }
     function ScanChildrenSorting(currentTerm :TTFTAObject; theParent : TTFTAList;
                                  theIndex : Integer; eventlist : TTFTAEventLookupList) : ansistring;
     var numberChildren : integer = 0;
+        i : integer;
     begin
 
-      if ( not currentTerm.IsSorted) and { changes only if not already sorted and not one of the following types }
-         ( (currentTerm.EventType = tftaEventTypeAND) or
-           (currentTerm.EventType = tftaEventTypeSAND) or
-           (currentTerm.EventType = tftaEventTypeOR) or
-           (currentTerm.EventType = tftaEventTypeXOR)
-         ) then
+      if not currentTerm.IsBasicEvent then
       begin
-        { for each child ... }
-        numberChildren := currentTerm.Count;
-        i := 0;
-        repeat
+        numberChildren := self.Count;
+        Result := '';
+        if numberChildren > 1 then  { and, or, xor, pand, sand operators }
+        begin
+          for i:=0 to numberChildren-2 do
+          begin
+            Result := Result + ScanChildrenSorting(currentTerm[i],currentTerm.Children,i,eventlist) + ',';
+          end;
+          Result := Result + ScanChildrenSorting(currentTerm[i+1],currentTerm.Children,i+1,eventlist);
+        end else  { not operator or one of the above in rare cases, where
+                    transformation results in only single parameter }
+        begin
+          Result := ScanChildrenSorting(currentTerm[0],currentTerm.Children,0,eventlist);
+        end;
+        Result := currentTerm.EventTypeToString + '[' + Result + ']';
+      end else
+      begin;
+        Result := currentTerm.PlainTemporalExpr; { name is stored in VExpr at creation of basic event }
+      end;
 
-          inc(i);
-        until (i = numberChildren);
+
+
+        { one of the following commutative types }
+        if ( (currentTerm.EventType = tftaEventTypeAND) or
+             (currentTerm.EventType = tftaEventTypeSAND) or
+             (currentTerm.EventType = tftaEventTypeOR) or
+             (currentTerm.EventType = tftaEventTypeXOR)
+           ) then
+        begin
+          { for each child ... }
+          numberChildren := currentTerm.Count;
+          i := 0;
+          repeat
+
+            inc(i);
+          until (i = numberChildren);
+
+        end else
+        begin
+          { currentTerm is a non-commutative operator type
+             }
+        end;
 
       end else
       begin
-        { currentTerm already is sorted or a non-commutative operator type
-          --> no change needed but we need to return the }
+        { is already sorted }
       end;
 
     end; { function ScanChildrenSorting }
 
+
 begin
-  Result := ; { if sorted then no change necessary }
-  if Result then
-  begin
-    if (currentTerm.EventType = tftaEventTypeAND) or
-       (currentTerm.EventType = tftaEventTypeSAND) or
-       (currentTerm.EventType = tftaEventTypeOR) or
-       (currentTerm.EventType = tftaEventTypeXOR) then
-    begin
-      { for each child ... }
-      numberChildren := currentTerm.Count;
-      i := 0;
-      repeat
-
-        inc(i);
-      until (i = numberChildren);
-
-    end; { check for right term type }
-  end else
-  begin
-    { currentTerm already is sorted and thus Result is false --> do nothing }
-  end;
+  ScanChildrenSorting(tT,tP,tI,tEL);
+  Result := somethingChanged;
 end;
 
 {------------------------------------------------------------------------------
