@@ -54,6 +54,7 @@ uses
   function  SANDPANDTransform(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
   function  SANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
   function  SimplificationLoop(theobject :TTFTAObject; theParent : TTFTAList; theIndex : Integer; theEventList : TTFTAEventLookupList) : boolean;
+  function  SortOperands(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
   function  XORSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
 
 implementation
@@ -907,6 +908,71 @@ begin
   until not changedChildren;
 end;  { function SimplificationLoop }
 
+
+{ 1.Check if given term is of type SAND or AND or XOR or OR; if not then exit.
+ 2.For each operand of given term with flag “sorted” not set do the following:
+(a)if operand has flag “sorted” set, then continue with next operand.
+(b)if operand is not of type SAND or AND or XOR or OR, then continue with next operand.
+(c)Call SortOperands for this operand (iteratively go down in linked lists).
+ 3.Sort all operands of given term alphabetically according to their TTFTAObject.TemporalExpr.
+ 4.Set flag m. }
+
+{------------------------------------------------------------------------------
+  sort the operands of commutative terms (AND, OR, XOR, SAND)
+------------------------------------------------------------------------------}
+function SortOperands(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+
+    function ScanChildrenSorting(currentTerm :TTFTAObject; theParent : TTFTAList;
+                                 theIndex : Integer; eventlist : TTFTAEventLookupList) : ansistring;
+    var numberChildren : integer = 0;
+    begin
+
+      if ( not currentTerm.IsSorted) and { changes only if not already sorted and not one of the following types }
+         ( (currentTerm.EventType = tftaEventTypeAND) or
+           (currentTerm.EventType = tftaEventTypeSAND) or
+           (currentTerm.EventType = tftaEventTypeOR) or
+           (currentTerm.EventType = tftaEventTypeXOR)
+         ) then
+      begin
+        { for each child ... }
+        numberChildren := currentTerm.Count;
+        i := 0;
+        repeat
+
+          inc(i);
+        until (i = numberChildren);
+
+      end else
+      begin
+        { currentTerm already is sorted or a non-commutative operator type
+          --> no change needed but we need to return the }
+      end;
+
+    end; { function ScanChildrenSorting }
+
+begin
+  Result := ; { if sorted then no change necessary }
+  if Result then
+  begin
+    if (currentTerm.EventType = tftaEventTypeAND) or
+       (currentTerm.EventType = tftaEventTypeSAND) or
+       (currentTerm.EventType = tftaEventTypeOR) or
+       (currentTerm.EventType = tftaEventTypeXOR) then
+    begin
+      { for each child ... }
+      numberChildren := currentTerm.Count;
+      i := 0;
+      repeat
+
+        inc(i);
+      until (i = numberChildren);
+
+    end; { check for right term type }
+  end else
+  begin
+    { currentTerm already is sorted and thus Result is false --> do nothing }
+  end;
+end;
 
 {------------------------------------------------------------------------------
   split XOR with more than two operands

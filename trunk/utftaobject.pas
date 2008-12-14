@@ -202,7 +202,6 @@ type
     function  WriteStatus(indent:integer = 0)  : ansistring;
 
     procedure AssignChildren(Obj: TTFTAList);
-    // procedure AssignObject(theObject : TTFTAObject);
     procedure CheckTermProperties;
     procedure DEBUGPrint(isUpdate : boolean; eventlist : TTFTAEventLookupList; thestring : ansistring = '');
     procedure DeleteChild(Index: Integer);
@@ -224,6 +223,7 @@ type
     property  IsFalse : boolean read CheckLogicFalse;
     property  IsNegated : boolean read VIsNegated  write VIsNegated ;
     property  IsNotCompletelyBuildYet : boolean read VIsNotCompletelyBuildYet write VIsNotCompletelyBuildYet;
+    property  IsSorted : boolean read VIsSorted write VIsSorted;
     property  IsTrue : boolean read CheckLogicTrue;
     property  Items[Index: Integer]: TTFTAObject read GetChild write SetChild; default;
     property  LogicLevel : integer read VIsTrueFalse;
@@ -428,7 +428,11 @@ end;
 ------------------------------------------------------------------------------}
 function TTFTAObject.GetTempExpr : ansistring;
 var i,j : Integer;
+    b   : boolean = True;
 begin
+
+  { for all parts concerning the scanning and changing of TTFTAObject.IsSorted
+    within this function see the algorithm documentation (look for "sorting") }
   if not self.IsBasicEvent then
   begin
     if not self.IsNotCompletelyBuildYet then
@@ -442,12 +446,15 @@ begin
           for i:=0 to j-2 do
           begin
             Result := Result + self[i].TemporalExpr + ',';
+            b := b and self[i].IsSorted;
           end;
           Result := Result + self[i+1].TemporalExpr + ']';
+          b := b and self[i+1].IsSorted;
         end else  { not operator or one of the above in rare cases, where
                     transformation results in only single parameter }
         begin
           Result := Result + self[0].TemporalExpr + ']';
+          b := b and self[0].IsSorted;
         end;
       end else
       begin
@@ -461,6 +468,7 @@ begin
   begin;
     Result := self.VExpr;
   end;
+  self.IsSorted := b;
 end;
 {------------------------------------------------------------------------------
   Sets the logical expression represented by the term / object
@@ -522,23 +530,9 @@ begin
                            self.NeedsToBeUpdated,
                            self.PointerToUpdateObject,self.TemporalExpr);
   Result.Children.Assign(self.Children);
+  Result.IsSorted := self.IsSorted;
 end;
 
-{------------------------------------------------------------------------------
-  Assigns theObject to TTFTAobjectœ
-------------------------------------------------------------------------------}
-//procedure TTFTAObject.AssignObject(theObject : TTFTAObject);
-//begin
-  //self.IsCoreEvent:=theObject.IsCoreEvent;
-  //self.EventType:=theObject.EventType;
-  //self.IsBasicEvent:=theObject.IsBasicEvent;
-  //self.IsEventSequence:=theObject.IsEventSequence;
-  //self.IsNegated:=theObject.IsNegated;
-  //IsDisjunct:=theObject.IsDisjunct;
-  //self.IsExtendedSequence:= theObject.IsExtendedSequence;
-  //self.Children := theObject.Children;
-  //self.TemporalExpr:=theObject.TemporalExpr;
-//end;
 {------------------------------------------------------------------------------
 ------------------------------------------------------------------------------}
 function TTFTAObject.CheckLogicFalse : boolean;
@@ -1099,6 +1093,7 @@ begin
   Result.IsNotCompletelyBuildYet    :=  IsNotCompletelyBuildYet   ;
   Result.IsDisjunct                 :=  IsDisjunct                ;
   Result.IsExtendedSequence         :=  IsExtendedSequence        ;
+  Result.IsSorted                   :=  False                     ;
   Result.NeedsToBeUpdated           :=  NeedsToBeUpdated          ;
   Result.PointerToUpdateObject      :=  PointerToUpdateObject     ;
   Result.PosInEventList             :=  posInList                 ;

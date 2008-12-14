@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value="./"/>
       <TargetFileExt Value=""/>
-      <ActiveEditorIndexAtStart Value="0"/>
+      <ActiveEditorIndexAtStart Value="2"/>
     </General>
     <VersionInfo>
       <ProjectVersion Value=""/>
@@ -36,7 +36,7 @@
         <Filename Value="tftasolver.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="tftasolver"/>
-        <CursorPos X="27" Y="9"/>
+        <CursorPos X="29" Y="11"/>
         <TopLine Value="1"/>
         <EditorIndex Value="0"/>
         <UsageCount Value="301"/>
@@ -58,7 +58,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="sjspointertools"/>
         <CursorPos X="66" Y="27"/>
-        <TopLine Value="10"/>
+        <TopLine Value="9"/>
         <EditorIndex Value="1"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -83,7 +83,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="utftaexpression"/>
         <CursorPos X="89" Y="315"/>
-        <TopLine Value="539"/>
+        <TopLine Value="538"/>
         <EditorIndex Value="3"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -115,7 +115,7 @@
         <ResourceFilename Value="utftaformtftasolver.lrs"/>
         <UnitName Value="utftaformtftasolver"/>
         <CursorPos X="31" Y="167"/>
-        <TopLine Value="264"/>
+        <TopLine Value="263"/>
         <EditorIndex Value="5"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -131,8 +131,8 @@
         <Filename Value="utftalogik.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="utftalogik"/>
-        <CursorPos X="108" Y="757"/>
-        <TopLine Value="836"/>
+        <CursorPos X="58" Y="948"/>
+        <TopLine Value="916"/>
         <EditorIndex Value="4"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -141,8 +141,8 @@
         <Filename Value="utftaobject.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="utftaobject"/>
-        <CursorPos X="44" Y="378"/>
-        <TopLine Value="1086"/>
+        <CursorPos X="13" Y="446"/>
+        <TopLine Value="430"/>
         <EditorIndex Value="2"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -183,29 +183,29 @@
         <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/control.inc"/>
         <CursorPos X="1" Y="2096"/>
         <TopLine Value="2075"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="5"/>
       </Unit17>
       <Unit18>
         <Filename Value="utftaeventlookuplist.pas"/>
         <UnitName Value="utftaeventlookuplist"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="6"/>
       </Unit18>
       <Unit19>
         <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/application.inc"/>
         <CursorPos X="1" Y="285"/>
         <TopLine Value="265"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="2"/>
       </Unit19>
       <Unit20>
         <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/treeview.inc"/>
         <CursorPos X="1" Y="2204"/>
         <TopLine Value="2183"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="3"/>
       </Unit20>
     </Units>
-    <JumpHistory Count="19" HistoryIndex="18">
+    <JumpHistory Count="25" HistoryIndex="24">
       <Position1>
         <Filename Value="utftaexpression.pas"/>
         <Caret Line="112" Column="1" TopLine="92"/>
@@ -282,6 +282,30 @@
         <Filename Value="tftasolver.lpr"/>
         <Caret Line="8" Column="7" TopLine="1"/>
       </Position19>
+      <Position20>
+        <Filename Value="utftalogik.pas"/>
+        <Caret Line="942" Column="13" TopLine="903"/>
+      </Position20>
+      <Position21>
+        <Filename Value="utftalogik.pas"/>
+        <Caret Line="935" Column="22" TopLine="903"/>
+      </Position21>
+      <Position22>
+        <Filename Value="utftalogik.pas"/>
+        <Caret Line="57" Column="13" TopLine="21"/>
+      </Position22>
+      <Position23>
+        <Filename Value="utftalogik.pas"/>
+        <Caret Line="923" Column="1" TopLine="891"/>
+      </Position23>
+      <Position24>
+        <Filename Value="utftalogik.pas"/>
+        <Caret Line="58" Column="3" TopLine="34"/>
+      </Position24>
+      <Position25>
+        <Filename Value="utftaobject.pas"/>
+        <Caret Line="52" Column="24" TopLine="29"/>
+      </Position25>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
