@@ -305,7 +305,9 @@ end;
 ------------------------------------------------------------------------------}
 function LawOfCompleteness(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 var aTerm,bTerm,cTerm,xTerm,yTerm, tempTerm : TTFTAObject;
-    aExpr,bExpr,cExpr,xExpr,yExpr,overallexpr : ansistring;
+    aExpr,bExpr,cExpr,xExpr,yExpr : ansistring;
+    newXORTerm, tempXORTerm : TTFTAObject;
+    sortOccured : boolean;
 begin
   Result := False;
   { only the term itself may be modified! its children (their instances!) must not be
@@ -316,8 +318,8 @@ begin
     { if currentTerm.Count > 2 then split currentTerm first }
     if currentTerm.Count > 2 then
     begin
-      if ANDSplit(currentTerm, theParent, theIndex, eventList) then
-        currentTerm := theParent[theIndex]
+      ANDSplit(currentTerm, theParent, theIndex, eventList);
+      currentTerm := theParent[theIndex];
     end;
 
     { iff x and y are not atomic (i.e. basic events) the original object (the AND term) will become an
@@ -337,74 +339,79 @@ begin
 
     aExpr := 'PAND[' + xExpr + ',' + yExpr + ']';
     bExpr := 'PAND[' + yExpr + ',' + xExpr + ']';
-    cExpr := 'SAND[' + xExpr + ',' + yExpr + ']';
-    overallexpr := 'XOR[' + aExpr + ',' + bExpr + ',' + cExpr + ']';
 
-    tempTerm := eventlist.ListHoldsObjectAt(overallexpr);
-    if not Assigned(tempTerm) then
-    begin  { overall term does not exist }
-      aTerm := eventlist.ListHoldsObjectAt(aExpr);
-      if not Assigned(aTerm) then
-      begin { aExpr term does not exist }
-        aTerm := eventlist.NewItem;
-        aTerm.EventType := tftaEventTypePAND;
-      end;
-      bTerm := eventlist.ListHoldsObjectAt(bExpr);
-      if not Assigned(bTerm) then
-      begin { bExpr term does not exist }
-        bTerm := eventlist.NewItem;
-        bTerm.EventType := tftaEventTypePAND;
-      end;
-      cTerm := eventlist.ListHoldsObjectAt(cExpr);
-      if not Assigned(cTerm) then
-      begin { cExpr term does not exist }
-        cTerm := eventlist.NewItem;
-        cTerm.EventType := tftaEventTypeSAND;
-      end;
-      { extract old children from overall term }
-      currentTerm.ExtractChild(currentTerm[0]);
-      currentTerm.ExtractChild(currentTerm[0]);
-      {add new children }
+    aTerm := eventlist.ListHoldsObjectAt(aExpr);
+    if not Assigned(aTerm) then
+    begin { aExpr term does not exist }
+      aTerm := eventlist.NewItem;
+      aTerm.EventType := tftaEventTypePAND;
       aTerm.AddChild(xTerm);
       aTerm.AddChild(yTerm);
       aTerm.CheckTermProperties;
-      {$IfDef TESTMODE}aTerm.DEBUGPrint(false,eventlist,'LawOfCompleteness 1'); {$ENDIF}
-
+    end;
+    cExpr := aTerm.TemporalExpr;
+    bTerm := eventlist.ListHoldsObjectAt(bExpr);
+    if not Assigned(bTerm) then
+    begin { bExpr term does not exist }
+      bTerm := eventlist.NewItem;
+      bTerm.EventType := tftaEventTypePAND;
       bTerm.AddChild(yTerm);
       bTerm.AddChild(xTerm);
       bTerm.CheckTermProperties;
-      {$IfDef TESTMODE}bTerm.DEBUGPrint(false,eventlist,'LawOfCompleteness 2'); {$ENDIF}
-
-      cTerm.AddChild(xTerm);
-      cTerm.AddChild(yTerm);
-      cTerm.CheckTermProperties;
-      {$IfDef TESTMODE}cTerm.DEBUGPrint(false,eventlist,'LawOfCompleteness 3'); {$ENDIF}
-
-      { add the new children to the overall term }
-      currentTerm.AddChild(aTerm);
-      currentTerm.AddChild(bTerm);
-      currentTerm.AddChild(cTerm);
-      { set properties for modified object currentTerm }
-      currentTerm.EventType := tftaEventTypeXOR;
-      currentTerm.CheckTermProperties;
-
-      currentTerm := theParent[theIndex];
-      { as currentTerm is commutative (XOR) and newly created it must be sorted }
-      SortOperands(currentTerm, theParent, theIndex, eventlist);
-
-      if currentTerm.TemporalExpr = overallexpr then
+    end;
+    cExpr := bTerm.TemporalExpr;
+    { cTerm is itself commutative and thus needs to be sorted... }
+    cTerm := eventlist.NewItem;
+    tempTerm := cTerm; { backuo for later comparison }
+    cTerm.EventType := tftaEventTypeSAND;
+    cTerm.AddChild(xTerm);
+    cTerm.AddChild(yTerm);
+    cTerm.CheckTermProperties;
+    sortOccured := SortOperands(cTerm,NIL,0,eventlist);
+    { after SortOperands cTerm holds three possible objects, see comments within
+      uTFTALogic.PANDPANDTransform for more information }
+    If sortOccured then
+    begin
+      if cTerm = tempTerm then
       begin
-        {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'LawOfCompleteness 4'); {$ENDIF}
-        theParent.Owner.CheckTermProperties;
+        { the case 2) }
       end else
       begin
-        {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'LawOfCompleteness 4.5');  {$ENDIF}
-        theParent.Owner.CheckTermProperties;
+        { the case 3) --> free useless element in eventlist }
+        eventlist.Delete(tempTerm.PosInEventList);
       end;
-    end else
-    begin  { overall term does exist }
-      GenericUpdateObject(currentTerm,tempTerm,eventlist,theParent,theIndex,'LawOfCompleteness 5');
     end;
+    cExpr := cTerm.TemporalExpr;
+    tempTerm := NIL;
+    { either way at thispoint cTerm holds the pointer to the correct SAND[...] }
+
+    { now create a new preliminary object for the overall term, sort this and then
+      check against the already existing objects in EventList. If there exists
+      an identical event we need to take this instead and free the preliminary one }
+    newXORTerm := eventlist.NewItem;
+    tempXORTerm := newXORTerm; { save pointer to this object for later comparison (see three cases below) }
+    newXORTerm.EventType:= tftaEventTypeXOR;
+    newXORTerm.AddChild(aTerm);
+    newXORTerm.AddChild(bTerm);
+    newXORTerm.AddChild(cTerm);
+    newXORTerm.CheckTermProperties;
+    cExpr := newXORTerm.TemporalExpr;
+    sortOccured := SortOperands(newXORTerm,NIL,0,eventlist);
+    { after SortOperands newXORTerm holds three possible Objects, see comments within
+      uTFTALogic.PANDPANDTransform for more information }
+    If sortOccured then
+    begin
+      if newXORTerm = tempXORTerm then
+      begin
+        { the case 2) }
+      end else
+      begin
+        { the case 3) --> free useless element in eventlist }
+        eventlist.Delete(tempXORTerm.PosInEventList);
+      end;
+    end;
+    { either way at thispoint newXORTerm holds the pointer to the correct XOR[...] }
+    GenericUpdateObject(currentTerm,newXORTerm,eventlist,theParent,theIndex,'LawOfCompleteness 1');
   end; { check that overall term is a AND }
 end;
 
