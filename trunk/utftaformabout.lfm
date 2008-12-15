@@ -1,10 +1,8 @@
 object FormAbout: TFormAbout
-  Left = 410
+  Left = 414
   Height = 400
-  Top = 311
+  Top = 335
   Width = 600
-  HorzScrollBar.Page = 599
-  VertScrollBar.Page = 399
   ActiveControl = ButtonClose
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
@@ -12,15 +10,28 @@ object FormAbout: TFormAbout
   ClientHeight = 400
   ClientWidth = 600
   FormStyle = fsStayOnTop
+  ParentFont = False
   Position = poMainFormCenter
   ShowInTaskBar = stNever
+  LCLVersion = '0.9.26'
   object Label1: TLabel
     Left = 5
     Height = 58
     Top = 5
-    Width = 589
+    Width = 293
+    Alignment = taCenter
     AutoSize = False
-    Caption = 'TFTASolver'#10'Author: Simon J. Schilling (sjschilling@gmx.net)'#10'Copyright 2008 (Version 0.1.1118) by the author'
+    Caption = 'TFTASolver'#10'http://tftasolver.berlios.de'#10'Copyright 2008 (Version 0.1.) '
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 302
+    Height = 58
+    Top = 5
+    Width = 293
+    Alignment = taCenter
+    AutoSize = False
+    Caption = 'Author: Simon J. Schilling '#10'sjschilling@users.berlios.de'
     ParentColor = False
   end
   object ButtonClose: TButton
@@ -737,6 +748,7 @@ object FormAbout: TFormAbout
           'Public License instead of this License.  But first, please read'
           '<http://www.gnu.org/philosophy/why-not-lgpl.html>.'
         )
+        ParentFont = False
         ReadOnly = True
         ScrollBars = ssVertical
         TabOrder = 0

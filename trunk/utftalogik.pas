@@ -399,6 +399,7 @@ begin
       end else
       begin
         {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'LawOfCompleteness 4.5');  {$ENDIF}
+        theParent.Owner.CheckTermProperties;
       end;
     end else
     begin  { overall term does exist }

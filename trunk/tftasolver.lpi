@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value="./"/>
       <TargetFileExt Value=""/>
-      <ActiveEditorIndexAtStart Value="6"/>
+      <ActiveEditorIndexAtStart Value="5"/>
     </General>
     <VersionInfo>
       <ProjectVersion Value=""/>
@@ -90,12 +90,17 @@
       </Unit5>
       <Unit6>
         <Filename Value="utftaformabout.pas"/>
+        <ComponentName Value="FormAbout"/>
         <HasResources Value="True"/>
         <IsPartOfProject Value="True"/>
+        <ResourceBaseClass Value="Form"/>
         <ResourceFilename Value="utftaformabout.lrs"/>
         <UnitName Value="utftaformabout"/>
+        <CursorPos X="79" Y="5"/>
+        <TopLine Value="1"/>
+        <EditorIndex Value="7"/>
         <UsageCount Value="301"/>
-        <SyntaxHighlighter Value="Text"/>
+        <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="utftaformdebugmessages.pas"/>
@@ -115,8 +120,8 @@
         <ResourceFilename Value="utftaformtftasolver.lrs"/>
         <UnitName Value="utftaformtftasolver"/>
         <CursorPos X="1" Y="214"/>
-        <TopLine Value="191"/>
-        <EditorIndex Value="7"/>
+        <TopLine Value="33"/>
+        <EditorIndex Value="8"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
       </Unit8>
@@ -131,8 +136,8 @@
         <Filename Value="utftalogik.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="utftalogik"/>
-        <CursorPos X="1" Y="170"/>
-        <TopLine Value="133"/>
+        <CursorPos X="9" Y="403"/>
+        <TopLine Value="321"/>
         <EditorIndex Value="5"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -162,8 +167,10 @@
       <Unit14>
         <Filename Value="utftaformabout.lfm"/>
         <IsPartOfProject Value="True"/>
+        <CursorPos X="1" Y="1"/>
+        <TopLine Value="1"/>
         <UsageCount Value="301"/>
-        <SyntaxHighlighter Value="Text"/>
+        <SyntaxHighlighter Value="LFM"/>
       </Unit14>
       <Unit15>
         <Filename Value="utftaformdebugmessages.lfm"/>
@@ -183,9 +190,7 @@
         <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/control.inc"/>
         <CursorPos X="92" Y="2091"/>
         <TopLine Value="2073"/>
-        <EditorIndex Value="8"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="13"/>
       </Unit17>
       <Unit18>
         <Filename Value="utftastringlist.pas"/>
@@ -194,16 +199,16 @@
         <CursorPos X="5" Y="184"/>
         <TopLine Value="132"/>
         <EditorIndex Value="3"/>
-        <UsageCount Value="59"/>
+        <UsageCount Value="66"/>
         <Loaded Value="True"/>
       </Unit18>
       <Unit19>
         <Filename Value="testmode.conf"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="3" Y="24"/>
+        <CursorPos X="46" Y="3"/>
         <TopLine Value="1"/>
         <EditorIndex Value="6"/>
-        <UsageCount Value="36"/>
+        <UsageCount Value="43"/>
         <Loaded Value="True"/>
         <SyntaxHighlighter Value="None"/>
       </Unit19>
@@ -211,129 +216,129 @@
         <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/custommemo.inc"/>
         <CursorPos X="67" Y="49"/>
         <TopLine Value="43"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit20>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="164" Column="1" TopLine="141"/>
+        <Caret Line="165" Column="1" TopLine="142"/>
       </Position1>
       <Position2>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="165" Column="1" TopLine="142"/>
+        <Caret Line="158" Column="1" TopLine="135"/>
       </Position2>
       <Position3>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="158" Column="1" TopLine="135"/>
+        <Caret Line="164" Column="1" TopLine="141"/>
       </Position3>
       <Position4>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="164" Column="1" TopLine="141"/>
+        <Caret Line="165" Column="1" TopLine="142"/>
       </Position4>
       <Position5>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="165" Column="1" TopLine="142"/>
+        <Caret Line="158" Column="1" TopLine="135"/>
       </Position5>
       <Position6>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="158" Column="1" TopLine="135"/>
+        <Caret Line="160" Column="1" TopLine="137"/>
       </Position6>
       <Position7>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="160" Column="1" TopLine="137"/>
+        <Caret Line="161" Column="1" TopLine="138"/>
       </Position7>
       <Position8>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="161" Column="1" TopLine="138"/>
+        <Caret Line="162" Column="1" TopLine="139"/>
       </Position8>
       <Position9>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="162" Column="1" TopLine="139"/>
+        <Caret Line="164" Column="1" TopLine="141"/>
       </Position9>
       <Position10>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="164" Column="1" TopLine="141"/>
+        <Caret Line="165" Column="1" TopLine="142"/>
       </Position10>
       <Position11>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="165" Column="1" TopLine="142"/>
+        <Caret Line="166" Column="1" TopLine="143"/>
       </Position11>
       <Position12>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="166" Column="1" TopLine="143"/>
+        <Caret Line="168" Column="1" TopLine="145"/>
       </Position12>
       <Position13>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="168" Column="1" TopLine="145"/>
+        <Caret Line="170" Column="1" TopLine="147"/>
       </Position13>
       <Position14>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="170" Column="1" TopLine="147"/>
+        <Caret Line="173" Column="1" TopLine="150"/>
       </Position14>
       <Position15>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="173" Column="1" TopLine="150"/>
+        <Caret Line="178" Column="1" TopLine="155"/>
       </Position15>
       <Position16>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="178" Column="1" TopLine="155"/>
+        <Caret Line="179" Column="55" TopLine="156"/>
       </Position16>
       <Position17>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="179" Column="55" TopLine="156"/>
+        <Caret Line="156" Column="1" TopLine="133"/>
       </Position17>
       <Position18>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="156" Column="1" TopLine="133"/>
+        <Caret Line="170" Column="1" TopLine="147"/>
       </Position18>
       <Position19>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="170" Column="1" TopLine="147"/>
+        <Caret Line="173" Column="1" TopLine="150"/>
       </Position19>
       <Position20>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="173" Column="1" TopLine="150"/>
+        <Caret Line="178" Column="1" TopLine="155"/>
       </Position20>
       <Position21>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="178" Column="1" TopLine="155"/>
+        <Caret Line="179" Column="1" TopLine="156"/>
       </Position21>
       <Position22>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="179" Column="1" TopLine="156"/>
+        <Caret Line="180" Column="1" TopLine="157"/>
       </Position22>
       <Position23>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="180" Column="1" TopLine="157"/>
+        <Caret Line="182" Column="1" TopLine="159"/>
       </Position23>
       <Position24>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="182" Column="1" TopLine="159"/>
+        <Caret Line="183" Column="1" TopLine="160"/>
       </Position24>
       <Position25>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="183" Column="1" TopLine="160"/>
+        <Caret Line="184" Column="1" TopLine="161"/>
       </Position25>
       <Position26>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="184" Column="1" TopLine="161"/>
+        <Caret Line="182" Column="1" TopLine="159"/>
       </Position26>
       <Position27>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="182" Column="1" TopLine="159"/>
+        <Caret Line="183" Column="1" TopLine="160"/>
       </Position27>
       <Position28>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="183" Column="1" TopLine="160"/>
+        <Caret Line="184" Column="1" TopLine="161"/>
       </Position28>
       <Position29>
         <Filename Value="utftalogik.pas"/>
-        <Caret Line="184" Column="1" TopLine="161"/>
+        <Caret Line="188" Column="1" TopLine="165"/>
       </Position29>
       <Position30>
-        <Filename Value="utftalogik.pas"/>
-        <Caret Line="188" Column="1" TopLine="165"/>
+        <Filename Value="utftaformabout.pas"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

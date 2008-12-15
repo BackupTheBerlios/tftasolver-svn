@@ -16,6 +16,7 @@ type
     ButtonClose: TButton;
     Label1: TLabel;
     Label2: TLabel;
+    Label3: TLabel;
     Memo1: TMemo;
     PageControl1: TPageControl;
     TabSheet1: TTabSheet;
