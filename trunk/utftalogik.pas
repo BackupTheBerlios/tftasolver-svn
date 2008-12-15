@@ -47,6 +47,7 @@ implementation
   function  ANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  ANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  ANDTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
+  function  GenericCombine(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  GenericSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; theType : TTFTAOperatorType) : boolean; forward;
   procedure GenericUpdateObject(oldTerm : TTFTAObject; newTerm : TTFTAObject; eventlist : TTFTAEventLookupList; parentList : TTFTAList; oldObjectListIndex : Integer; callString : ansistring = ''); forward;
   function  LawOfCompleteness(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean; forward;
@@ -125,6 +126,76 @@ begin
         end;
       end;
     end;
+  end;
+end;
+
+{------------------------------------------------------------------------------
+  Generic combine of commutative terms (incl. sorting)
+------------------------------------------------------------------------------}
+function GenericCombine(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+var myType : TTFTAOperatorType;
+    i : integer;
+    nowPosInTerm : integer;
+    nowSizeArray : integer;
+    SameTypeTerms : array of integer;
+    numberChildren : integer;
+    tempObject : TTFTAObject;
+begin
+  Result := False;
+  myType := currentTerm.EventType;
+  if ( (myType = tftaEventTypeAND) or
+       (myType = tftaEventTypeSAND) or
+       (myType = tftaEventTypeOR) or
+       (myType = tftaEventTypeXOR)
+     ) then
+  begin
+    { scan all children and get all objects of same type as currentTerm;
+      this is done in a single loop }
+    nowPosInTerm := 0;
+    nowSizeArray := 0;
+    numberChildren := currentTerm.Count;
+    repeat
+      if (currentTerm[nowPosInTerm].EventType = myType) then
+      begin { if same type }
+        inc(nowSizeArray);
+        SetLength(SameTypeTerms,nowSizeArray); { expand array }
+        SameTypeTerms[nowSizeArray-1] := nowPosInTerm; { add current pos to array }
+      end;
+      inc(nowPosInTerm);
+    until (nowPosInTerm = numberChildren);
+    if nowSizeArray > 0 then
+    begin { at least one same type event was found }
+      Result := true;
+      {$IfDef TESTMODE}
+        currentTerm.DEBUGPrint(true,eventlist,'GenericCombine 1');
+      {$ENDIF}
+      { for each of the same type events do }
+      for i := 0 to nowSizeArray-1 do
+      begin
+        { get all children of the event and add them to current Event;
+          do not yet extract the same type events as this would interfere with the
+          indexes stored in SameTypeTerms; adding at the end does not interfere here. }
+        nowPosInTerm := 0;
+        numberChildren := currentTerm[i].Count;
+        repeat
+          currentTerm.AddChild(currentTerm[i][nowPosInTerm]);
+          inc(nowPosInTerm);
+        until (nowPosInTerm = numberChildren);
+      end;
+      { now extract all SameTypeTerms from currentTerm; in order to minimize
+        interference we do this from back to front }
+      for i := nowSizeArray-1 downto 0 do
+      begin
+        currentTerm.DeleteChild(SameTypeTerms[i]);
+      end;
+      { now sort currentTerm (thereby checking whether an identical object
+        already is listed in Eventlist }
+      SortOperands(currentTerm,theParent,theIndex,eventlist);
+      {$IfDef TESTMODE}
+        currentTerm.DEBUGPrint(true,eventlist,'GenericCombine 2');
+      {$ENDIF}
+
+    end; { if nowSizeArray > 0 }
   end;
 end;
 
@@ -1019,6 +1090,8 @@ begin
       If (not changedSelf) and PANDPANDTransform(theobject, theParent , theIndex, theEventList) then
         changedSelf := true;
       If (not changedSelf) and SANDPANDTransform(theobject, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and GenericCombine(theobject, theParent , theIndex, theEventList) then
         changedSelf := true;
 
       If changedSelf then
