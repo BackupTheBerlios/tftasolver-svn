@@ -26,6 +26,9 @@ unit utftaobject;
   ############################################################################ }
 
 {$mode objfpc}{$H+}
+// switch TESTMODE on or of globally by editing testmode.conf (found in main path
+// of TFTASolver.tftasolver
+{$INCLUDE testmode.conf}
 
 interface
 
@@ -61,7 +64,9 @@ type
 
   TTFTAEventLookupList = class(TFPObjectList)
   private
-    VDEBUGMemo: TMemo;
+    {$IfDef TESTMODE}
+      VDEBUGMemo: TMemo;
+    {$EndIf}
     VmyApplication : TApplication;
     VtheFALSE : TTFTAObject;
     VtheTRUE  : TTFTAObject;
@@ -81,12 +86,18 @@ type
     procedure SetItem(Index: Integer; Item: TTFTAObject);
 
   public
-    constructor Create(pointerToDebugMemo : TMemo);
+    {$IfDef TESTMODE}
+      constructor Create(pointerToDebugMemo : TMemo);
+    {$Else}
+      constructor Create;
+    {$EndIf}
     destructor  Destroy;
+
 
     function  Add(Item: TTFTAObject): Integer;
     function  ListHoldsObjectAt(Text : ansistring) : TTFTAObject;
     function  Extract(Item: TTFTAObject):TTFTAObject;
+    procedure Delete(Index : Integer);
     procedure Insert(Index: Integer; Item: TTFTAObject);
     function  NewItem: TTFTAObject;
     function  NewItem(      EventType               : TTFTAOperatorType;
@@ -114,7 +125,9 @@ type
                   		      PointerToUpdateObject   : TTFTAObject;
                   		      TemporalExpr            : ansistring) : TTFTAObject;
 
+    {$IfDef TESTMODE}
     property  DEBUGMemo : TMemo read VDEBUGMemo write VDEBUGMemo;
+    {$EndIf}
     property  Items[Index: Integer]: TTFTAObject read GetItem write SetItem; default;
     property  pointerToApplication : TApplication read VmyApplication write VmyApplication;
     property  TheFALSEElement : TTFTAObject read VtheFALSE;
@@ -147,7 +160,6 @@ type
     procedure Delete(Index : Integer);
     procedure Insert(Index: Integer; Item: TTFTAObject);
     procedure SetItem(Index: Integer; Item: TTFTAObject);
-    procedure Sort;
     property  Items[Index: Integer]: TTFTAObject read GetItem write SetItem; default;
     property  Owner : TTFTAObject read VOwner write VOwner;
     property  OwnsObjects: Boolean read VOwnsObjects write VOwnsObjects;
@@ -161,7 +173,7 @@ type
   private
 
     VChildren : TTFTAList;        { list of all my descendants (children) }
-    VDEBUGMemo : TMemo;
+    {$IfDef TESTMODE}VDEBUGMemo : TMemo;{$EndIf}
     VEventLookupList : TTFTAEventLookuplist;
     VExpr : ansistring;           { if I'm a BasicEvent, I have to carry my event name }
     VIsBasicEvent : boolean;
@@ -208,16 +220,19 @@ type
 
     procedure AssignChildren(Obj: TTFTAList);
     procedure CheckTermProperties;
+    {$IfDef TESTMODE}
     procedure DEBUGPrint(isUpdate : boolean; eventlist : TTFTAEventLookupList; thestring : ansistring = '');
+    {$EndIf}
     procedure DeleteChild(Index: Integer);
     procedure InsertChild(Index: Integer; Item: TTFTAObject);
     procedure SetChild(Index: Integer; Item: TTFTAObject);
     procedure SetLogicalValue (Parameter : boolean);
     procedure SetLogicalValue (Parameter : pointer);
-    procedure SortChildren;
 
     property  Children : TTFTAList read VChildren write VChildren;
+    {$IfDef TESTMODE}
     property  DEBUGMemo : TMemo read VDEBUGMemo write VDEBUGMemo;
+    {$EndIf}
     property  EventType : TTFTAOperatorType read VType write SetVType;
     property  EventLookupList : TTFTAEventLookuplist read VEventLookupList write VEventLookupList;
     property  IsAllChildrenAreBasic : boolean read GetChildrenBasicState;
@@ -242,32 +257,6 @@ type
   end;
 
 implementation
-
-{ the follwoing is defined by OpenPascal for the TFPObjectList.Sort
-  type TListSortCompare = function(Item1: Pointer;Item2: Pointer):Integer;
-  now we need a function like this which actually compares two objects of
-  type TTFTAObject for TTFTAList.Sort (by comparing their TemporalExpr, of course) }
-function CompareTwoTTFTAObjects(Item1: Pointer; Item2: Pointer) : Integer;
-begin
-  if Assigned(Item1) then
-  begin
-    if Assigned(Item2) then
-      { Item1 <> NIL, Item2 <> NIL --> compare TemporalExpr's }
-      Result := AnsiCompareStr(TTFTAObject(Item1).PlainTemporalExpr,TTFTAObject(Item2).PlainTemporalExpr)
-    else
-      { Item1 <> NIL, Item2 = NIL --> return 1 (Item1 after Item2) }
-      Result := 1;
-  end else
-  begin
-    if Assigned(Item2) then
-      { Item1 = NIL, Item2 <> NIL --> return -1 (Item2 after Item1) }
-      Result := -1
-    else
-      { Item1 = NIL, Item2 = NIL --> return 0 (Item1 same as Item2) }
-      Result := 0;
-  end;
-end;
-
 
 { ############################################################################ }
 { TTFTAObject }
@@ -453,18 +442,6 @@ begin
     self.IsNegated := false;
 end;
 
-procedure TTFTAObject.SortChildren;
-begin
-  { sort is only relevant for commutative operators (AND, OR, SAND, XOR) }
-  if (self.EventType = tftaEventTypeAND) or
-     (self.EventType = tftaEventTypeSAND) or
-     (self.EventType = tftaEventTypeOR) or
-     (self.EventType = tftaEventTypeXOR) then
-  begin
-    self.Children.Sort;
-  end;
-end;
-
 {------------------------------------------------------------------------------
   Provides the logical expression represented by the term / object
   Scanns through all descendants, which is time consuming
@@ -613,6 +590,7 @@ begin
                            self.PointerToUpdateObject,self.TemporalExpr);
   Result.Children.Assign(self.Children);
   Result.IsSorted := self.IsSorted;
+  Result.EventLookupList := self.EventLookupList;
 end;
 
 {------------------------------------------------------------------------------
@@ -846,6 +824,7 @@ begin
 
 end;
 
+{$IfDef TESTMODE}
 procedure TTFTAObject.DEBUGPrint(isUpdate : boolean; eventlist : TTFTAEventLookupList; thestring : ansistring = '');
 begin
   if Assigned(self.DEBUGMemo) then
@@ -862,6 +841,8 @@ begin
     end;
   eventlist.pointerToApplication.ProcessMessages;
 end;
+{$EndIf}
+
 {------------------------------------------------------------------------------
   prueft und setzt ggf. die Eigenschaften eines temporalen Terms wie
   IsDisjunct, IsEventSequence ...
@@ -886,7 +867,6 @@ end;
 function TTFTAList.Add(Item: TTFTAObject): Integer;
 begin
   Result := inherited Add(Item);
-  //self.Last.DEBUGMemo := self.Owner.DEBUGMemo;
 end;
 
 procedure TTFTAList.Assign(Obj: TTFTAList);
@@ -999,11 +979,10 @@ begin
   if Assigned(Result) and Result.NeedsToBeUpdated then
   begin
     tempObject := Result.PointerToUpdateObject;
-    if Assigned(Result.DEBUGMemo) then
-    begin
-      Result.DEBUGMemo.Append(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(tempObject));
-      writeln(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(tempObject));
-    end;
+    {$IfDef TESTMODE}
+      if Assigned(Result.DEBUGMemo) then
+        Result.DEBUGMemo.Append(PointerAddrStr(Result) + ' --> ' + PointerAddrStr(tempObject));
+    {$EndIf}
     Delete(Index);
     Insert(Index,tempObject);
     Result := self.GetItem(Index);
@@ -1035,25 +1014,16 @@ begin
   inherited Items[Integer(Index)] := Item;
 end;
 
-procedure TTFTAList.Sort;
-begin
-  { it is necessary to differentiate between FPC compiler mode
-    and "other" compiler mode (Delphi TurboPAscal etc.), as FPC has a
-    different syntax for using function types...
-    see: http://www.daniweb.com/forums/post740838-10.html }
-  {$ifdef FPC}
-    inherited Sort(@CompareTwoTTFTAObjects);
-  {$else}
-    inherited Sort(CompareTwoTTFTAObjects);
-  {$endif}
-end;
-
 { ############################################################################ }
 { TTFTAEventLookupList }
-constructor TTFTAEventLookupList.Create(pointerToDebugMemo : TMemo);
+{$IfDef TESTMODE}
+  constructor TTFTAEventLookupList.Create(pointerToDebugMemo : TMemo);
+{$Else}
+  constructor TTFTAEventLookupList.Create;
+{$EndIf}
 begin
   inherited Create;
-  self.DEBUGMemo  := pointerToDebugMemo;
+  {$IfDef TESTMODE}self.DEBUGMemo  := pointerToDebugMemo; {$EndIf}
   self.OwnsObjects:= true; { the EventLookupList owns objects (the objects.children - list does not! }
 
   { create the FALSE event }
@@ -1098,6 +1068,12 @@ destructor TTFTAEventLookupList.Destroy;
 begin
   // nothing specific yet ...
   inherited Destroy;
+end;
+
+procedure TTFTAEventLookupList.Delete(Index : Integer);
+begin
+  self[Index].Free;
+  self.List.Delete(Index);
 end;
 
 function TTFTAEventLookupList.Extract(Item: TTFTAObject):TTFTAObject;
@@ -1190,7 +1166,9 @@ begin
   Result.EventLookupList := self;
 
   Result.EventType                  :=  EventType                 ;
+  {$IfDef TESTMODE}
   Result.DEBUGMemo                  :=  self.DEBUGMemo            ;
+  {$EndIf}
   Result.IsBasicEvent               :=  IsBasicEvent              ;
   Result.IsCoreEvent                :=  IsCoreEvent               ;
   Result.IsEventSequence            :=  IsEventSequence           ;

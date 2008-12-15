@@ -26,6 +26,9 @@ unit utftaexpression;
   ############################################################################ }
 
 {$mode objfpc}{$H+}
+// switch TESTMODE on or of globally by editing testmode.conf (found in main path
+// of TFTASolver.tftasolver
+{$INCLUDE testmode.conf}
 
 interface
 
@@ -41,8 +44,9 @@ type
   { ######################################################################## }
   TTFTAExpression = class
   private
-
+    {$IfDef TESTMODE}
     DEBUGMemo             : TMemo;
+    {$EndIf}
     VEventList            : TTFTAEventLookupList;
     VInputString          : ansistring;
     VInputTree            : TTreeNodes;
@@ -70,7 +74,9 @@ type
     procedure BuildTreeNodes(theTree : TTreeNodes);
     procedure ParseInput(theTree : TTreeNodes);
     procedure Reset;
+    {$IfDef TESTMODE}
     procedure SetDEBUGMemo(Parameter : TMemo);
+    {$EndIf}
     procedure Simplify;
     property  Count : Integer read ReadCount;
     property  EventList : TTFTAEventLookupList read VEventList write VEventList;
@@ -152,15 +158,21 @@ begin
     { Set a pointer to the TreeNodes of InputTreeView within Mainwindow }
     InputTree := theTree;
 
-    { Clear the DebugWindow from old messages }
-    If Assigned(DEBUGMemo) then
-    begin
-      DEBUGMemo.Lines.Clear;
-      DEBUGMemo.Append('DEBUG:');
-    end;
+    {$IfDef TESTMODE}
+      { Clear the DebugWindow from old messages }
+      If Assigned(DEBUGMemo) then
+      begin
+        DEBUGMemo.Lines.Clear;
+        DEBUGMemo.Append('DEBUG:');
+      end;
+    {$EndIf}
     
     { create the Event-Lookup-List }
-    EventList := TTFTAEventLookupList.Create(DEBUGMemo);
+    {$IfDef TESTMODE}
+      EventList := TTFTAEventLookupList.Create(DEBUGMemo);
+    {$Else}
+      EventList := TTFTAEventLookupList.Create;
+    {$EndIf}
 
     EventList.pointerToApplication := pointerToApplication;
 
@@ -178,12 +190,12 @@ begin
                                       NIL,   {PointerToUpdateObject}
                                       'TOP'
                                      );
-
+    {$IfDef TESTMODE}
     if Assigned( DEBUGMemo) then DEBUGMemo.Append('TOP Levels created' + sLineBreak +
                      '  @ Address TemporalTerm: ' + PointerAddrStr(TemporalTerm) + sLineBreak +
                      '  @ Address FALSETerm: ' + PointerAddrStr(EventList.TheFALSEElement) + sLineBreak +
                      '  @ Address TRUETerm: ' + PointerAddrStr(EventList.TheTRUEElement) );
-
+    {$EndIf}
     { call the converting routine;
       provide parameters: a newly created child in TemporalTerm,
                           the whole InputString,
@@ -192,13 +204,13 @@ begin
     
     { now build InputTree from TemporalTerm }
     TemporalExpressionToTreeNodes(TemporalTerm, InputTree, NIL, 0);
-
+    {$IfDef TESTMODE}
     if Assigned( DEBUGMemo) then
       for i := 0 to EventList.Count -1 do
       begin
         EventList[i].DEBUGPrint(false,EventList);
       end;
-    
+    {$EndIf}
   end;  { ParseInput}
 end;
 
@@ -294,12 +306,12 @@ begin
   { object is NOT part of EventList yet --> create new object and set its
     properties and point Result to the newly created object }
   Result := EventList.NewItem;
-  
+  {$IfDef TESTMODE}
   if Assigned( DEBUGMemo) then
     DEBUGMemo.Append('TTFTAExpression.AddNewTFTAObject from ' +
                       PointerAddrStr(theObject) + ' --- new address: ' +
                       PointerAddrStr(Result)    );
-
+  {$EndIf}
   { put pointer to newly created object to TemporalTerm }
   theObject.AddChild(Result);
   Result.EventType := theType;
@@ -323,10 +335,12 @@ end;
   Setze den Zeiger zum Debug-Ausgabe-Fenster des Hauptfensters
   Damit ist dieses Ausgabefenster
 ------------------------------------------------------------------------------}
+{$IfDef TESTMODE}
 procedure TTFTAExpression.SetDEBUGMemo(Parameter : TMemo);
 begin
   DEBUGMemo := Parameter;
 end;
+{$EndIf}
 
 {------------------------------------------------------------------------------
   scanns a given string (mystring) for the next usable expression holding a
@@ -452,9 +466,6 @@ begin
         are multiple occurences of the same event (object) saves (potentially)
         huge amounts of time as term transformations only happen once }
       theTempObject := EventList.ListHoldsObjectAt(theNewString);
-      //if Assigned( DEBUGMemo) then
-          //DEBUGMemo.Append('String2Expr: Testing for existance on ' + theNewString + ' --- ' +
-                            //PointerAddrStr(theTempObject)  );
 
       if not Assigned(theTempObject) then
       begin
@@ -470,8 +481,10 @@ begin
         { object IS part of EventList --> just add pointer to it to TemporalTerm;
           there is no need to parse its children, as they already exists }
         currentObject.AddChild(theTempObject);
-        //if Assigned( DEBUGMemo) then
-          //DEBUGMemo.Append('Added ' + PointerAddrStr(theTempObject) + ' to ' + PointerAddrStr(currentObject)  );
+        {$IfDef TESTMODE}
+          if Assigned( DEBUGMemo) then
+            DEBUGMemo.Append('Added ' + PointerAddrStr(theTempObject) + ' to ' + PointerAddrStr(currentObject)  );
+        {$EndIf}
       end;
       
       { go on with next sibling to theTempObject (if any) }
@@ -479,10 +492,6 @@ begin
     end;
     { at this point, currentObject is completed and thus may from now on have a TempExpr }
     currentObject.IsNotCompletelyBuildYet := false;
-    { now, currentObject needs to be initially sorted! (all further sortings
-      will take place if any of the children changes and will be initiated by
-      TTFTAObject.TemporalExpr }
-    //currentObject.SortChildren;
     { next, set properties of the current node /treelevel according to the
       properties of its children (if any) }
     currentObject.CheckTermProperties;
@@ -534,9 +543,10 @@ begin
         begin
           currentObject.TemporalExpr := theNewString;
         end;
-        
-        //if Assigned( DEBUGMemo) then
-          //DEBUGMemo.Append('New Basic Event ' + PointerAddrStr(currentObject) + ' called ' + theNewString );
+        {$IfDef TESTMODE}
+        if Assigned( DEBUGMemo) then
+          DEBUGMemo.Append('New Basic Event ' + PointerAddrStr(currentObject) + ' called ' + theNewString );
+        {$EndIf}
     end;
   end;
   

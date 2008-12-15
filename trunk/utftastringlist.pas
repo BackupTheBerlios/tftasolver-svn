@@ -24,11 +24,14 @@ unit utftastringlist;
   ############################################################################ }
 
 {$mode objfpc}{$H+}
+// switch TESTMODE on or of globally by editing testmode.conf (found in main path
+// of TFTASolver.tftasolver
+{$INCLUDE testmode.conf}
 
 interface
 
 uses
-  Classes, SysUtils, StrUtils, contnrs;
+  Forms, Dialogs, Classes, SysUtils, StrUtils, contnrs;
 
 type
 
@@ -38,12 +41,17 @@ type
     VData : pointer;
     VIndex: integer;
   public
-    property Data : pointer read VData write VData;
-    property Index : pointer read VIndex write VIndex;
-    property Text : pointer read VText write VText;
+    property Data           : pointer    read VData  write VData;
+    property FormerPosition : integer    read VIndex write VIndex;
+    property Text           : ansistring read VText  write VText;
   end;
 
   TTFTAStringList = class(TFPObjectList)
+  private
+    function GetCSText : ansistring;
+    function GetText   : ansistring;
+    function PrivateGetText(withCS:boolean) : ansistring;
+
   protected
     function  GetItem(Index: Integer): TTFTAStringListObject;
     procedure SetItem(Index: Integer;  Item: TTFTAStringListObject);
@@ -51,9 +59,11 @@ type
   public
     constructor Create;
     destructor  Destroy;
-    function  Add(Item: TTFTAStringListObject): Integer;
-    function  Sort : boolean;
-    property  Items[Index: Integer]: TTFTAStringListObject read GetItem write SetItem; default;
+    function    Add(AText: ansistring): Integer;
+    function    Sort : boolean;
+    property    CSText : ansistring read GetCSText;
+    property    Text   : ansistring read GetText;
+    property    Items[Index: Integer]: TTFTAStringListObject read GetItem write SetItem; default;
   end;
 
 implementation
@@ -92,9 +102,13 @@ begin
   inherited Create;
 end;
 
-function TTFTAStringList.Add(Item: TTFTAStringListObject): Integer;
+function TTFTAStringList.Add(AText: ansistring): Integer;
+var newItem : TTFTAStringListObject;
 begin
-  Result := inherited Add(Item);
+  newItem := TTFTAStringListObject.Create;
+  newItem.Text := AText;
+  newItem.FormerPosition := self.Count;
+  Result := inherited Add(newItem);
 end;
 
 {------------------------------------------------------------------------------
@@ -111,10 +125,42 @@ begin
   Result := TTFTAStringListObject(inherited Items[Index]);
 end;
 
+function TTFTAStringList.GetCSText : ansistring;
+begin
+  Result := PrivateGetText(true);
+end;
+
+function TTFTAStringList.GetText : ansistring;
+begin
+  Result := PrivateGetText(false);
+end;
+
+function TTFTAStringList.PrivateGetText(withCS:boolean) : ansistring;
+var numberItems : Integer;
+    i : Integer = 0;
+    c : ansistring;
+begin
+
+  Result := ''; { default }
+  numberItems := self.Count;
+  if withCS then
+    c := ','
+  else
+    c := '';
+
+  repeat
+    Result := Result + self[i].Text + c;
+    inc(i);
+  until (i = numberItems - 1 );
+  if numberItems > 1 then
+    Result := Result + self[i].Text;
+
+end;
+
 procedure TTFTAStringList.SetItem(Index: Integer; Item: TTFTAStringListObject);
 begin
+  //Item.FormerPosition:=Index;
   inherited Items[Index] := Item;
-  self[Index].Index:=Index;
 end;
 
 function TTFTAStringList.Sort : boolean;
@@ -135,7 +181,8 @@ begin
   Result := True; { default }
   numberItems := self.Count;
   repeat
-    anyChange := anyChange or ( self[i].Index <> i );
+    anyChange := anyChange or ( self[i].FormerPosition <> i );
+    inc(i);
   until anyChange or (i = numberItems);
 
   Result := anyChange;

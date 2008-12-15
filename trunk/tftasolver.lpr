@@ -2,6 +2,10 @@ program tftasolver;
 
 {$mode objfpc}{$H+}
 
+// switch TESTMODE on or of globally by editing testmode.conf (found in main path
+// of TFTASolver.tftasolver
+{$INCLUDE testmode.conf}
+
 uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
@@ -9,13 +13,14 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms,  strutils
   { you can add units after this }
-  ,
-  utftaformtftasolver,
-  utftaexpression, utftalogik, utftaobject, sjspointertools, utftaformabout,
-  utftaformdebugmessages;
+  ,utftaformtftasolver,utftaexpression, utftalogik, utftaobject,
+  sjspointertools, utftaformabout,
+  {$IFDEF TESTMODE}
+  utftaformdebugmessages,
+  {$ENDIF}
+  utftastringlist;
   
 var
-   GlobalDebugLevel : integer;
    i                : longint;
 
 //{$R tftasolver.res}
@@ -23,18 +28,11 @@ var
 {$IFDEF WINDOWS}{$R tftasolver.rc}{$ENDIF}
 
 begin
-
-  GlobalDebugLevel := 0; {defaultwert}
-  { Auslesen der Kommandozeilenparameter}
-  for i:=1 to Paramcount do
-  begin
-    { DEBUGLEVEL }
-    if ParamStr(i) = '--debuglevel' then GlobalDebugLevel := Numb2Dec(ParamStr(i+1),10);
-  end;
-
   Application.Initialize;
   Application.CreateForm(TTFTAMainWindow, TFTAMainWindow);
-  TFTAMainWindow.DEBUGLevel:=0;
+  {$IFDEF TESTMODE}
+    TFTAMainWindow.DEBUGLevel:=5;  { 5 is a default value, later to be detailled into different verbosities }
+  {$ENDIF}
   TFTAMainWindow.pointerToApplication := Application;
   Application.Run;
 end.

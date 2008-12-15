@@ -26,12 +26,15 @@ unit utftalogik;
   ############################################################################ }
 
 {$mode objfpc}{$H+}
+// switch TESTMODE on or of globally by editing testmode.conf (found in main path
+// of TFTASolver.tftasolver
+{$INCLUDE testmode.conf}
 
 interface
 
 uses
   Classes, SysUtils, Dialogs, ComCtrls, StdCtrls, strutils, utftaobject,
-    sjspointertools;
+    sjspointertools, utftastringlist;
   
   function  ANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
   function  ANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
@@ -54,7 +57,7 @@ uses
   function  SANDPANDTransform(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
   function  SANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
   function  SimplificationLoop(theobject :TTFTAObject; theParent : TTFTAList; theIndex : Integer; theEventList : TTFTAEventLookupList) : boolean;
-  function  SortOperands(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+  function  SortOperands(tT :TTFTAObject; tP : TTFTAList; tI : Integer; tEL : TTFTAEventLookupList) : boolean;
   function  XORSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
 
 implementation
@@ -70,7 +73,6 @@ begin
   if (currentTerm.EventType = tftaEventTypeAND) then
   begin
     i := 0;
-    currentTerm.DEBUGPrint(true,eventlist,'ANDFalse 2');
     repeat
       if currentTerm[i] = eventList.TheFALSEElement then
         AtLeastOneIsFalse := True ;
@@ -182,6 +184,7 @@ end;
 procedure GenericUpdateObject(oldTerm : TTFTAObject; newTerm : TTFTAObject; eventList : TTFTAEventLookupList;
                               parentList : TTFTAList; oldObjectListIndex : Integer; callString : ansistring = '');
 begin
+  if oldTerm = newTerm then exit;
 
   oldTerm.PointerToUpdateObject:=newTerm;
   oldTerm.NeedsToBeUpdated:=true;
@@ -192,8 +195,11 @@ begin
   if oldterm = newTerm then
   begin
     parentList.Owner.CheckTermProperties;
-    if Assigned(oldterm.DEBUGMemo) then
-      oldterm.DEBUGPrint(true,eventList,callString);
+    {$IfDef TESTMODE}
+      if Assigned(oldterm.DEBUGMemo) then
+        oldterm.DEBUGPrint(true,eventList,callString);
+      eventlist.pointerToApplication.ProcessMessages;
+    {$ENDIF}
   end else
     ShowMessage('Fatal Error (081210.1221) while processing event ' +
                 PointerAddrStr(oldTerm) + ' ( ' + oldTerm.TemporalExpr + ' ) ' );
@@ -267,20 +273,17 @@ begin
       aTerm.AddChild(xTerm);
       aTerm.AddChild(yTerm);
       aTerm.CheckTermProperties;
-
-      aTerm.DEBUGPrint(false,eventlist,'LawOfCompleteness 1');
+      {$IfDef TESTMODE}aTerm.DEBUGPrint(false,eventlist,'LawOfCompleteness 1'); {$ENDIF}
 
       bTerm.AddChild(yTerm);
       bTerm.AddChild(xTerm);
       bTerm.CheckTermProperties;
-
-      bTerm.DEBUGPrint(false,eventlist,'LawOfCompleteness 2');
+      {$IfDef TESTMODE}bTerm.DEBUGPrint(false,eventlist,'LawOfCompleteness 2'); {$ENDIF}
 
       cTerm.AddChild(xTerm);
       cTerm.AddChild(yTerm);
       cTerm.CheckTermProperties;
-
-      cTerm.DEBUGPrint(false,eventlist,'LawOfCompleteness 3');
+      {$IfDef TESTMODE}cTerm.DEBUGPrint(false,eventlist,'LawOfCompleteness 3'); {$ENDIF}
 
       { add the new children to the overall term }
       currentTerm.AddChild(aTerm);
@@ -293,10 +296,12 @@ begin
       currentTerm := theParent[theIndex];
       if currentTerm.TemporalExpr = overallexpr then
       begin
-        currentTerm.DEBUGPrint(true,eventlist,'LawOfCompleteness 4');
+        {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'LawOfCompleteness 4'); {$ENDIF}
         theParent.Owner.CheckTermProperties;
       end else
-        currentTerm.DEBUGPrint(true,eventlist,'LawOfCompleteness 4.5');
+      begin
+        {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'LawOfCompleteness 4.5');  {$ENDIF}
+      end;
     end else
     begin  { overall term does exist }
       GenericUpdateObject(currentTerm,tempTerm,eventlist,theParent,theIndex,'LawOfCompleteness 5');
@@ -322,7 +327,7 @@ begin
     if currentTerm.Children.DeleteAllCopies then
     begin
       Result := True;
-      currentTerm.DEBUGPrint(true,eventlist,'LawOfIDemtopency 1');
+      {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'LawOfIDemtopency 1'); {$ENDIF}
     end;
     { if all children were the same then there is only one child left now.
       SAND, AND, XOR, OR with only one child are the child!}
@@ -637,8 +642,7 @@ begin
         tempTerm.AddChild(y);
         { set properties for object tempTerm }
         tempTerm.CheckTermProperties;
-
-        tempTerm.DEBUGPrint(false,eventlist,'PANDPANDTransform 1');
+        {$IfDef TESTMODE}tempTerm.DEBUGPrint(false,eventlist,'PANDPANDTransform 1'); {$ENDIF}
 
         { extract second child itself, i.e. change currentTerm }
         currentTerm.ExtractChild(currentTerm[0]);
@@ -658,11 +662,12 @@ begin
       currentTerm := theParent[theIndex];
       if currentTerm.TemporalExpr = overallexpr then
       begin
-        currentTerm.DEBUGPrint(true,eventlist,'PANDPANDTransform 2');
+        {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'PANDPANDTransform 2');  {$ENDIF}
         theParent.Owner.CheckTermProperties;
       end else
-        currentTerm.DEBUGPrint(true,eventlist,'PANDPANDTransform 2.5');
-
+      begin
+        {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'PANDPANDTransform 2.5'); {$ENDIF}
+      end;
     end else
     begin
       { overall term does indeed exist already (= tempTerm); therefore: old object NeedsToBeUpdated = true and
@@ -767,7 +772,7 @@ begin
           restOfPand := tempTerm;
         end else
         begin
-          restOfPand.DEBUGPrint(false,eventlist,'SANDPANDTransform 1');
+          {$IfDef TESTMODE}restOfPand.DEBUGPrint(false,eventlist,'SANDPANDTransform 1'); {$ENDIF}
         end;
       end else
       begin
@@ -793,21 +798,20 @@ begin
         begin
           { create new sand object which includes the last part of the former pand term }
           tempTerm := currentTerm.Clone(eventlist);
-          tempTerm.DEBUGPrint(true,eventlist, 'SANDPANDTRansform 1.5');
+          {$IfDef TESTMODE}tempTerm.DEBUGPrint(true,eventlist, 'SANDPANDTRansform 1.5');{$ENDIF}
           tempTerm.AddChild(pandTermLastChild);
 
-          tempTerm.DEBUGPrint(false,eventlist,'SANDPANDTransform 2');
+          {$IfDef TESTMODE}tempTerm.DEBUGPrint(false,eventlist,'SANDPANDTransform 2'); {$ENDIF}
 
           currentTerm.Children.OwnsObjects:=false;
           currentTerm.Children.Clear; { delete all pointers to old objects }
           { now add restofPand and tempTerm as new children }
-          tempTerm.DEBUGPrint(false,eventlist,'SANDPANDTransform 2.5');
+          {$IfDef TESTMODE}tempTerm.DEBUGPrint(false,eventlist,'SANDPANDTransform 2.5'); {$ENDIF}
           currentTerm.AddChild(restOfPand);
           currentTerm.AddChild(tempTerm);
           currentTerm.EventType := tftaEventTypePAND;
           currentTerm.CheckTermProperties;
-
-          currentTerm.DEBUGPrint(true,eventlist, 'SANDPANDTRansform 3');
+          {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist, 'SANDPANDTRansform 3'); {$ENDIF}
 
         end else { currentTerm plus last child of pandTerm exists }
         begin
@@ -819,8 +823,7 @@ begin
           currentTerm.AddChild(tempTerm);
           currentTerm.EventType := tftaEventTypePAND;
           currentTerm.CheckTermProperties;
-
-          currentTerm.DEBUGPrint(true,eventlist,'SANDPANDTRansform 4');
+          {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'SANDPANDTRansform 4'); {$ENDIF}
 
         end; { currentTerm plus last child of pandTerm did exist }
       end else { complete new term already exists }
@@ -920,66 +923,91 @@ var somethingChanged : boolean = false;  { set within ScanChildrenSorting if any
       boolean in order to notify the calling instance whether any changes have
       taken place. }
     function ScanChildrenSorting(currentTerm :TTFTAObject; theParent : TTFTAList;
-                                 theIndex : Integer; eventlist : TTFTAEventLookupList) : ansistring;
+                                 theIndex : Integer; eventlist : TTFTAEventLookupList;
+                                 var isChange : boolean) : ansistring;
     var numberChildren : integer = 0;
         i : integer;
+        expressionList : TTFTAStringList = NIL;
+        tempObject : TTFTAObject;
     begin
 
       if not currentTerm.IsBasicEvent then
       begin
-        numberChildren := self.Count;
+        numberChildren := currentTerm.Count;
         Result := '';
         if numberChildren > 1 then  { and, or, xor, pand, sand operators }
         begin
-          for i:=0 to numberChildren-2 do
-          begin
-            Result := Result + ScanChildrenSorting(currentTerm[i],currentTerm.Children,i,eventlist) + ',';
-          end;
-          Result := Result + ScanChildrenSorting(currentTerm[i+1],currentTerm.Children,i+1,eventlist);
-        end else  { not operator or one of the above in rare cases, where
-                    transformation results in only single parameter }
-        begin
-          Result := ScanChildrenSorting(currentTerm[0],currentTerm.Children,0,eventlist);
-        end;
-        Result := currentTerm.EventTypeToString + '[' + Result + ']';
-      end else
-      begin;
-        Result := currentTerm.PlainTemporalExpr; { name is stored in VExpr at creation of basic event }
-      end;
-
-
-
-        { one of the following commutative types }
-        if ( (currentTerm.EventType = tftaEventTypeAND) or
-             (currentTerm.EventType = tftaEventTypeSAND) or
-             (currentTerm.EventType = tftaEventTypeOR) or
-             (currentTerm.EventType = tftaEventTypeXOR)
-           ) then
-        begin
-          { for each child ... }
-          numberChildren := currentTerm.Count;
+          expressionList := TTFTAStringList.Create;
           i := 0;
           repeat
-
+            expressionList.Add(ScanChildrenSorting(currentTerm[i],currentTerm.Children,i,eventlist,isChange));
             inc(i);
           until (i = numberChildren);
+          { now sort the entries in expressionList,
+            if TTFTAStringList.sort returns false, then no sort was performed, i.e.
+            no sorting of the currentTerm-children is necessary; if sort returns
+            true, then sorting is necessary }
+          { only sort if commutative operator and sorting of currentTerm.children necessary,
+            otherwise just return temporal expression stored in expressionList.Text }
+          if ( (currentTerm.EventType = tftaEventTypeAND) or
+               (currentTerm.EventType = tftaEventTypeSAND) or
+               (currentTerm.EventType = tftaEventTypeOR) or
+               (currentTerm.EventType = tftaEventTypeXOR)
+             ) and
+             ( expressionList.Sort ) then
+          begin
+            { if such an event already exists in eventlist, then take this, else
+              create a new one }
+            isChange := true;
+            Result := currentTerm.EventTypeToString + '[' + expressionList.CSText + ']';
+            {$IfDef TESTMODE}
+              currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting (Aenderung) 1');
+            {$ENDIF}
 
+            tempObject := eventlist.ListHoldsObjectAt(Result);
+            if not Assigned(tempObject) then
+            begin
+              tempObject := currentTerm.Clone(eventlist);
+              currentTerm.Children.Clear;
+              { for each child ... }
+              numberChildren := tempObject.Count;
+              i := 0;
+              repeat
+                currentTerm.AddChild(tempObject[expressionList[i].FormerPosition]);
+                inc(i);
+              until (i = numberChildren);
+              currentTerm.CheckTermProperties;
+              {$IfDef TESTMODE}
+                currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting (Aenderung) 2');
+              {$ENDIF}
+              { we can free the cloned event (in tempObject) }
+              eventlist.Delete(eventlist.Count-1);
+            end else
+            begin
+              { event already listed in eventlist }
+              GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'ScanChildrenSorting 3');
+            end;
+
+          end;
+          Result := currentTerm.EventTypeToString + '[' + expressionList.CSText + ']';
         end else
         begin
-          { currentTerm is a non-commutative operator type
-             }
+          { NOT operator or one of the above in rare cases, where
+            transformation results in only single parameter }
+          Result := currentTerm.EventTypeToString + '[' +
+                    ScanChildrenSorting(currentTerm[0],currentTerm.Children,0,eventlist,isChange) + ']';
         end;
-
       end else
-      begin
-        { is already sorted }
+      begin;
+        { is basic event }
+        Result := currentTerm.PlainTemporalExpr; { name is stored in VExpr at creation of basic event }
       end;
 
     end; { function ScanChildrenSorting }
 
 
 begin
-  ScanChildrenSorting(tT,tP,tI,tEL);
+  ScanChildrenSorting(tT,tP,tI,tEL,somethingChanged);
   Result := somethingChanged;
 end;
 

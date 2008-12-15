@@ -11,6 +11,9 @@ unit utftaformtftasolver;
   §§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§ }
 
 {$mode objfpc}{$H+}
+// switch TESTMODE on or of globally by editing testmode.conf (found in main path
+// of TFTASolver.tftasolver
+{$INCLUDE testmode.conf}
 
 interface
 
@@ -25,7 +28,9 @@ uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ComCtrls, ExtCtrls , Buttons, strutils,
   { eigene Units }
-  utftaexpression, utftaformabout, utftaformdebugmessages, utftaobject;
+  utftaexpression, utftaformabout,
+  {$IFDEF TESTMODE}utftaformdebugmessages, {$ENDIF}
+  utftaobject;
 
 { ##############################################################################
   ##############################################################################
@@ -51,7 +56,7 @@ type
     ButtonAbout: TButton;
     Label1: TLabel;
     MemoInputString: TMemo;
-    MemoDEBUG: TMemo;
+    {$IFDEF TESTMODE} MemoDEBUG: TMemo; {$ENDIF}
     MemoOutputString: TMemo;
     ProgressBar1: TProgressBar;
     Shape1: TShape;
@@ -66,17 +71,20 @@ type
     procedure BitBtnLoadClick(Sender: TObject);
     procedure BitBtnSaveClick(Sender: TObject);
     procedure ButtonAboutClick(Sender: TObject);
+
   private
-    { private declarations }
-    vDEBUGFenster : TFormDebugMeldungen;
-    vDEBUGLevel : integer;
-    procedure SetzeDEBUGLevel(Parameter : integer);
+    {$IFDEF TESTMODE}
+      vDEBUGFenster : TFormDebugMeldungen;
+      vDEBUGLevel : integer;
+      procedure SetzeDEBUGLevel(Parameter : integer);
+    {$ENDIF}
   public
-    { public declarations }
     TemporalExpression : TTFTAExpression;
     pointerToApplication : TApplication;
-    property DEBUGLevel : integer read vDEBUGLevel write SetzeDEBUGLevel;
-    procedure SchreibeDEBUGMeldung(Parameter: ansistring);
+    {$IFDEF TESTMODE}
+      property  DEBUGLevel : integer read vDEBUGLevel write SetzeDEBUGLevel;
+      procedure SchreibeDEBUGMeldung(Parameter: ansistring);
+    {$ENDIF}
   end; 
 
 { ##############################################################################
@@ -99,7 +107,7 @@ implementation
 
 { TTFTAMainWindow }
 
-
+{$IFDEF TESTMODE}
 {------------------------------------------------------------------------------
   Schreibe Property vDEBUGLevel
 ------------------------------------------------------------------------------}
@@ -120,6 +128,9 @@ begin
     MemoDEBUG := NIL;
   end;
 end;
+{$ENDIF}
+
+{$IFDEF TESTMODE}
 {------------------------------------------------------------------------------
   Schreibt eine Meldung ins DebugFenster
 ------------------------------------------------------------------------------}
@@ -127,6 +138,7 @@ procedure TTFTAMainWindow.SchreibeDEBUGMeldung(Parameter : ansistring);
 begin
   if Assigned(vDEBUGFenster) then vDEBUGFenster.SchreibeMeldung(Parameter);
 end;
+{$ENDIF}
 
 { ##############################################################################
   ##############################################################################
@@ -157,8 +169,8 @@ begin
     //TemporalExpression.Reset
   else
     TemporalExpression := TTFTAExpression.Create;
-  
-  TemporalExpression.SetDEBUGMemo(MemoDEBUG);
+  {$IFDEF TESTMODE}TemporalExpression.SetDEBUGMemo(MemoDEBUG); {$ENDIF}
+
   { give input string to TemporalExpression }
   TemporalExpression.InputString := s  ;
   TemporalExpression.pointerToApplication := pointerToApplication;
@@ -233,8 +245,7 @@ var x : TTFTAObject;
     begin
       i:=0;
       repeat
-        //SchreibeDEBUGMeldung(IntToStr(i) + ': Adresse ' + PointerAddrStr(Item[i]));
-        SchreibeDEBUGMeldung(Item[i].WriteStatus(iterationlevel));
+        {$IFDEF TESTMODE}SchreibeDEBUGMeldung(Item[i].WriteStatus(iterationlevel));  {$ENDIF}
         if Item[i].HasChildren then
           begin
             zaehle(Item[i],iterationlevel+2);
@@ -247,13 +258,11 @@ begin
   x := self.TemporalExpression.TemporalTerm;
   
   if x.HasChildren then zaehle(x,0);
-  
-  SchreibeDEBUGMeldung('EventListe mit ' + IntToStr(self.TemporalExpression.EventList.Count) + ' Eintraegen...');
-  
-  
-  for i := 1 to self.TemporalExpression.EventList.Count do
-    SchreibeDEBUGMeldung(self.TemporalExpression.EventList.Items[i-1].TemporalExpr);
-  
+  {$IFDEF TESTMODE}
+    SchreibeDEBUGMeldung('EventListe mit ' + IntToStr(self.TemporalExpression.EventList.Count) + ' Eintraegen...');
+    for i := 1 to self.TemporalExpression.EventList.Count do
+      SchreibeDEBUGMeldung(self.TemporalExpression.EventList.Items[i-1].TemporalExpr);
+  {$ENDIF}
 end;
 
 
