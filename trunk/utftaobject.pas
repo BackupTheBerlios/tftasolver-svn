@@ -358,7 +358,15 @@ end;
 function TTFTAObject.GetChild(Index: Integer): TTFTAObject;
 begin
   if Assigned(self.Children) then
-    Result := self.Children[Index]
+    if (self.Children.Count > Index) or ( Index < 0 ) then
+      Result := self.Children[Index]
+    else
+    begin
+      Result := self[0];
+      ShowMessage('Term: ' + PointerAddrStr(self) + ' --- Kinder 0 bis' + IntToStr(self.Count-1)  +
+                  ' --- Aufruf mit ' + IntToStr(Index));
+      self.EventLookupList.pointerToApplication.ProcessMessages;
+    end
   else
     Result := NIL;
 end;
@@ -850,7 +858,6 @@ end;
 ------------------------------------------------------------------------------}
 procedure TTFTAObject.CheckTermProperties;
 begin
-
     self.CheckForEventSequenceEvent;
     self.CheckForExtendedSequenceEvent;
     self.CheckForDisjunctEvent;

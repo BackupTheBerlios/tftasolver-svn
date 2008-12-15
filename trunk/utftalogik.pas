@@ -176,9 +176,10 @@ begin
           do not yet extract the same type events as this would interfere with the
           indexes stored in SameTypeTerms; adding at the end does not interfere here. }
         nowPosInTerm := 0;
-        numberChildren := currentTerm[i].Count;
+        numberChildren := currentTerm[SameTypeTerms[i]].Count;
+        if numberChildren > 0 then
         repeat
-          currentTerm.AddChild(currentTerm[i][nowPosInTerm]);
+          currentTerm.AddChild(currentTerm[SameTypeTerms[i]][nowPosInTerm]);
           inc(nowPosInTerm);
         until (nowPosInTerm = numberChildren);
       end;
@@ -191,6 +192,7 @@ begin
       { now sort currentTerm (thereby checking whether an identical object
         already is listed in Eventlist }
       SortOperands(currentTerm,theParent,theIndex,eventlist);
+      currentTerm.CheckTermProperties;
       {$IfDef TESTMODE}
         currentTerm.DEBUGPrint(true,eventlist,'GenericCombine 2');
       {$ENDIF}
@@ -314,7 +316,8 @@ begin
     { if currentTerm.Count > 2 then split currentTerm first }
     if currentTerm.Count > 2 then
     begin
-      ANDSplit(currentTerm, theParent, theIndex, eventList) ;
+      if ANDSplit(currentTerm, theParent, theIndex, eventList) then
+        currentTerm := theParent[theIndex]
     end;
 
     { iff x and y are not atomic (i.e. basic events) the original object (the AND term) will become an
@@ -1061,6 +1064,8 @@ begin
     repeat  { inner loop, continue until no chnage in oneself }
       changedSelf := false; { flag whether in the inner loop a change happend }
 
+      If (not changedSelf) and GenericCombine(theobject, theParent , theIndex, theEventList) then
+        changedSelf := true;
       If (not changedSelf) and PANDSplit(theobject, theParent , theIndex, theEventList) then
         changedSelf := true;
       If (not changedSelf) and PANDFalse(theobject, theParent, theIndex, theEventList) then
@@ -1090,8 +1095,6 @@ begin
       If (not changedSelf) and PANDPANDTransform(theobject, theParent , theIndex, theEventList) then
         changedSelf := true;
       If (not changedSelf) and SANDPANDTransform(theobject, theParent , theIndex, theEventList) then
-        changedSelf := true;
-      If (not changedSelf) and GenericCombine(theobject, theParent , theIndex, theEventList) then
         changedSelf := true;
 
       If changedSelf then
