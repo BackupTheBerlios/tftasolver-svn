@@ -1,5 +1,5 @@
 object TFTAMainWindow: TTFTAMainWindow
-  Left = 4
+  Left = 8
   Height = 700
   Top = 321
   Width = 1000

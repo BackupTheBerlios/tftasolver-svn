@@ -1,7 +1,7 @@
 object FormAbout: TFormAbout
-  Left = 414
+  Left = 418
   Height = 400
-  Top = 335
+  Top = 359
   Width = 600
   ActiveControl = ButtonClose
   BorderIcons = [biSystemMenu]
