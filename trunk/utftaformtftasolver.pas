@@ -29,7 +29,7 @@ uses
   ComCtrls, ExtCtrls , Buttons, strutils,
   { eigene Units }
   utftaexpression, utftaformabout,
-  {$IFDEF TESTMODE}utftaformdebugmessages, {$ENDIF}
+  {$IFDEF TESTMODE}utftaformdebugmessages, sjspointertools, {$ENDIF}
   utftaobject;
 
 { ##############################################################################
@@ -261,7 +261,8 @@ begin
   {$IFDEF TESTMODE}
     SchreibeDEBUGMeldung('EventListe mit ' + IntToStr(self.TemporalExpression.EventList.Count) + ' Eintraegen...');
     for i := 1 to self.TemporalExpression.EventList.Count do
-      SchreibeDEBUGMeldung(self.TemporalExpression.EventList.Items[i-1].TemporalExpr);
+      SchreibeDEBUGMeldung(PointerAddrStr(self.TemporalExpression.EventList.Items[i-1])+ ' === ' +
+                                          self.TemporalExpression.EventList.Items[i-1].TemporalExpr);
   {$ENDIF}
 end;
 

@@ -41,6 +41,9 @@ uses
   function  SimplificationLoop(theobject :TTFTAObject; theParent : TTFTAList; theIndex : Integer; theEventList : TTFTAEventLookupList) : boolean;
   function  SortOperands(tT :TTFTAObject; tP : TTFTAList; tI : Integer; tEL : TTFTAEventLookupList) : boolean;
 
+  { also public but not primary simplification routines but internal "helper" routines }
+  function  checkIfAlreadyListed(currentTerm : TTFTAObject; eventlist : TTFTAEventLookupList; var newTerm : TTFTAObject) : boolean;
+
 implementation
 
   { "private" functions / Procedures }
@@ -49,7 +52,6 @@ implementation
   function  ANDTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  GenericCombine(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  GenericSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; theType : TTFTAOperatorType) : boolean; forward;
-  procedure GenericUpdateObject(oldTerm : TTFTAObject; newTerm : TTFTAObject; eventlist : TTFTAEventLookupList; parentList : TTFTAList; oldObjectListIndex : Integer; callString : ansistring = ''); forward;
   function  LawOfCompleteness(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean; forward;
   function  LawOfIdempotency(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean; forward;
   function  LawOfNonrecurrence(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList ) : boolean; forward;
@@ -67,6 +69,9 @@ implementation
   function  SANDPANDTransform(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;  forward;
   function  SANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean; forward;
   function  XORSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean; forward;
+
+  { also private but not primary simplification routines but internal "helper" routines }
+  procedure GenericUpdateObject(oldTerm : TTFTAObject; newTerm : TTFTAObject; eventlist : TTFTAEventLookupList; parentList : TTFTAList; oldObjectListIndex : Integer; callString : ansistring = ''); forward;
 
 {------------------------------------------------------------------------------
   transform and[ ... False ... ] to False
@@ -127,6 +132,35 @@ begin
       end;
     end;
   end;
+end;
+
+{------------------------------------------------------------------------------
+  helper function: check whether a currentTerm is alread listed in eventlist
+  and if so return true and a pointer to the existing event in newTerm, else
+  return false and newTerm = currentTerm
+------------------------------------------------------------------------------}
+function checkIfAlreadyListed(currentTerm : TTFTAObject; eventlist : TTFTAEventLookupList; var newTerm : TTFTAObject) : boolean;
+begin
+  newTerm := NIL;
+  newTerm := eventlist.ListHoldsObjectAt(currentTerm.TemporalExpr);
+  Result  := Assigned(newTerm) and (not (newTerm = currentTerm) );
+  { this is the same as:
+        if Assigned(newTerm) then
+        begin
+          if newTerm = currentTerm then
+          begin
+            // no other event found
+            Result  := False;
+          end else
+          begin
+            // other event found
+            Result  := True;
+          end;
+        end else
+        begin
+          // should not happen!
+          Result  := False;
+        end;                  }
 end;
 
 {------------------------------------------------------------------------------
@@ -266,6 +300,8 @@ begin
   if oldTerm = newTerm then exit;
 
   oldTerm.PointerToUpdateObject:=newTerm;
+  oldTerm.Children.Clear;
+  oldTerm.TemporalExpr:='out of action';
   oldTerm.NeedsToBeUpdated:=true;
 
   { if parentList is provided, then do the update within parentList;
@@ -307,7 +343,7 @@ function LawOfCompleteness(currentTerm :TTFTAObject; theParent : TTFTAList; theI
 var aTerm,bTerm,cTerm,xTerm,yTerm, tempTerm : TTFTAObject;
     aExpr,bExpr,cExpr,xExpr,yExpr : ansistring;
     newXORTerm, tempXORTerm : TTFTAObject;
-    sortOccured : boolean;
+    sortOccurred : boolean;
 begin
   Result := False;
   { only the term itself may be modified! its children (their instances!) must not be
@@ -367,10 +403,10 @@ begin
     cTerm.AddChild(xTerm);
     cTerm.AddChild(yTerm);
     cTerm.CheckTermProperties;
-    sortOccured := SortOperands(cTerm,NIL,0,eventlist);
+    sortOccurred := SortOperands(cTerm,NIL,0,eventlist);
     { after SortOperands cTerm holds three possible objects, see comments within
       uTFTALogic.PANDPANDTransform for more information }
-    If sortOccured then
+    If sortOccurred then
     begin
       if cTerm = tempTerm then
       begin
@@ -396,10 +432,10 @@ begin
     newXORTerm.AddChild(cTerm);
     newXORTerm.CheckTermProperties;
     cExpr := newXORTerm.TemporalExpr;
-    sortOccured := SortOperands(newXORTerm,NIL,0,eventlist);
+    sortOccurred := SortOperands(newXORTerm,NIL,0,eventlist);
     { after SortOperands newXORTerm holds three possible Objects, see comments within
       uTFTALogic.PANDPANDTransform for more information }
-    If sortOccured then
+    If sortOccurred then
     begin
       if newXORTerm = tempXORTerm then
       begin
@@ -419,6 +455,7 @@ end;
   idempotency for and, or, xor, sand
 ------------------------------------------------------------------------------}
 function LawOfIdempotency(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList ) : boolean;
+var newTerm : TTFTAObject = NIL;
 begin
   Result := False;
   { only the term itself may be modified! its children (their instances!) must not be
@@ -433,7 +470,13 @@ begin
     if currentTerm.Children.DeleteAllCopies then
     begin
       Result := True;
-      {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'LawOfIDemtopency 1'); {$ENDIF}
+      { check whether identical event already exists }
+      if checkIfAlreadyListed(currentTerm,eventlist,newTerm) then
+        GenericUpdateObject(currentTerm,newTerm,eventlist,theParent,theIndex,'LawOfIdempotency 1');
+      {$IfDef TESTMODE}
+        if not Assigned(newTerm) then
+          currentTerm.DEBUGPrint(true,eventlist,'LawOfIDemtopency 1.5');
+      {$ENDIF}
     end;
     { if all children were the same then there is only one child left now.
       SAND, AND, XOR, OR with only one child are the child!}
@@ -709,12 +752,10 @@ function PANDPANDTransform(currentTerm :TTFTAObject; theParent : TTFTAList; theI
 var tempTerm,x,y,z : TTFTAObject;
     newANDTerm, tempANDTerm     : TTFTAObject;
     expr, overallexpr : ansistring;
-    sortOccured : boolean = False;
+    sortOccurred : boolean = False;
 
 begin
   Result := False;
-  { only the currentTermrm itself may be modified! its children (their instances!) must not be
-    touched, therefore a new object has to be created (the and[x,y])}
   if (currentTerm.EventType = tftaEventTypePAND) and (currentTerm[1].EventType = tftaEventTypePAND) and
      (currentTerm.Count = 2) and (currentTerm[1].Count = 2) then
   begin
@@ -722,43 +763,54 @@ begin
     x := currentTerm[0];
     y := currentTerm[1][0];
     z := currentTerm[1][1];
-    { check wether a new object is really needed to be created or wether there
-      already is an object like the one that needs to be created. In the latter
-      case do not create a new one but link the existing one. Checking and linking
-      isdone via the EventList. }
-    { create new and object }
+    { Note: the following detailled comments (1) to (6) are referred to by all other
+            routines that create commutative events and thus need to be sorted
+            after creation. }
+    { (0) - Only the currentTermrm itself may be modified but its children
+            (their instances!) must not be touched (as they might exist somewhere
+            else within the overall temporal expression), therefore a new object
+            has to be created.
+          - check wether a new object is really needed to be created or wether there
+            already is an object like the one that needs to be created.
+          - In the latter case link to the existing one and delete the temporarily
+            created one (Checking and linking is done via the EventList). }
+    { (1) create new and object as part of eventlist }
     newANDTerm := eventlist.NewItem;
-    tempANDTerm := newANDTerm; { save pointer to this object for later comparison (see three cases below) }
+    { (2) save pointer to this object for later comparison (see three cases below) }
+    tempANDTerm := newANDTerm;
+    { (3) assign the children (operands) and term's properties }
     newANDTerm.EventType:= tftaEventTypeAND;
     newANDTerm.AddChild(x);
     newANDTerm.AddChild(y);
     newANDTerm.CheckTermProperties;
-    sortOccured := SortOperands(newANDTerm,NIL,0,eventlist);
-    { after SortOperands newANDTerm holds three possible Objects:
-      1) The "old" newANDTerm (as before) as x and y are "in order" and thus no sorting would have
-         been necessary (we didn't know that of course)
-         --> In this case SortOperands returns false.
-      2) A "new" newANDTerm (unlike before) as x and y are "not in order" and thus sorting
-         was necessary --- and the "new" newANDTerm was not already listed in EventList
-         --> In this case SortOperands returns True and the last newly created
-         eventlist.Items still points to the newANDTerm.
-      3) Like 2) but the "new" newANDTerm was already listed in EventList
-         --> In this case SortOperands returns True and the last newly created
-         eventlist.Items points to the now useless "old" newANDTerm which is
-         different from the "new" newANDTerm.    }
-    If sortOccured then
+    { (4) sort the new term (as it is commutative); this includes checking whether
+          there already exists an identical object within eventlist (see comments
+          in SortOperands and ScanChildrenSort }
+    sortOccurred := SortOperands(newANDTerm,NIL,0,eventlist);
+    { (5) after SortOperands newANDTerm holds four possible Objects:
+          case 1) The "old" newANDTerm (as before) as x and y are "in order" and
+                  thus no sorting would have been necessary (we didn't know that
+                  of course) --- and the "old" newANDTerm was not already listed in EventList
+                  --> In this case SortOperands returns false; sortOccurred = false;
+                      tempANDTerm and newANDTerm are the same and point to the old/new term.
+          case 2) A "new" newANDTerm (unlike before) as x and y are "not in order" and thus sorting
+                  was necessary --- and the "new" newANDTerm was not already listed in EventList
+                  --> In this case SortOperands returns True; sortOccurred = true;
+                      tempANDTerm and newANDTerm are the same and point to the new term.
+          case 3) the "new" newANDTerm was already listed in EventList
+                  --> In this case SortOperands returns True; sortOccurred = true;
+                      tempANDTerm still points to the now useless "old" newANDTerm
+                      while newANDTerm points to the already listed event (the one
+                      used further on); tempANDTerm may be deleted }
+    If sortOccurred and { not case 1 }
+       not ( newANDTerm = tempANDTerm ) then { not case 2 }
     begin
-      if newANDTerm = tempANDTerm then
-      begin
-        { the case 2) }
-      end else
-      begin
-        { the case 3) --> free useless element in eventlist }
-        eventlist.Delete(tempANDTerm.PosInEventList);
-      end;
+      { the case 3) --> free useless element in eventlist }
+      eventlist.Delete(tempANDTerm.PosInEventList);
     end;
-    { either way at thispoint newANDTerm holds the pointer to the correct AND[...] }
+    { (6) either way at thispoint newANDTerm holds the pointer to the correct AND[...] }
     expr := newANDTerm.TemporalExpr;
+
     { expr now holds the TemporalExpression of the newly to be created object;
       now check wether there is the overall to be created object already existing (listed in eventlist)}
     overallexpr := 'PAND[' + expr + ',' + z.TemporalExpr + ']';
@@ -853,7 +905,7 @@ var expr              : ansistring;
     pandterm          : TTFTAObject;
     pandTermLastChild : TTFTAObject;
     restOfPand        : TTFTAObject;
-    sortOccured       : boolean;
+    sortOccurred       : boolean;
     tempTerm          : TTFTAObject;
     tempSANDTerm      : TTFTAObject;
 begin
@@ -918,9 +970,9 @@ begin
       {$IfDef TESTMODE}newSANDTerm.DEBUGPrint(true,eventlist, 'SANDPANDTRansform 1.5');{$ENDIF}
       newSANDTerm.AddChild(pandTermLastChild);
       newSANDTerm.CheckTermProperties;
-      sortOccured := SortOperands(newSANDTerm,NIL,0,eventlist);
+      sortOccurred := SortOperands(newSANDTerm,NIL,0,eventlist);
       { for the three cases see explanations in PANDPANDTransform }
-      If sortOccured then
+      If sortOccurred then
       begin
         if newSANDTerm = tempSANDTerm then
         begin
@@ -982,6 +1034,7 @@ var numberChildren : integer = 0;
   i : integer;
   expressionList : TTFTAStringList = NIL;
   tempObject : TTFTAObject;
+  localIsChange : boolean = False;
 begin
 
   if not currentTerm.IsBasicEvent then
@@ -993,68 +1046,87 @@ begin
       expressionList := TTFTAStringList.Create;
       i := 0;
       repeat
-        expressionList.Add(ScanChildrenSorting(currentTerm[i],currentTerm.Children,i,eventlist,isChange));
+        expressionList.Add(ScanChildrenSorting(currentTerm[i],currentTerm.Children,i,eventlist,localIsChange));
         inc(i);
       until (i = numberChildren);
+
       { now sort the entries in expressionList,
         if TTFTAStringList.sort returns false, then no sort was performed, i.e.
         no sorting of the currentTerm-children is necessary; if sort returns
         true, then sorting is necessary }
-      { only sort if commutative operator and sorting of currentTerm.children necessary,
-        otherwise just return temporal expression stored in expressionList.Text }
-      if ( (currentTerm.EventType = tftaEventTypeAND) or
-           (currentTerm.EventType = tftaEventTypeSAND) or
-           (currentTerm.EventType = tftaEventTypeOR) or
-           (currentTerm.EventType = tftaEventTypeXOR)
-         ) and
-         ( expressionList.Sort ) then
+      { only sort if commutative operator (check for PAND is sufficient as more
+        than it is checked before, that currentTerm has more than one operand }
+      if not (currentTerm.EventType = tftaEventTypePAND) then
       begin
+        { right now localIsChange is still set from the next iteration of ScanChildrenSort;
+          its value is irrelevant now, as possible changes of other descendants than the
+          direct children have already been handled at deeper levels of the iterative
+          walk-through; only changes at the current childrens' level are relevant }
+        localIsChange := expressionList.Sort;
         { if such an event already exists in eventlist, then take this, else
           create a new one }
-        isChange := true;
         Result := currentTerm.EventTypeToString + '[' + expressionList.CSText + ']';
         {$IfDef TESTMODE}
           currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting (Aenderung) 1');
         {$ENDIF}
-
         tempObject := eventlist.ListHoldsObjectAt(Result);
-        if not Assigned(tempObject) then
+        { four possibilities:
+          1) [ sort was necessary ] and [ new (sorted) event not already listed in eventlist ]
+          2) [ sort was necessary ] and [ new (sorted) event already listed in eventlist ]
+          3) [ no sort was necessary ] and [ new (sorted) event not already listed in eventlist ]
+          2) [ no sort was necessary ] and [ new (sorted) event already listed in eventlist ] }
+        if Assigned(tempObject) then
         begin
-          tempObject := currentTerm.Clone(eventlist);
-          currentTerm.Children.Clear;
-          { for each child ... }
-          numberChildren := tempObject.Count;
-          i := 0;
-          repeat
-            currentTerm.AddChild(tempObject[expressionList[i].FormerPosition]);
-            inc(i);
-          until (i = numberChildren);
-          currentTerm.CheckTermProperties;
-          {$IfDef TESTMODE}
-            currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting (Aenderung) 2');
-          {$ENDIF}
-          { we can free the cloned event (in tempObject) }
-          eventlist.Delete(eventlist.Count-1);
+          { possibilites 2 or 4 --> re-link currentTerm to existing event }
+          GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'ScanChildrenSorting 3');
+          localIsChange := true; { regardless of sorting a change (the re-link) has happened }
         end else
         begin
-          { event already listed in eventlist }
-          GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'ScanChildrenSorting 3');
-        end;
-
+          if localIsChange then { implies: not Assigned(tempObject) }
+          begin
+            { possibility 1 --> sort the operands of currentTerm }
+            tempObject := currentTerm.Clone(eventlist);
+            currentTerm.Children.Clear;
+            { for each child ... }
+            numberChildren := tempObject.Count;
+            i := 0;
+            repeat
+              currentTerm.AddChild(tempObject[expressionList[i].FormerPosition]);
+              inc(i);
+            until (i = numberChildren);
+            currentTerm.CheckTermProperties;
+            {$IfDef TESTMODE}
+              currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting (Aenderung) 2');
+            {$ENDIF}
+            { we can free the cloned event (in tempObject) }
+            eventlist.Delete(eventlist.Count-1);
+          end else
+          begin
+            { possibility 3 --> do nothing (localIsChange = false) }
+          end;
+        end; { four possibilities }
+      end else
+      begin
+        { non commutative operator (aka PAND) }
+        Result := currentTerm.EventTypeToString + '[' + expressionList.CSText + ']';
+        localIsChange := false; { PAND: no change of the direct childrens' order }
       end;
-      Result := currentTerm.EventTypeToString + '[' + expressionList.CSText + ']';
     end else
     begin
       { NOT operator or one of the above in rare cases, where
         transformation results in only single parameter }
-      Result := currentTerm.EventTypeToString + '[' +
-                ScanChildrenSorting(currentTerm[0],currentTerm.Children,0,eventlist,isChange) + ']';
+      Result := ScanChildrenSorting(currentTerm[0],currentTerm.Children,0,eventlist,localIsChange);
+      Result := currentTerm.EventTypeToString + '[' + Result + ']';
+      localIsChange := false; { NOT: no change of the direct child }
     end;
   end else
   begin;
     { is basic event }
     Result := currentTerm.PlainTemporalExpr; { name is stored in VExpr at creation of basic event }
+    localIsChange := false; { BASIC: no change of the event }
   end;
+
+  isChange := localIsChange;
 
 end; { function ScanChildrenSorting }
 

@@ -455,7 +455,7 @@ begin
 
   { for all parts concerning the scanning and changing of TTFTAObject.IsSorted
     within this function see the algorithm documentation (look for "sorting") }
-  if not self.IsBasicEvent then
+  if (not self.IsBasicEvent) and (not self.NeedsToBeUpdated) then
   begin
     if not self.IsNotCompletelyBuildYet then
     begin
@@ -470,42 +470,6 @@ begin
             Result := Result + self[i].TemporalExpr + ',';
           end;
           Result := Result + self[i+1].TemporalExpr;
-          //{ now check whether a change has taken place,
-            //if yes, we need to resort, if no, we need to do nothing;
-            //for this compare the prestored string with the one derived from the childern }
-          //If not AnsiMatchStr(Result,self.PlainTemporalExpr) then
-          //begin
-            //self.SortChildren;
-            //Result := '';
-            //{ for each child (all children are already sorted after passing
-              //the iterative scan from before) get the prestored TemporalExpr
-              //(directly from Child.VExpr) }
-            //for i:=0 to j-2 do
-            //begin
-              //Result := Result + self[i].PlainTemporalExpr + ',';
-            //end;
-            //Result := Result + self[i+1].PlainTemporalExpr;
-            //{ set own prestored value to the new string derived from the children}
-            //self.VExpr := Result;
-            //{ it can be, that after a sort a formerly "different" term suddely is identical
-              //to another term already listed in TTFTAEventLookupList. In this case link the
-              //former to the latter... }
-            //tempObject := self.EventLookupList.Extract(self);
-            //doubleObject := self.EventLookupList.ListHoldsObjectAt(Result);
-            //self.EventLookupList.Insert(self.PosInEventList,tempObject);
-            //if Assigned(doubleObject) then
-            //begin
-              //self.PointerToUpdateObject := doubleObject;
-              //self.NeedsToBeUpdated := true;
-              //Result := doubleObject.TemporalExpr;
-            //end;
-
-          //end else
-          //begin
-            //{ do nothing, Result and VExpr are already the same, i.e.
-              //all children are sorted (by passing down iteratively, see above)
-              //and oneself has not changed either, thus is also sorted... }
-          //end;
         end else  { not operator or one of the above in rare cases, where
                     transformation results in only single parameter }
         begin
@@ -516,7 +480,7 @@ begin
         end;
         Result := self.EventTypeToString + '[' + Result + ']';
       end else
-      begin { no basic event, build completely but no children ?! }
+      begin { no basic event, no NeedsToBeUpdated, build completely but no children ?! }
         Result := '###ERROR11241###' ;
       end;
     end else
@@ -525,7 +489,10 @@ begin
     end;
   end else
   begin;
-    Result := self.PlainTemporalExpr; { name is stored in VExpr at creation of basic event }
+    { basic event or outdated event (NeedsToBeUpdated = true).
+      Name of basic event is stored in VExpr at creation of basic event;
+      "out of order" is stored if NeedsToBeUpdated = true }
+    Result := self.PlainTemporalExpr;
   end;
 
 end;
@@ -535,7 +502,7 @@ end;
 ------------------------------------------------------------------------------}
 procedure TTFTAObject.SetTempExpr(theExpr : ansistring);
 begin
-  if self.IsBasicEvent then self.VExpr:=theExpr;
+  if (not self.HasChildren) then self.VExpr:=theExpr;
 end;
 {------------------------------------------------------------------------------
   Liefert Typ des Ereignisses (aus VType) als String
