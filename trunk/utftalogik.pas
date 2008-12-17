@@ -225,13 +225,9 @@ begin
         already is listed in Eventlist }
       SortOperands(currentTerm,theParent,theIndex,eventlist);
       currentTerm.CheckTermProperties;
-
-
-
       {$IfDef TESTMODE}
         currentTerm.DEBUGPrint(true,eventlist,'GenericCombine 2');
       {$ENDIF}
-
     end; { if nowSizeArray > 0 }
   end;
 end;
@@ -302,11 +298,6 @@ begin
 
   oldTerm.RedirectMe(newTerm);
 
-  { if parentList is provided, then do the update within parentList;
-    there is a second possibility: for sorting it is necessary to call SortOperands
-    for new terms that do not yet are assigned within the overall TemporalExpr and
-    thus do not have a parentList and oldObjectIndex; for those do only redirect
-    the pointer to the new term }
   if assigned(parentList) then
   begin
     oldterm := parentList[oldObjectListIndex];
@@ -324,7 +315,7 @@ begin
       ShowMessage('Fatal Error (081210.1221) while processing event ' +
                   PointerAddrStr(oldTerm) + ' ( ' + oldTerm.TemporalExpr + ' ) ' );
   end else
-  begin  { case without parentList }
+  begin  { case without parentList (mainly for SortOperands-routine) }
     {$IfDef TESTMODE}
       if Assigned(newterm.DEBUGMemo) then
         newterm.DEBUGPrint(true,eventList,callString + ' (without assigned partenList!)');
@@ -715,6 +706,7 @@ end;
 
 {------------------------------------------------------------------------------
   transform pand[x,False] or pand[False,x] pand[x,True] to False
+  transform pand[True,x] to x
 ------------------------------------------------------------------------------}
 function PANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
@@ -727,6 +719,14 @@ begin
     begin
       Result := True;
       GenericUpdateObject(currentTerm,eventlist.TheFALSEElement,eventlist,theParent,theIndex,'PANDFalse 1');
+    end
+    else
+    begin
+      if currentTerm[0] = eventlist.TheTRUEElement then
+      begin
+        Result := True;
+        GenericUpdateObject(currentTerm,currentTerm[1],eventlist,theParent,theIndex,'PANDFalse 2');
+      end;
     end;
   end;
 end;
@@ -793,7 +793,7 @@ begin
           there already exists an identical object within eventlist (see comments
           in SortOperands and ScanChildrenSort }
     sortOccurred := SortOperands(newANDTerm,NIL,0,eventlist);
-    { (5) after SortOperands newANDTerm holds four possible Objects:
+    { (5) after SortOperands newANDTerm holds three possible Objects:
           case 1) The "old" newANDTerm (as before) as x and y are "in order" and
                   thus no sorting would have been necessary (we didn't know that
                   of course) --- and the "old" newANDTerm was not already listed in EventList
@@ -1056,14 +1056,11 @@ begin
         expressionList.Add(tempString);
         inc(i);
       until (i = numberChildren);
-
       { now sort the entries in expressionList,
         if TTFTAStringList.sort returns false, then no sort was performed, i.e.
         no sorting of the currentTerm-children is necessary; if sort returns
         true, then sorting is necessary }
-      { only sort if commutative operator (check for PAND is sufficient as more
-        than it is checked before, that currentTerm has more than one operand }
-      if not (currentTerm.IsTypePAND) and expressionList.Sort then
+      if currentTerm.IsCommutative and expressionList.Sort then
       begin
         { right now localIsChange is still set from the next iteration of ScanChildrenSort;
           its value is irrelevant now, as possible changes of other descendants than the
@@ -1077,11 +1074,7 @@ begin
           currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting (Aenderung) 1');
         {$ENDIF}
         tempObject := eventlist.ListHoldsObjectAt(Result);
-        { three possibilities:
-          1) [ sort was necessary ] and [ new (sorted) event not already listed in eventlist ]
-          2) [ sort was necessary ] and [ new (sorted) event already listed in eventlist ]
-          3) [ no sort was necessary ] and [ new (sorted) event already listed in eventlist ]
-          if no sort, then the event can not not be in list! }
+        { three possibilities: see PANDPANDTRansform }
         if not Assigned(tempObject) then
         begin
           { possibility 1 --> sort the operands of currentTerm }
@@ -1117,7 +1110,7 @@ begin
             exists somewhere else ... }
           tempObject := NIL;
           if checkIfAlreadyListed(currentTerm,eventlist,tempObject) then
-             GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'ScanChildrenSorting 5');
+            GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'ScanChildrenSorting 5');
           {$IfDef TESTMODE}
             if tempObject = currentTerm then {in this case checkIfAlreadyListed is false and thus no
                                        debug output was created }
