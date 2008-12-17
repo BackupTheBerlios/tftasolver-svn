@@ -455,6 +455,20 @@ begin
     Result := False; { no children -> children cant be basic events }
 end;
 {------------------------------------------------------------------------------
+  Reads VPointerToUpdateObject, but if the object VPointerToUpdateObject points
+  to itself has NeedsToBeUpdated set, then return
+  VPointerToUpdateObject.GetPointerToUpdateObject
+------------------------------------------------------------------------------}
+function TTFTAObject.GetPointerToUpdateObject : TTFTAObject;
+begin
+  Result := self.VPointerToUpdateObject;
+  if Assigned(Result) and (Result.NeedsToBeUpdated) then
+  begin
+    self.RedirectMe(Result.VPointerToUpdateObject);
+    Result := Result.VPointerToUpdateObject;
+  end;
+end;
+{------------------------------------------------------------------------------
   Provides the logical expression represented by the term / object
   Scanns through all descendants, which is time consuming
   use with care and as seldom as possible

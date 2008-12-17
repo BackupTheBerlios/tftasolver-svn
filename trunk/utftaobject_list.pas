@@ -112,6 +112,10 @@ begin
   if Assigned(Result) and Result.NeedsToBeUpdated then
   begin
     Result := Result.PointerToUpdateObject;
+    {$IfDef TESTMODE}
+      if Assigned(Result.DEBUGMemo) then
+        Result.DEBUGMemo.Append('Extract ' + PointerAddrStr(Result) + ' --> ' + PointerAddrStr(tempObject));
+    {$EndIf}
   end;
 end;
 

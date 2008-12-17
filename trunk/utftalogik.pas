@@ -158,23 +158,13 @@ begin
   Result  := Assigned(newTerm) and (not (newTerm = currentTerm) );
   { this is the same as:
         if Assigned(newTerm) then
-        begin
           if newTerm = currentTerm then
-          begin
-            // no other event found
-            Result  := False;
-          end else
-          begin
-            // other event found
-            Result  := True;
-          end;
-        end else
-        begin
-          // should not happen!
-          Result  := False;
-        end;                  }
+            Result  := False  // no other event found
+          else
+            Result  := True   // other event found
+        else
+          Result  := False;  // should not happen!                 }
 end;
-
 {------------------------------------------------------------------------------
   Generic combine of commutative terms (incl. sorting)
 ------------------------------------------------------------------------------}
@@ -660,6 +650,7 @@ end;
   transform xor[ ... False ... ] to xor[ ... ]
 ------------------------------------------------------------------------------}
 function ORXORFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+var newTerm : TTFTAObject;
 begin
   Result := False;
   if (currentTerm.IsTypeOR) or (currentTerm.IsTypeXOR) then
@@ -670,18 +661,29 @@ begin
     end;
     if Result then
     begin
-      if not currentTerm.HasChildren then { all children were FALSE }
-      begin;
-        GenericUpdateObject(currentTerm,eventlist.TheFALSEElement,eventlist,theParent,theIndex,'ORXORFalse 1');
+      if currentTerm.Count > 1 then
+      begin
+        { check whether identical event already exists }
+        if checkIfAlreadyListed(currentTerm,eventlist,newTerm) then
+          GenericUpdateObject(currentTerm,newTerm,eventlist,theParent,theIndex,'ANDTrue 1');
+        {$IfDef TESTMODE}
+          if newTerm = currentTerm then {in this case checkIfAlreadyListed is false and thus no
+                                     debug output was created }
+            currentTerm.DEBUGPrint(true,eventlist,'ANDTrue 1.5');
+        {$ENDIF}
       end else
       begin
-        if currentTerm.Count = 1 then { all but one child were FALSE -> only one left }
+        if currentTerm.Count = 1 then
         begin;
-          GenericUpdateObject(currentTerm,currentTerm[0],eventlist,theParent,theIndex,'ORXORFalse 2');
+          { no extra check is needed whether new term already exists, it exists (as child #0) }
+          GenericUpdateObject(currentTerm,currentTerm[0],eventlist,theParent,theIndex,'ANDTrue');
+        end else
+        begin { currentTerm has no children left }
+          GenericUpdateObject(currentTerm,eventlist.TheFALSEElement,eventlist,theParent,theIndex,'ANDTrue');
         end;
       end;
-    end;
-  end;
+    end;  { Result }
+  end;  { isTypeAND }
 end;
 
 {------------------------------------------------------------------------------
@@ -871,6 +873,7 @@ var AtLeastOneIsFalse : boolean = False;
     AtLeastOneIsTrue  : boolean = False;
     AtLeastOneIsNormalEvent : boolean = False;
     i : Integer;
+    doBreak : boolean = False;
 begin
   Result := False;
   if (currentTerm.IsTypeSAND) then
@@ -883,12 +886,10 @@ begin
         else
           AtLeastOneIsNormalEvent := True ;
       inc(i);
-    until ( i = (currentTerm.Count) ) or
-          ( AtLeastOneIsFalse ) or
-          ( AtLeastOneIsTrue and AtLeastOneIsNormalEvent );
+      doBreak := AtLeastOneIsFalse or ( AtLeastOneIsTrue and AtLeastOneIsNormalEvent )
+    until doBreak or (i = currentTerm.Count);
 
-    if ( AtLeastOneIsFalse ) or
-       ( AtLeastOneIsTrue and AtLeastOneIsNormalEvent ) then
+    if doBreak then
     begin
       Result := True;
       GenericUpdateObject(currentTerm,eventlist.TheFALSEElement,eventlist,theParent,theIndex,'SANDFalse 1');
@@ -971,10 +972,10 @@ begin
         - run SortOperands on the clone }
       newSANDTerm := currentTerm.Clone(eventlist);
       tempSANDTerm:= newSANDTerm;
-      {$IfDef TESTMODE}newSANDTerm.DEBUGPrint(true,eventlist, 'SANDPANDTRansform 1.5');{$ENDIF}
       newSANDTerm.AddChild(pandTermLastChild);
       newSANDTerm.CheckTermProperties;
       sortOccurred := SortOperands(newSANDTerm,NIL,0,eventlist);
+      {$IfDef TESTMODE}newSANDTerm.DEBUGPrint(true,eventlist, 'SANDPANDTRansform 1.5');{$ENDIF}
       { for the three cases see explanations in PANDPANDTransform }
       If sortOccurred then
       begin

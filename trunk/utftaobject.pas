@@ -203,6 +203,7 @@ type
     function  CheckLogicFalse    : boolean;
     function  CheckLogicTrue     : boolean;
     function  GetChildrenBasicState : boolean;
+    function  GetPointerToUpdateObject : TTFTAObject;
     function  GetTempExpr : ansistring;
 
     procedure CheckForCoreEvent;
@@ -270,7 +271,7 @@ type
     property  LogicLevel : integer read VIsTrueFalse;
     property  NeedsToBeUpdated : boolean read VNeedsToBeUpdated write VNeedsToBeUpdated;
     property  PlainTemporalExpr : ansistring read VExpr;
-    property  PointerToUpdateObject : TTFTAObject read VPointerToUpdateObject write VPointerToUpdateObject;
+    property  PointerToUpdateObject : TTFTAObject read GetPointerToUpdateObject write VPointerToUpdateObject;
     property  PosInEventList : Integer read VPosInEventList write VPosInEventList;
     property  TemporalExpr : ansistring read GetTempExpr write SetTempExpr;
 
