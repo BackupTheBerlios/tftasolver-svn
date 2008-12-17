@@ -288,7 +288,7 @@ end;
 ------------------------------------------------------------------------------}
 function TTFTAObject.CheckIsCommutative : boolean;
 begin
-  Result := ( self.IsTypePAND ) and ( self.Count > 1 );
+  Result := ( not self.IsTypePAND ) and ( self.Count > 1 );
   { this is the same as (but shorter/quicker than)
      Result := (self.IsTypeAND) or
                (self.IsTypeOR) or
