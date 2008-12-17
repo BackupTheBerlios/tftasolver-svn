@@ -110,6 +110,7 @@ end;
   transform and[ ... True ... ] to and[ ... ]
 ------------------------------------------------------------------------------}
 function ANDTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+var newTerm : TTFTAObject;
 begin
   Result := False;
   if (currentTerm.IsTypeAND) then
@@ -120,18 +121,29 @@ begin
     end;
     if Result then
     begin
-      if not currentTerm.HasChildren then
-      begin;
-        GenericUpdateObject(currentTerm,eventlist.TheTRUEElement,eventlist,theParent,theIndex,'ANDTrue');
+      if currentTerm.Count > 1 then
+      begin
+        { check whether identical event already exists }
+        if checkIfAlreadyListed(currentTerm,eventlist,newTerm) then
+          GenericUpdateObject(currentTerm,newTerm,eventlist,theParent,theIndex,'ANDTrue 1');
+        {$IfDef TESTMODE}
+          if newTerm = currentTerm then {in this case checkIfAlreadyListed is false and thus no
+                                     debug output was created }
+            currentTerm.DEBUGPrint(true,eventlist,'ANDTrue 1.5');
+        {$ENDIF}
       end else
       begin
         if currentTerm.Count = 1 then
         begin;
+          { no extra check is needed whether new term already exists, it exists (as child #0) }
           GenericUpdateObject(currentTerm,currentTerm[0],eventlist,theParent,theIndex,'ANDTrue');
+        end else
+        begin { currentTerm has no children }
+          GenericUpdateObject(currentTerm,eventlist.TheTRUEElement,eventlist,theParent,theIndex,'ANDTrue');
         end;
       end;
-    end;
-  end;
+    end;  { Result }
+  end;  { isTypeAND }
 end;
 
 {------------------------------------------------------------------------------
