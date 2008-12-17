@@ -81,7 +81,7 @@ var AtLeastOneIsFalse : boolean = False;
     i : Integer;
 begin
   Result := False;
-  if (currentTerm.EventType = tftaEventTypeAND) then
+  if (currentTerm.IsTypeAND) then
   begin
     i := 0;
     repeat
@@ -112,7 +112,7 @@ end;
 function ANDTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := False;
-  if (currentTerm.EventType = tftaEventTypeAND) then
+  if (currentTerm.IsTypeAND) then
   begin
     while Assigned(currentTerm.ExtractChild(eventlist.TheTRUEElement)) do
     begin
@@ -177,11 +177,7 @@ var myType : TTFTAOperatorType;
 begin
   Result := False;
   myType := currentTerm.EventType;
-  if ( (myType = tftaEventTypeAND) or
-       (myType = tftaEventTypeSAND) or
-       (myType = tftaEventTypeOR) or
-       (myType = tftaEventTypeXOR)
-     ) then
+  if currentTerm.IsCommutative then
   begin
     { scan all children and get all objects of same type as currentTerm;
       this is done in a single loop }
@@ -299,10 +295,14 @@ begin
   { note: no sorting necessary; sorting must be done prior to calling this routine }
   if oldTerm = newTerm then exit;
 
+<<<<<<< .mine
+  oldTerm.RedirectMe(newTerm);
+=======
   oldTerm.PointerToUpdateObject:=newTerm;
   oldTerm.Children.Clear;
   oldTerm.TemporalExpr:='out of action';
   oldTerm.NeedsToBeUpdated:=true;
+>>>>>>> .r37
 
   { if parentList is provided, then do the update within parentList;
     there is a second possibility: for sorting it is necessary to call SortOperands
@@ -348,7 +348,7 @@ begin
   Result := False;
   { only the term itself may be modified! its children (their instances!) must not be
     touched, therefore three new objects are to be created }
-  if (currentTerm.EventType = tftaEventTypeAND) and (not currentTerm.IsAllChildrenAreBasic) then
+  if (currentTerm.IsTypeAND) and (not currentTerm.IsAllChildrenAreBasic) then
   begin
     Result := True;
     { if currentTerm.Count > 2 then split currentTerm first }
@@ -460,16 +460,21 @@ begin
   Result := False;
   { only the term itself may be modified! its children (their instances!) must not be
     touched }
-  if ( currentTerm.Count > 1 ) and
-     ((currentTerm.EventType = tftaEventTypeAND) or
-      (currentTerm.EventType = tftaEventTypeOR) or
-      (currentTerm.EventType = tftaEventTypeXOR) or
-      (currentTerm.EventType = tftaEventTypeSAND)
-     ) then
+  if currentTerm.IsCommutative then
   begin
     if currentTerm.Children.DeleteAllCopies then
     begin
       Result := True;
+<<<<<<< .mine
+      { check whether identical event already exists }
+      if checkIfAlreadyListed(currentTerm,eventlist,newTerm) then
+        GenericUpdateObject(currentTerm,newTerm,eventlist,theParent,theIndex,'LawOfIdempotency 1');
+      {$IfDef TESTMODE}
+        if newTerm = currentTerm then {in this case checkIfAlreadyListed is false and thus no
+                                   debug output was created }
+          currentTerm.DEBUGPrint(true,eventlist,'LawOfIDemtopency 1.5');
+      {$ENDIF}
+=======
       { check whether identical event already exists }
       if checkIfAlreadyListed(currentTerm,eventlist,newTerm) then
         GenericUpdateObject(currentTerm,newTerm,eventlist,theParent,theIndex,'LawOfIdempotency 1');
@@ -477,6 +482,7 @@ begin
         if not Assigned(newTerm) then
           currentTerm.DEBUGPrint(true,eventlist,'LawOfIDemtopency 1.5');
       {$ENDIF}
+>>>>>>> .r37
     end;
     { if all children were the same then there is only one child left now.
       SAND, AND, XOR, OR with only one child are the child!}
@@ -504,9 +510,9 @@ var op1 : TTFTAObject;
     var i : integer = 0;
         numberChildren : integer;
     begin
-      if (theObject.EventType = tftaEventTypePAND) or
-         (theObject.EventType = tftaEventTypeAND) or
-         (theObject.EventType = tftaEventTypeSAND) then
+      if (theObject.IsTypePAND) or
+         (theObject.IsTypeAND) or
+         (theObject.IsTypeSAND) then
       begin
         numberChildren := theObject.Count;
         { add theObject to Alist and continue for all children of theObject, then return }
@@ -517,9 +523,9 @@ var op1 : TTFTAObject;
         until i = numberChildren;
       end else
       begin
-        if (theObject.EventType = tftaEventTypeOR) or
-           (theObject.EventType = tftaEventTypeXOR) or
-           (theObject.EventType = tftaEventTypeBASIC) then
+        if (theObject.IsTypeOR) or
+           (theObject.IsTypeXOR) or
+           (theObject.IsTypeBASIC) then
         begin
           { add theObject to Alist and return }
           AList.Add(theObject);
@@ -539,7 +545,7 @@ var op1 : TTFTAObject;
         numberChildren : integer;
     begin
       Result := True;
-      if (theObject.EventType = tftaEventTypePAND) then
+      if (theObject.IsTypePAND) then
       begin
         { check if theObject ist not already listed in AList }
         if AList.IndexOf(theObject) = -1 then
@@ -549,8 +555,8 @@ var op1 : TTFTAObject;
           Result := false;
       end else  { not PAND }
       begin
-        if (theObject.EventType = tftaEventTypeAND) or
-           (theObject.EventType = tftaEventTypeSAND) then
+        if (theObject.IsTypeAND) or
+           (theObject.IsTypeSAND) then
         begin
           { check if theObject is not already listed in AList }
           if AList.IndexOf(theObject) = -1 then
@@ -567,9 +573,9 @@ var op1 : TTFTAObject;
           end;
         end else { neither PAND nor AND nor SAND }
         begin
-          if (theObject.EventType = tftaEventTypeOR) or
-             (theObject.EventType = tftaEventTypeXOR) or
-             (theObject.EventType = tftaEventTypeBASIC) then
+          if (theObject.IsTypeOR) or
+             (theObject.IsTypeXOR) or
+             (theObject.IsTypeBASIC) then
           begin
             { check if theObject is listed in AList }
             Result := (AList.IndexOf(theObject) = -1); { True if not listed, False if listed }
@@ -583,7 +589,7 @@ var op1 : TTFTAObject;
 
 begin
   Result := False;
-  if (currentTerm.EventType = tftaEventTypePAND) and (currentTerm.Count = 2) then
+  if (currentTerm.IsTypePAND) and (currentTerm.Count = 2) then
   begin
     { create A- and B-lists }
     AList := TTFTAList.Create;
@@ -612,7 +618,7 @@ end;
 function NOTFalseTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := False;
-  if (currentTerm.EventType = tftaEventTypeNOT) then
+  if (currentTerm.IsTypeNOT) then
   begin
     if ( currentTerm[0] = eventlist.TheFALSEElement ) then
     begin
@@ -635,8 +641,8 @@ end;
 function NOTNOT(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean;
 begin
   Result := False;
-  if ( currentTerm.EventType = tftaEventTypeNOT    ) and
-     ( currentTerm[0].EventType = tftaEventTypeNOT ) then
+  if ( currentTerm.IsTypeNOT    ) and
+     ( currentTerm[0].IsTypeNOT ) then
   begin
     Result := True;
     GenericUpdateObject(currentTerm,currentTerm[0][0],eventlist,theParent,theIndex,'NOTNOT 1');
@@ -658,7 +664,7 @@ end;
 function ORXORFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := False;
-  if (currentTerm.EventType = tftaEventTypeOR) or (currentTerm.EventType = tftaEventTypeXOR) then
+  if (currentTerm.IsTypeOR) or (currentTerm.IsTypeXOR) then
   begin
     while Assigned(currentTerm.ExtractChild(eventlist.TheFALSEElement)) do
     begin
@@ -689,7 +695,7 @@ var AtLeastOneIsTrue : boolean = False;
     i : Integer;
 begin
   Result := False;
-  if (currentTerm.EventType = tftaEventTypeOR) or (currentTerm.EventType = tftaEventTypeXOR) then
+  if (currentTerm.IsTypeOR) or (currentTerm.IsTypeXOR) then
   begin
     i := 0;
     repeat
@@ -713,7 +719,7 @@ end;
 function PANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 begin
   Result := False;
-  if (currentTerm.EventType = tftaEventTypePAND) and (currentTerm.Count = 2) then
+  if (currentTerm.IsTypePAND) and (currentTerm.Count = 2) then
   begin
     if ( currentTerm[0] = eventlist.TheFALSEElement ) or
        ( currentTerm[1] = eventlist.TheFALSEElement ) or
@@ -733,7 +739,7 @@ function PANDMultiples(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex
 begin
   Result := False;
   //currentTerm.DEBUGMemo.Append('PANDMultiples checking on ' + PointerAddrStr(currentTerm) + ' ::: ' + currentTerm.TemporalExpr);
-  if (currentTerm.EventType = tftaEventTypePAND) and (currentTerm.Count = 2) then
+  if (currentTerm.IsTypePAND) and (currentTerm.Count = 2) then
   begin
     if ( currentTerm[0] = currentTerm[1] ) then
     begin
@@ -756,7 +762,11 @@ var tempTerm,x,y,z : TTFTAObject;
 
 begin
   Result := False;
+<<<<<<< .mine
+  if (currentTerm.IsTypePAND) and (currentTerm[1].IsTypePAND) and
+=======
   if (currentTerm.EventType = tftaEventTypePAND) and (currentTerm[1].EventType = tftaEventTypePAND) and
+>>>>>>> .r37
      (currentTerm.Count = 2) and (currentTerm[1].Count = 2) then
   begin
     Result := True;
@@ -869,7 +879,7 @@ var AtLeastOneIsFalse : boolean = False;
     i : Integer;
 begin
   Result := False;
-  if (currentTerm.EventType = tftaEventTypeSAND) then
+  if (currentTerm.IsTypeSAND) then
   begin
     i := 0;
     repeat
@@ -913,13 +923,13 @@ begin
   { only the term itself may be modified! its children (their instances!) must not be
     touched }
   { 1: Check whether currentTerm is of type SAND }
-  if (currentTerm.EventType = tftaEventTypeSAND) then
+  if (currentTerm.IsTypeSAND) then
   begin
     { 2: Seek first Child of type PAND (if none, then exit) }
     i:= 0;
     foundpand := false;
     repeat
-      foundpand := (currentTerm[i].EventType = tftaEventTypePAND);
+      foundpand := (currentTerm[i].IsTypePAND);
       inc(i);
     until (i = currentTerm.Count) or foundpand;
 
@@ -1034,7 +1044,12 @@ var numberChildren : integer = 0;
   i : integer;
   expressionList : TTFTAStringList = NIL;
   tempObject : TTFTAObject;
+<<<<<<< .mine
   localIsChange : boolean = False;
+  tempString : ansistring;
+=======
+  localIsChange : boolean = False;
+>>>>>>> .r37
 begin
 
   if not currentTerm.IsBasicEvent then
@@ -1046,7 +1061,12 @@ begin
       expressionList := TTFTAStringList.Create;
       i := 0;
       repeat
+<<<<<<< .mine
+        tempString := ScanChildrenSorting(currentTerm[i],currentTerm.Children,i,eventlist,localIsChange);
+        expressionList.Add(tempString);
+=======
         expressionList.Add(ScanChildrenSorting(currentTerm[i],currentTerm.Children,i,eventlist,localIsChange));
+>>>>>>> .r37
         inc(i);
       until (i = numberChildren);
 
@@ -1054,15 +1074,29 @@ begin
         if TTFTAStringList.sort returns false, then no sort was performed, i.e.
         no sorting of the currentTerm-children is necessary; if sort returns
         true, then sorting is necessary }
+<<<<<<< .mine
+      { only sort if commutative operator (check for PAND is sufficient as more
+        than it is checked before, that currentTerm has more than one operand }
+      if not (currentTerm.IsTypePAND) and expressionList.Sort then
+=======
       { only sort if commutative operator (check for PAND is sufficient as more
         than it is checked before, that currentTerm has more than one operand }
       if not (currentTerm.EventType = tftaEventTypePAND) then
+>>>>>>> .r37
       begin
+<<<<<<< .mine
+        { right now localIsChange is still set from the next iteration of ScanChildrenSort;
+          its value is irrelevant now, as possible changes of other descendants than the
+          direct children have already been handled at deeper levels of the iterative
+          walk-through; only changes at the current childrens' level are relevant }
+        localIsChange := true;
+=======
         { right now localIsChange is still set from the next iteration of ScanChildrenSort;
           its value is irrelevant now, as possible changes of other descendants than the
           direct children have already been handled at deeper levels of the iterative
           walk-through; only changes at the current childrens' level are relevant }
         localIsChange := expressionList.Sort;
+>>>>>>> .r37
         { if such an event already exists in eventlist, then take this, else
           create a new one }
         Result := currentTerm.EventTypeToString + '[' + expressionList.CSText + ']';
@@ -1070,18 +1104,52 @@ begin
           currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting (Aenderung) 1');
         {$ENDIF}
         tempObject := eventlist.ListHoldsObjectAt(Result);
+<<<<<<< .mine
+        { three possibilities:
+          1) [ sort was necessary ] and [ new (sorted) event not already listed in eventlist ]
+          2) [ sort was necessary ] and [ new (sorted) event already listed in eventlist ]
+          3) [ no sort was necessary ] and [ new (sorted) event already listed in eventlist ]
+          if no sort, then the event can not not be in list! }
+        if not Assigned(tempObject) then
+=======
         { four possibilities:
           1) [ sort was necessary ] and [ new (sorted) event not already listed in eventlist ]
           2) [ sort was necessary ] and [ new (sorted) event already listed in eventlist ]
           3) [ no sort was necessary ] and [ new (sorted) event not already listed in eventlist ]
           2) [ no sort was necessary ] and [ new (sorted) event already listed in eventlist ] }
         if Assigned(tempObject) then
+>>>>>>> .r37
         begin
+<<<<<<< .mine
+          { possibility 1 --> sort the operands of currentTerm }
+          tempObject := currentTerm.Clone(eventlist);
+          currentTerm.Children.Clear;
+          { for each child ... }
+          numberChildren := tempObject.Count;
+          i := 0;
+          repeat
+            currentTerm.AddChild(tempObject[expressionList[i].FormerPosition]);
+            inc(i);
+          until (i = numberChildren);
+          currentTerm.CheckTermProperties;
+          {$IfDef TESTMODE}
+            currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting (Aenderung) 2');
+          {$ENDIF}
+          { we can free the cloned event (in tempObject) }
+          eventlist.Delete(eventlist.Count-1);
+=======
           { possibilites 2 or 4 --> re-link currentTerm to existing event }
           GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'ScanChildrenSorting 3');
           localIsChange := true; { regardless of sorting a change (the re-link) has happened }
+>>>>>>> .r37
         end else
         begin
+<<<<<<< .mine
+          { possibilites 2 or 4 --> re-link currentTerm to existing event }
+          GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'ScanChildrenSorting 3');
+          localIsChange := true; { regardless of sorting a change (the re-link) has happened }
+        end;
+=======
           if localIsChange then { implies: not Assigned(tempObject) }
           begin
             { possibility 1 --> sort the operands of currentTerm }
@@ -1110,14 +1178,21 @@ begin
         { non commutative operator (aka PAND) }
         Result := currentTerm.EventTypeToString + '[' + expressionList.CSText + ']';
         localIsChange := false; { PAND: no change of the direct childrens' order }
+>>>>>>> .r37
       end;
     end else
     begin
       { NOT operator or one of the above in rare cases, where
         transformation results in only single parameter }
+<<<<<<< .mine
+      Result := ScanChildrenSorting(currentTerm[0],currentTerm.Children,0,eventlist,localIsChange);
+      Result := currentTerm.EventTypeToString + '[' + Result + ']';
+      { localIsChange is given by the iterative call of ScanChildrenSort (see one line above) }
+=======
       Result := ScanChildrenSorting(currentTerm[0],currentTerm.Children,0,eventlist,localIsChange);
       Result := currentTerm.EventTypeToString + '[' + Result + ']';
       localIsChange := false; { NOT: no change of the direct child }
+>>>>>>> .r37
     end;
   end else
   begin;
@@ -1126,8 +1201,13 @@ begin
     localIsChange := false; { BASIC: no change of the event }
   end;
 
+<<<<<<< .mine
+  isChange := isChange or localIsChange;
+
+=======
   isChange := localIsChange;
 
+>>>>>>> .r37
 end; { function ScanChildrenSorting }
 
 {------------------------------------------------------------------------------
@@ -1135,7 +1215,7 @@ end; { function ScanChildrenSorting }
 ------------------------------------------------------------------------------}
 function SimplificationLoop(theobject :TTFTAObject; theParent : TTFTAList; theIndex : Integer; theEventList : TTFTAEventLookupList) : boolean;
 var i : Integer = 0;
-    changedSelf : boolean = false;
+    changedSelf : boolean;
     changedChildren : boolean = false;
 begin
   Result := false;
@@ -1143,7 +1223,7 @@ begin
 
     repeat  { inner loop, continue until no chnage in oneself }
       changedSelf := false; { flag whether in the inner loop a change happend }
-
+      changedSelf := False;
       If (not changedSelf) and GenericCombine(theobject, theParent , theIndex, theEventList) then
         changedSelf := true;
       If (not changedSelf) and PANDSplit(theobject, theParent , theIndex, theEventList) then
