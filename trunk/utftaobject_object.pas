@@ -529,7 +529,7 @@ procedure TTFTAObject.RedirectMe(newItem : TTFTAObject);
 begin
   self.PointerToUpdateObject:=newItem;
   self.Children.Clear;
-  self.TemporalExpr:='redirected';
+  self.TemporalExpr:='redirected to ' + PointerAddrStr(newItem);
   self.NeedsToBeUpdated:=true;
 end;
 {------------------------------------------------------------------------------
