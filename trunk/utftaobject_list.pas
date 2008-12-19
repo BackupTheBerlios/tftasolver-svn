@@ -111,11 +111,11 @@ begin
   Result := TTFTAObject(inherited Extract(TObject(Item)));
   if Assigned(Result) and Result.NeedsToBeUpdated then
   begin
-    Result := Result.PointerToUpdateObject;
     {$IfDef TESTMODE}
       if Assigned(Result.DEBUGMemo) then
-        Result.DEBUGMemo.Append('Extract ' + PointerAddrStr(Result) + ' --> ' + PointerAddrStr(tempObject));
+        Result.DEBUGMemo.Append('Extract ' + PointerAddrStr(Result) + ' --> ' + PointerAddrStr(Result.PointerToUpdateObject));
     {$EndIf}
+    Result := Result.PointerToUpdateObject;
   end;
 end;
 

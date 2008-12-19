@@ -50,6 +50,8 @@ implementation
   function  ANDFalse(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  ANDSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  ANDTrue(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
+  function  DistributeANDORXOR(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
+  function  DistributePANDXOR(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;forward;
   function  GenericCombine(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  GenericSplit(term :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; theType : TTFTAOperatorType) : boolean; forward;
   function  LawOfCompleteness(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList): boolean; forward;
@@ -165,6 +167,138 @@ begin
         else
           Result  := False;  // should not happen!                 }
 end;
+
+{------------------------------------------------------------------------------
+  Boolean Disributive Law between AND and OR / XOR
+------------------------------------------------------------------------------}
+function DistributeANDORXOR(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+var i : integer = 0;
+    numberChildren : integer;
+    foundORXOR : boolean = false;
+    theORXORTerm : TTFTAObject;
+    theRestTerm  : TTFTAObject;
+    newFirstOperand : TTFTAObject;
+begin
+  Result := False;
+  if (currentTerm.IsTypeAND) and (currentTerm.Count > 1) then
+  begin
+    { scan all children for first occurrence of an OR or XOR }
+    numberChildren := currentTerm.Count;
+    repeat
+      foundORXOR := (currentTerm[i].IsTypeOR or currentTerm[i].IsTypeXOR);
+      inc(i);
+    until (i = numberChildren) or foundORXOR;
+    if foundORXOR then
+    begin
+      Result := True;
+      dec(i);
+      { Extract the found term }
+      theORXORTerm := currentTerm[i];
+      currentTerm.DeleteChild(i);
+      theRestTerm := currentTerm.Clone(eventlist);
+      currentTerm.EventType:= theORXORTerm.EventType;
+      currentTerm.Children.Clear;
+      { for each child of theORXORTerm do }
+      i := 0;
+      numberChildren := theORXORTerm.Count;
+      repeat
+        { sorting and / or checking whether such an event
+          already exists is not helpful here as this needs to be done later
+          during the call of GenericCombine anyhow.}
+        newFirstOperand := eventlist.NewItem;
+        newFirstOperand.EventType := tftaEventTypeAND;
+        newFirstOperand.AddChild(theORXORTerm[i]);
+        newFirstOperand.AddChild(theRestTerm);
+        newFirstOperand.CheckTermProperties;
+        currentTerm.AddChild(newFirstOperand);
+        inc(i);
+      until (i = numberChildren);
+      currentTerm.CheckTermProperties;
+      { for each child of currentTerm do }
+      i := 0;
+      numberChildren := currentTerm.Count;
+      repeat
+        GenericCombine(currentTerm[i], currentTerm.Children , i, eventlist);
+        inc(i);
+      until (i = numberChildren);
+    end;
+  end;
+end;
+
+{------------------------------------------------------------------------------
+  Temporal Disributive Law between PAND and XOR
+------------------------------------------------------------------------------}
+function DistributePANDXOR(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+var i : integer = 0;
+    numberChildren : integer;
+    theXORTerm : TTFTAObject;
+    theOperand : TTFTAObject;
+    tempObject : TTFTAObject;
+    newString : ansistring;
+    tempString : ansistring;
+begin
+  Result := False;
+  if (currentTerm.IsTypePAND) and (currentTerm.Count = 2) then
+  begin
+    if currentTerm[0].IsTypeXOR then
+    begin
+      theXORTerm := currentTerm[0];
+      theOperand := currentTerm[1];
+      currentTerm.Children.Clear;
+      currentTerm.EventType:=tftaEventTypeXOR;
+      { for each child of theXORTerm do }
+      i := 0;
+      numberChildren := theXORTerm.Count;
+      tempString := theOperand.TemporalExpr;
+      repeat
+        newString := cEventTypeStringArray[ord(tftaEventTypePAND)] + '[' +
+                     theXORTerm[i].TemporalExpr + ',' + tempString + ']' ;
+        tempObject := eventlist.ListHoldsObjectAt(newString);
+        if not Assigned(tempObject) then
+        begin
+          tempObject := eventlist.NewItem;
+          tempObject.EventType:= tftaEventTypePAND;
+          tempObject.AddChild(theXORTerm[i]);
+          tempObject.AddChild(theOperand);
+          tempObject.CheckTermProperties;
+        end;
+        currentTerm.AddChild(tempObject);
+        inc(i);
+      until (i = numberChildren);
+      currentTerm.CheckTermProperties;
+    end else
+    begin
+      if currentTerm[1].IsTypeXOR then
+      begin
+        theXORTerm := currentTerm[1];
+        theOperand := currentTerm[0];
+        currentTerm.Children.Clear;
+        currentTerm.EventType:=tftaEventTypeXOR;
+        { for each child of theXORTerm do }
+        i := 0;
+        numberChildren := theXORTerm.Count;
+        tempString := theOperand.TemporalExpr;
+        repeat
+          newString := cEventTypeStringArray[ord(tftaEventTypePAND)] + '[' +
+                       tempString + ',' + theXORTerm[i].TemporalExpr + ']' ;
+          tempObject := eventlist.ListHoldsObjectAt(newString);
+          if not Assigned(tempObject) then
+          begin
+            tempObject := eventlist.NewItem;
+            tempObject.EventType:= tftaEventTypePAND;
+            tempObject.AddChild(theOperand);
+            tempObject.AddChild(theXORTerm[i]);
+            tempObject.CheckTermProperties;
+          end;
+          currentTerm.AddChild(tempObject);
+          inc(i);
+        until (i = numberChildren);
+        currentTerm.CheckTermProperties;
+      end;
+    end;
+  end;
+end;
+
 {------------------------------------------------------------------------------
   Generic combine of commutative terms (incl. sorting)
 ------------------------------------------------------------------------------}
@@ -750,7 +884,6 @@ begin
   end;
 end;
 
-
 {------------------------------------------------------------------------------
   transform pand[x,pand[y,z]] to pand[and[x,y],z]
 ------------------------------------------------------------------------------}
@@ -1152,7 +1285,7 @@ begin
 
     repeat  { inner loop, continue until no chnage in oneself }
       changedSelf := false; { flag whether in the inner loop a change happend }
-      changedSelf := False;
+
       If (not changedSelf) and GenericCombine(theobject, theParent , theIndex, theEventList) then
         changedSelf := true;
       If (not changedSelf) and PANDSplit(theobject, theParent , theIndex, theEventList) then
@@ -1185,6 +1318,11 @@ begin
         changedSelf := true;
       If (not changedSelf) and SANDPANDTransform(theobject, theParent , theIndex, theEventList) then
         changedSelf := true;
+      If (not changedSelf) and DistributeANDORXOR(theobject, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and DistributePANDXOR(theobject, theParent , theIndex, theEventList) then
+        changedSelf := true;
+
 
       If changedSelf then
       begin

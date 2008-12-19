@@ -1,7 +1,7 @@
 object TFTAMainWindow: TTFTAMainWindow
-  Left = 12
+  Left = 8
   Height = 700
-  Top = 321
+  Top = 215
   Width = 1000
   ActiveControl = TreeViewInputStructure
   BorderIcons = [biSystemMenu, biMinimize]
