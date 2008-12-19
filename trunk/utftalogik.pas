@@ -242,6 +242,7 @@ begin
   begin
     if currentTerm[0].IsTypeXOR then
     begin
+      Result := True;
       theXORTerm := currentTerm[0];
       theOperand := currentTerm[1];
       currentTerm.Children.Clear;
@@ -270,6 +271,7 @@ begin
     begin
       if currentTerm[1].IsTypeXOR then
       begin
+        Result := True;
         theXORTerm := currentTerm[1];
         theOperand := currentTerm[0];
         currentTerm.Children.Clear;
