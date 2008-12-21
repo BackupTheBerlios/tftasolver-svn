@@ -1,11 +1,11 @@
 { Das ist eine automatisch erzeugte Lazarus-Ressourcendatei }
 
 LazarusResources.Add('TFormDebugMeldungen','FORMDATA',[
-  'TPF0'#19'TFormDebugMeldungen'#18'FormDebugMeldungen'#4'Left'#3#154#1#6'Heigh'
-  +'t'#3' '#3#3'Top'#2'q'#5'Width'#3#132#3#13'ActiveControl'#7#18'MemoAusgabebe'
-  +'reich'#7'Caption'#6#27'TFTASolver - Debugmeldungen'#12'ClientHeight'#3' '#3
-  +#11'ClientWidth'#3#132#3#10'ParentFont'#8#10'LCLVersion'#6#6'0.9.26'#0#5'TMe'
-  +'mo'#18'MemoAusgabebereich'#6'Height'#3' '#3#5'Width'#3#132#3#5'Color'#4#255
-  +#255#186#0#11'Font.Height'#2#246#13'Lines.Strings'#1#6#0#0#10'ParentFont'#8#8
-  +'ReadOnly'#9#10'ScrollBars'#7#14'ssAutoVertical'#8'TabOrder'#2#0#0#0#0
+  'TPF0'#19'TFormDebugMeldungen'#18'FormDebugMeldungen'#4'Left'#3#158#1#6'Heigh'
+  +'t'#3' '#3#3'Top'#3#137#0#5'Width'#3#132#3#13'ActiveControl'#7#18'MemoAusgab'
+  +'ebereich'#7'Caption'#6#27'TFTASolver - Debugmeldungen'#12'ClientHeight'#3' '
+  +#3#11'ClientWidth'#3#132#3#10'ParentFont'#8#10'LCLVersion'#6#6'0.9.26'#0#5'T'
+  +'Memo'#18'MemoAusgabebereich'#6'Height'#3' '#3#5'Width'#3#132#3#5'Color'#4
+  +#255#255#186#0#11'Font.Height'#2#246#13'Lines.Strings'#1#6#0#0#10'ParentFont'
+  +#8#8'ReadOnly'#9#10'ScrollBars'#7#14'ssAutoVertical'#8'TabOrder'#2#0#0#0#0
 ]);

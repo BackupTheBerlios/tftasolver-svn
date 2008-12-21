@@ -20,8 +20,6 @@ uses
   {$ENDIF}
   utftastringlist;
   
-var
-   i                : longint;
 
 //{$R tftasolver.res}
 

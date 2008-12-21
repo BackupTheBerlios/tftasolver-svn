@@ -226,6 +226,71 @@ begin
 end;
 
 {------------------------------------------------------------------------------
+  Temporal Disributive Law between OR and PAND
+------------------------------------------------------------------------------}
+function DistributeORPAND(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+var i : integer = 0;
+    numberChildren : integer;
+    theORTerm : TTFTAObject;
+    theOperand : TTFTAObject;
+    tempObject : TTFTAObject;
+    newString : ansistring;
+    tempString : ansistring;
+    overallExpr: ansistring = '';
+    notAllOperandsExisting : boolean = false;
+begin
+  Result := False;
+  if (currentTerm.IsTypePAND) and (currentTerm.Count = 2) then
+  begin
+    if currentTerm[0].IsTypeOR then
+    begin
+      Result := True;
+      theORTerm := currentTerm[0];
+      theOperand := currentTerm[1];
+      currentTerm.Children.Clear;
+      currentTerm.EventType:=tftaEventTypeOR;
+      { for each child of theORTerm do }
+      i := 0;
+      numberChildren := theORTerm.Count;
+      tempString := theOperand.TemporalExpr;
+      repeat
+        newString := cEventTypeStringArray[ord(tftaEventTypePAND)] + '[' +
+                     theORTerm[i].TemporalExpr + ',' + tempString + ']' ;
+        overallExpr := overallExpr + ',' + newString; { build the TemporalExpr of the overall term
+                                                 in order to compare to EventList-listed items later }
+        tempObject := eventlist.ListHoldsObjectAt(newString);
+        if not Assigned(tempObject) then
+        begin
+          notAllOperandsExisting := true; { set flag that not all operands are allready existing }
+          tempObject := eventlist.NewItem;
+          tempObject.EventType:= tftaEventTypePAND;
+          tempObject.AddChild(theORTerm[i]);
+          tempObject.AddChild(theOperand);
+          tempObject.CheckTermProperties;
+        end;
+        currentTerm.AddChild(tempObject);
+        inc(i);
+      until (i = numberChildren);
+      if not notAllOperandsExisting then { if notAllOperandsExisting then it is clear, that the
+                                           overall term can also not already be listed in EventList }
+      begin
+        { check whether overall term also exists }
+        overallExpr := cEventTypeStringArray[ord(tftaEventTypeOR)] + '[' +
+                       overallExpr;
+        overallExpr[Length(overallExpr)] := ']';
+        tempObject := eventlist.ListHoldsObjectAt(overallExpr);
+        if Assigned(tempObject) then
+        begin
+          { modify term }
+          GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'DistributeORPAND 2');
+        end;
+      end;
+      currentTerm.CheckTermProperties;
+    end;
+  end;
+end;
+
+{------------------------------------------------------------------------------
   Temporal Disributive Law between PAND and XOR
 ------------------------------------------------------------------------------}
 function DistributePANDXOR(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
@@ -236,6 +301,8 @@ var i : integer = 0;
     tempObject : TTFTAObject;
     newString : ansistring;
     tempString : ansistring;
+    overallExpr: ansistring = '';
+    notAllOperandsExisting : boolean = false;
 begin
   Result := False;
   if (currentTerm.IsTypePAND) and (currentTerm.Count = 2) then
@@ -255,8 +322,11 @@ begin
         newString := cEventTypeStringArray[ord(tftaEventTypePAND)] + '[' +
                      theXORTerm[i].TemporalExpr + ',' + tempString + ']' ;
         tempObject := eventlist.ListHoldsObjectAt(newString);
+        overallExpr := overallExpr + ',' + newString; { build the TemporalExpr of the overall term
+                                                 in order to compare to EventList-listed items later }
         if not Assigned(tempObject) then
         begin
+          notAllOperandsExisting := true;
           tempObject := eventlist.NewItem;
           tempObject.EventType:= tftaEventTypePAND;
           tempObject.AddChild(theXORTerm[i]);
@@ -266,6 +336,20 @@ begin
         currentTerm.AddChild(tempObject);
         inc(i);
       until (i = numberChildren);
+      if not notAllOperandsExisting then { if notAllOperandsExisting then it is clear, that the
+                                           overall term can also not already be listed in EventList }
+      begin
+        { check whether overall term also exists }
+        overallExpr := cEventTypeStringArray[ord(tftaEventTypeXOR)] + '[' +
+                       overallExpr;
+        overallExpr[Length(overallExpr)] := ']';
+        tempObject := eventlist.ListHoldsObjectAt(overallExpr);
+        if Assigned(tempObject) then
+        begin
+          { modify term }
+          GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'DistributeORPAND 2');
+        end;
+      end;
       currentTerm.CheckTermProperties;
     end else
     begin
@@ -283,9 +367,12 @@ begin
         repeat
           newString := cEventTypeStringArray[ord(tftaEventTypePAND)] + '[' +
                        tempString + ',' + theXORTerm[i].TemporalExpr + ']' ;
+          overallExpr := overallExpr + ',' + newString; { build the TemporalExpr of the overall term
+                                                 in order to compare to EventList-listed items later }
           tempObject := eventlist.ListHoldsObjectAt(newString);
           if not Assigned(tempObject) then
           begin
+            notAllOperandsExisting := true;
             tempObject := eventlist.NewItem;
             tempObject.EventType:= tftaEventTypePAND;
             tempObject.AddChild(theOperand);
@@ -295,6 +382,20 @@ begin
           currentTerm.AddChild(tempObject);
           inc(i);
         until (i = numberChildren);
+        if not notAllOperandsExisting then { if notAllOperandsExisting then it is clear, that the
+                                             overall term can also not already be listed in EventList }
+        begin
+          { check whether overall term also exists }
+          overallExpr := cEventTypeStringArray[ord(tftaEventTypeXOR)] + '[' +
+                         overallExpr;
+          overallExpr[Length(overallExpr)] := ']';
+          tempObject := eventlist.ListHoldsObjectAt(overallExpr);
+          if Assigned(tempObject) then
+          begin
+            { modify term }
+            GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'DistributeORPAND 2');
+          end;
+        end;
         currentTerm.CheckTermProperties;
       end;
     end;
@@ -1323,6 +1424,8 @@ begin
       If (not changedSelf) and DistributeANDORXOR(theobject, theParent , theIndex, theEventList) then
         changedSelf := true;
       If (not changedSelf) and DistributePANDXOR(theobject, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and DistributeORPAND(theobject, theParent , theIndex, theEventList) then
         changedSelf := true;
 
 
