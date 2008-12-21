@@ -113,7 +113,7 @@ end;
 {------------------------------------------------------------------------------
 ------------------------------------------------------------------------------}
 function  TTFTAEventLookupList.ListHoldsObjectAt(Text : ansistring) : TTFTAObject;
-var i : Integer;
+var i : Integer = 0;
 begin
   Result := nil;
   for i:= 1 to self.Count do

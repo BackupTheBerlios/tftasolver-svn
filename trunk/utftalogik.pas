@@ -271,13 +271,12 @@ begin
         currentTerm.AddChild(tempObject);
         inc(i);
       until (i = numberChildren);
-      if not notAllOperandsExisting then { if notAllOperandsExisting then it is clear, that the
+      if { not notAllOperandsExisting } True  then { if notAllOperandsExisting then it is clear, that the
                                            overall term can also not already be listed in EventList }
       begin
         { check whether overall term also exists }
-        overallExpr := cEventTypeStringArray[ord(tftaEventTypeOR)] + '[' +
-                       overallExpr;
-        overallExpr[Length(overallExpr)] := ']';
+        overallExpr[1] := '[';
+        overallExpr := cEventTypeStringArray[ord(tftaEventTypeOR)] + overallExpr + ']';
         tempObject := eventlist.ListHoldsObjectAt(overallExpr);
         if Assigned(tempObject) then
         begin
@@ -336,18 +335,17 @@ begin
         currentTerm.AddChild(tempObject);
         inc(i);
       until (i = numberChildren);
-      if not notAllOperandsExisting then { if notAllOperandsExisting then it is clear, that the
+      if { not notAllOperandsExisting } True then { if notAllOperandsExisting then it is clear, that the
                                            overall term can also not already be listed in EventList }
       begin
         { check whether overall term also exists }
-        overallExpr := cEventTypeStringArray[ord(tftaEventTypeXOR)] + '[' +
-                       overallExpr;
-        overallExpr[Length(overallExpr)] := ']';
+        overallExpr[1] := '[';
+        overallExpr := cEventTypeStringArray[ord(tftaEventTypeXOR)] + overallExpr + ']';
         tempObject := eventlist.ListHoldsObjectAt(overallExpr);
         if Assigned(tempObject) then
         begin
           { modify term }
-          GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'DistributeORPAND 2');
+          GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'DistributeXORPAND 3');
         end;
       end;
       currentTerm.CheckTermProperties;
@@ -382,18 +380,17 @@ begin
           currentTerm.AddChild(tempObject);
           inc(i);
         until (i = numberChildren);
-        if not notAllOperandsExisting then { if notAllOperandsExisting then it is clear, that the
+        if { not notAllOperandsExisting } True then { if notAllOperandsExisting then it is clear, that the
                                              overall term can also not already be listed in EventList }
         begin
           { check whether overall term also exists }
-          overallExpr := cEventTypeStringArray[ord(tftaEventTypeXOR)] + '[' +
-                         overallExpr;
-          overallExpr[Length(overallExpr)] := ']';
+          overallExpr[1] := '[';
+          overallExpr := cEventTypeStringArray[ord(tftaEventTypeXOR)] + overallExpr + ']';
           tempObject := eventlist.ListHoldsObjectAt(overallExpr);
           if Assigned(tempObject) then
           begin
             { modify term }
-            GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'DistributeORPAND 2');
+            GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'DistributeXORPAND 4');
           end;
         end;
         currentTerm.CheckTermProperties;

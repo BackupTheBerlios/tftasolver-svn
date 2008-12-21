@@ -536,6 +536,38 @@ procedure TTFTAObject.InsertChild(Index: Integer; Item: TTFTAObject);
 begin
   if Assigned(self.Children) then self.Children.Insert(Index, Item);
 end;
+
+//{------------------------------------------------------------------------------
+  //Compares itself with a given other TTFTAObject; returns True, if both are
+  //identical and false otherwise.
+//------------------------------------------------------------------------------}
+//function TTFTAObject.IsIdenticalTo(theOtherItem: TTFTAObject) : boolean;
+//var numberOfChildren : integer;
+    //i : integer = 0;
+//begin
+  //{ before actually starting the time consuming iterative walkthrough some
+    //quick checks are performed. }
+  //Result := (self.EventType = theOtherItem.EventType);
+  //numberofChildren := self.Count;
+  //Result := Result and (numberofChildren = theOtherItem.Count);
+  //{ only continue if the quick checks gave true }
+  //if Result then
+  //begin
+    //if (numberofChildren > 0) then
+    //begin { now walkthrough the children iteratively }
+      //{ both have the same number of children, see second check from above }
+      //repeat
+        //Result := Result and self[i].IsIdenticalTo(theOtherItem[i]);
+        //inc(i);
+      //until (not result) or (i = numberOfChildren);
+    //end else
+    //begin { no children in both events --> compare the names (aka TemporalExpr) }
+      //Result := Result and (self.TemporalExpr = theOtherItem.TemporalExpr);
+    //end;
+  //end;
+//end;
+
+
 {------------------------------------------------------------------------------
   Redirects (updates) object to newItem and sets properties accordingly
 ------------------------------------------------------------------------------}
