@@ -13,7 +13,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms,  strutils
   { you can add units after this }
-  ,utftaformtftasolver,utftaexpression, utftalogik, utftaobject,
+  ,utftaformtftasolver,utftaexpression, utftalogic, utftaobject,
   sjspointertools, utftaformabout,
   {$IFDEF TESTMODE}
   utftaformdebugmessages,

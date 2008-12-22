@@ -34,7 +34,7 @@ interface
 
 uses
   Forms, Classes, SysUtils, Dialogs, ComCtrls, StdCtrls, strutils, utftaobject
-  , sjspointertools, utftalogik;
+  , sjspointertools, utftalogic;
 
 { ############################################################################ }
 { ############################################################################ }
@@ -78,6 +78,7 @@ type
     procedure SetDEBUGMemo(Parameter : TMemo);
     {$EndIf}
     procedure Simplify;
+
     property  Count : Integer read ReadCount;
     property  EventList : TTFTAEventLookupList read VEventList write VEventList;
     property  InputString : ansistring read VInputString write VInputString;
