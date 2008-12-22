@@ -134,7 +134,7 @@ end;
 ------------------------------------------------------------------------------}
 function TTFTAExpression.ReadCount : Integer;
 begin
-  Result := TemporalTerm.Children.Count;
+  Result := TemporalTerm.Count;
 end;
 
 function TTFTAExpression.GetOutputString : ansistring;

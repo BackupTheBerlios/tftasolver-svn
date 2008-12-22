@@ -71,19 +71,18 @@ type
     procedure BitBtnLoadClick(Sender: TObject);
     procedure BitBtnSaveClick(Sender: TObject);
     procedure ButtonAboutClick(Sender: TObject);
-
   private
-    {$IFDEF TESTMODE}
-      vDEBUGFenster : TFormDebugMeldungen;
+      {$IFDEF TESTMODE}
+      vDEBUGWindow : TFormDebugMessage;
       vDEBUGLevel : integer;
-      procedure SetzeDEBUGLevel(Parameter : integer);
+      procedure SetDEBUGLevel(Parameter : integer);
     {$ENDIF}
   public
     TemporalExpression : TTFTAExpression;
     pointerToApplication : TApplication;
     {$IFDEF TESTMODE}
-      property  DEBUGLevel : integer read vDEBUGLevel write SetzeDEBUGLevel;
-      procedure SchreibeDEBUGMeldung(Parameter: ansistring);
+      property  DEBUGLevel : integer read vDEBUGLevel write SetDEBUGLevel;
+      procedure WriteDEBUGMessage(Parameter: ansistring);
     {$ENDIF}
   end; 
 
@@ -111,18 +110,18 @@ implementation
 {------------------------------------------------------------------------------
   Schreibe Property vDEBUGLevel
 ------------------------------------------------------------------------------}
-procedure TTFTAMainWindow.SetzeDEBUGLevel(Parameter : integer);
+procedure TTFTAMainWindow.SetDEBUGLevel(Parameter : integer);
 begin
   vDEBUGLevel := Parameter;
   if DEBUGLevel>0 then
   begin
-    if not Assigned(vDEBUGFenster) then
+    if not Assigned(vDEBUGWindow) then
     begin
-      vDEBUGFenster:= TFormDebugMeldungen.Create(Application);
-      vDEBUGFenster.Show;
+      vDEBUGWindow:= TFormDebugMessage.Create(Application);
+      vDEBUGWindow.Show;
     end;
-    SchreibeDEBUGMeldung('Bis auf Weiteres herrscht DebugLevel '+IntToStr(DEBUGLevel));
-    MemoDEBUG := vDEBUGFenster.MemoAusgabebereich;
+    WriteDEBUGMessage('We have DebugLevel '+IntToStr(DEBUGLevel));
+    MemoDEBUG := vDEBUGWindow.MemoOutput;
   end else
   begin
     MemoDEBUG := NIL;
@@ -134,9 +133,9 @@ end;
 {------------------------------------------------------------------------------
   Schreibt eine Meldung ins DebugFenster
 ------------------------------------------------------------------------------}
-procedure TTFTAMainWindow.SchreibeDEBUGMeldung(Parameter : ansistring);
+procedure TTFTAMainWindow.WriteDEBUGMessage(Parameter : ansistring);
 begin
-  if Assigned(vDEBUGFenster) then vDEBUGFenster.SchreibeMeldung(Parameter);
+  if Assigned(vDEBUGWindow) then vDEBUGWindow.WriteMessage(Parameter);
 end;
 {$ENDIF}
 
@@ -245,7 +244,7 @@ var x : TTFTAObject;
     begin
       i:=0;
       repeat
-        {$IFDEF TESTMODE}SchreibeDEBUGMeldung(Item[i].WriteStatus(iterationlevel));  {$ENDIF}
+        {$IFDEF TESTMODE}WriteDEBUGMessage(Item[i].WriteStatus(iterationlevel));  {$ENDIF}
         if Item[i].HasChildren then
           begin
             zaehle(Item[i],iterationlevel+2);
@@ -259,9 +258,9 @@ begin
   
   if x.HasChildren then zaehle(x,0);
   {$IFDEF TESTMODE}
-    SchreibeDEBUGMeldung('EventListe mit ' + IntToStr(self.TemporalExpression.EventList.Count) + ' Eintraegen...');
+    WriteDEBUGMessage('EventListe mit ' + IntToStr(self.TemporalExpression.EventList.Count) + ' Eintraegen...');
     for i := 1 to self.TemporalExpression.EventList.Count do
-      SchreibeDEBUGMeldung(PointerAddrStr(self.TemporalExpression.EventList.Items[i-1])+ ' === ' +
+      WriteDEBUGMessage(PointerAddrStr(self.TemporalExpression.EventList.Items[i-1])+ ' === ' +
                                           self.TemporalExpression.EventList.Items[i-1].TemporalExpr);
   {$ENDIF}
 end;
@@ -275,7 +274,7 @@ end;
 procedure TTFTAMainWindow.BitBtnLoadClick(Sender: TObject);
 begin
 
-  StatusBarHauptfenster.Panels.Items[1].Text:='ACHTUNG: NOCH KEINE FUNKTION HINTER ' + BitBtnLoad.Caption;
+  StatusBarHauptfenster.Panels.Items[1].Text:='NOTE: NOT YET IMPLEMENTED8 ' + BitBtnLoad.Caption;
 
 end;
 

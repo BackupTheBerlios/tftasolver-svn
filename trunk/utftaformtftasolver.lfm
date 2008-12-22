@@ -1,12 +1,12 @@
 object TFTAMainWindow: TTFTAMainWindow
-  Left = 12
+  Left = 396
   Height = 700
-  Top = 239
+  Top = 292
   Width = 1000
   ActiveControl = TreeViewInputStructure
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
-  Caption = 'TFTA Solver --- V0.1 --- 2008 SJS --- Freeware'
+  Caption = 'TFTA Solver --- V0.1 --- 2008 SJS --- licensed under GPL v3'
   ClientHeight = 700
   ClientWidth = 1000
   ParentFont = False
@@ -15,8 +15,8 @@ object TFTAMainWindow: TTFTAMainWindow
     Left = 5
     Height = 17
     Top = 5
-    Width = 396
-    Caption = 'Geben Sie hier Ihren temporallogischen Ausdruck ein:'
+    Width = 462
+    Caption = 'Please enter a temporal-logic expression into the left upper field'
     ParentColor = False
   end
   object Shape1: TShape
@@ -77,7 +77,7 @@ object TFTAMainWindow: TTFTAMainWindow
     Height = 50
     Top = 136
     Width = 240
-    Caption = 'Ausdruck laden'
+    Caption = 'Load Input Term'
     Glyph.Data = {
       36190000424D3619000000000000360000002800000028000000280000000100
       2000000000000019000064000000640000000000000000000000000000004949
@@ -292,7 +292,7 @@ object TFTAMainWindow: TTFTAMainWindow
     Height = 50
     Top = 192
     Width = 240
-    Caption = 'Ausdruck sichern'
+    Caption = 'Save Input Term'
     Glyph.Data = {
       36190000424D3619000000000000360000002800000028000000280000000100
       2000000000000019000064000000640000000000000000000000000000004949
@@ -508,7 +508,7 @@ object TFTAMainWindow: TTFTAMainWindow
     Hint = 'Der oben eingegebene temporallogische'#10'Ausdruck wird in eine Baumstruktur überführt, '#10'die'#10'anschließend gemäß den Regeln der '#10'temporalen Logik umgeformt wird (drücken Sie '#10'den Knopf "Ausdruck berechnen")'#10#10
     Top = 136
     Width = 240
-    Caption = 'Ausdruck übernehmen'
+    Caption = 'Scan Input Term'
     Glyph.Data = {
       36190000424D3619000000000000360000002800000028000000280000000100
       2000000000000019000064000000640000000000000000000000000000000000
@@ -726,7 +726,7 @@ object TFTAMainWindow: TTFTAMainWindow
     Hint = 'Zeigt die erzeugte Baumstruktur des'#10'obigen temporallogischen Ausdrucks'#10'an bzw. blendet diese wieder aus.'
     Top = 192
     Width = 240
-    Caption = 'Struktur anzeigen'
+    Caption = 'Show Input Structure'
     Glyph.Data = {
       36190000424D3619000000000000360000002800000028000000280000000100
       2000000000000019000064000000640000000000000000000000000000000000
@@ -956,7 +956,7 @@ object TFTAMainWindow: TTFTAMainWindow
     Height = 28
     Top = 672
     Width = 127
-    Caption = 'Über TFTASolver'
+    Caption = 'About'
     OnClick = ButtonAboutClick
     TabOrder = 6
   end
@@ -982,7 +982,7 @@ object TFTAMainWindow: TTFTAMainWindow
     Height = 50
     Top = 192
     Width = 240
-    Caption = 'Ergebnis sichern'
+    Caption = 'Save Result'
     Glyph.Data = {
       36190000424D3619000000000000360000002800000028000000280000000100
       2000000000000019000064000000640000000000000000000000000000004949
@@ -1198,7 +1198,7 @@ object TFTAMainWindow: TTFTAMainWindow
     Hint = 'Zeigt die erzeugte Baumstruktur des'#10'obigen temporallogischen Ausdrucks'#10'an bzw. blendet diese wieder aus.'
     Top = 192
     Width = 240
-    Caption = 'Struktur anzeigen'
+    Caption = 'Show Simplified Structure'
     Glyph.Data = {
       36190000424D3619000000000000360000002800000028000000280000000100
       2000000000000019000064000000640000000000000000000000000000000000
@@ -1429,7 +1429,7 @@ object TFTAMainWindow: TTFTAMainWindow
     Hint = 'Startet die Umformung des links eingegebenen'#10'temporallogischen Terms.'#10'Drücken Sie vorher zum Übernehmen den '#10
     Top = 136
     Width = 240
-    Caption = 'Ausdruck berechnen'
+    Caption = 'Simplify Input Term'
     Enabled = False
     Glyph.Data = {
       36190000424D3619000000000000360000002800000028000000280000000100

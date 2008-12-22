@@ -10,28 +10,28 @@ uses
 
 type
 
-  { TFormDebugMeldungen }
+  { TFormDebugMessage }
 
-  TFormDebugMeldungen = class(TForm)
-    MemoAusgabebereich: TMemo;
+  TFormDebugMessage = class(TForm)
+    MemoOutput: TMemo;
   private
     { private declarations }
   public
     { public declarations }
-    procedure SchreibeMeldung(Parameter : ansistring) ;
+    procedure WriteMessage(Parameter : ansistring) ;
   end; 
 
 var
-  FormDebugMeldungen: TFormDebugMeldungen;
+  FormDebugMessage: TFormDebugMessage;
 
 implementation
 
 {------------------------------------------------------------------------------
-  Schreibt eine Meldung ins DebugFenster
+  write a messageinto debug window
 ------------------------------------------------------------------------------}
-procedure TFormDebugMeldungen.SchreibeMeldung(Parameter : ansistring);
+procedure TFormDebugMessage.WriteMessage(Parameter : ansistring);
 begin
-  MemoAusgabebereich.Append(Parameter);
+  MemoOutput.Append(Parameter);
 end;
 
 initialization

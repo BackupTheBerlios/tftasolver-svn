@@ -1,15 +1,15 @@
-object FormDebugMeldungen: TFormDebugMeldungen
-  Left = 414
+object FormDebugMessage: TFormDebugMessage
+  Left = 418
   Height = 800
-  Top = 137
+  Top = 161
   Width = 900
-  ActiveControl = MemoAusgabebereich
-  Caption = 'TFTASolver - Debugmeldungen'
+  ActiveControl = MemoOutput
+  Caption = 'TFTASolver - Debug-Messages'
   ClientHeight = 800
   ClientWidth = 900
   ParentFont = False
   LCLVersion = '0.9.26'
-  object MemoAusgabebereich: TMemo
+  object MemoOutput: TMemo
     Height = 800
     Width = 900
     Color = 12255231
