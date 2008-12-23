@@ -1,7 +1,7 @@
 object FormDebugMessage: TFormDebugMessage
-  Left = 418
+  Left = 422
   Height = 800
-  Top = 161
+  Top = 185
   Width = 900
   ActiveControl = MemoOutput
   Caption = 'TFTASolver - Debug-Messages'

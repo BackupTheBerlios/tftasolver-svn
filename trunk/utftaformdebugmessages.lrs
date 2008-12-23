@@ -1,8 +1,8 @@
 { Das ist eine automatisch erzeugte Lazarus-Ressourcendatei }
 
 LazarusResources.Add('TFormDebugMessage','FORMDATA',[
-  'TPF0'#17'TFormDebugMessage'#16'FormDebugMessage'#4'Left'#3#162#1#6'Height'#3
-  +' '#3#3'Top'#3#161#0#5'Width'#3#132#3#13'ActiveControl'#7#10'MemoOutput'#7'C'
+  'TPF0'#17'TFormDebugMessage'#16'FormDebugMessage'#4'Left'#3#166#1#6'Height'#3
+  +' '#3#3'Top'#3#185#0#5'Width'#3#132#3#13'ActiveControl'#7#10'MemoOutput'#7'C'
   +'aption'#6#27'TFTASolver - Debug-Messages'#12'ClientHeight'#3' '#3#11'Client'
   +'Width'#3#132#3#10'ParentFont'#8#10'LCLVersion'#6#6'0.9.26'#0#5'TMemo'#10'Me'
   +'moOutput'#6'Height'#3' '#3#5'Width'#3#132#3#5'Color'#4#255#255#186#0#11'Fon'
