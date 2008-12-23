@@ -41,6 +41,7 @@ begin
                                      object initiate by one of the children }
   self.PointerToUpdateObject := NIL;
   self.NeedsToBeUpdated := false;
+  self.SpeedSearchIsSet := false;
   self.IsNotCompletelyBuildYet := false;
   self.VExpr:='NIL';                    { dummy value in order to not get exceptions }
 
@@ -437,7 +438,10 @@ end;
 function TTFTAObject.GetChild(Index: Integer): TTFTAObject;
 begin
   if Assigned(self.Children) then
-    Result := self.Children[Index]
+    if (self.Count-1 < Index) or (Index < 0) then
+      ShowMessage('Fatal Error (081223.1811) while processing event ' +
+                   {PointerAddrStr(self) + ' ( ' + self.TemporalExpr + ' ) ' +} ' with Index=' + IntToStr(Index))
+    else Result := self.Children[Index]
   else
     Result := NIL;
 end;
@@ -464,8 +468,8 @@ begin
   Result := self.VPointerToUpdateObject;
   if Assigned(Result) and (Result.NeedsToBeUpdated) then
   begin
-    self.RedirectMe(Result.VPointerToUpdateObject);
     Result := Result.VPointerToUpdateObject;
+    self.RedirectMe(Result.VPointerToUpdateObject);
   end;
 end;
 {------------------------------------------------------------------------------
@@ -485,8 +489,8 @@ begin
   begin
     if not self.IsNotCompletelyBuildYet then
     begin
-      if self.HasChildren then
-      begin
+      //if not self.SpeedSearchIsSet then
+      //begin
         j := self.Count;
         Result := '';
         if j > 1 then  { and, or, xor, pand, sand operators }
@@ -505,10 +509,16 @@ begin
           { no sort necessary, as only one child }
         end;
         Result := self.EventTypeToString + '[' + Result + ']';
-      end else
-      begin { no basic event, no NeedsToBeUpdated, build completely but no children ?! }
-        Result := '###ERROR11241###' ;
-      end;
+        { if in EventList the SpeedSearchFlag is set then store the Result in
+          self.VExpr and set self.SpeedSearchIsSet in order to minimize efforts
+          necessary for next scan (until eventlist.SpeedSearchFlag is unset }
+        if self.EventLookupList.SpeedSearchFlagOn then
+        begin
+          self.TemporalExpr := Result;
+          self.SpeedSearchIsSet := true;
+        end;
+      //end else
+      //Result := self.PlainTemporalExpr;
     end else
     begin
      Result := ''; { if object is just in built-up then it has no TempExpr (because it is still changing) }
@@ -630,7 +640,8 @@ end;
 ------------------------------------------------------------------------------}
 procedure TTFTAObject.SetTempExpr(theExpr : ansistring);
 begin
-  if (not self.HasChildren) then self.VExpr:=theExpr;
+  if (not self.HasChildren) or (self.SpeedSearchIsSet) then
+    self.VExpr:=theExpr;
 end;
 procedure TTFTAObject.SetVType(Parameter : TTFTAOperatorType);
 begin

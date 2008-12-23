@@ -2,7 +2,7 @@
 
 LazarusResources.Add('TTFTAMainWindow','FORMDATA',[
   'TPF0'#15'TTFTAMainWindow'#14'TFTAMainWindow'#4'Left'#3#140#1#6'Height'#3#188
-  +#2#3'Top'#3'$'#1#5'Width'#3#232#3#13'ActiveControl'#7#22'TreeViewInputStruct'
+  +#2#3'Top'#3'<'#1#5'Width'#3#232#3#13'ActiveControl'#7#22'TreeViewInputStruct'
   +'ure'#11'BorderIcons'#11#12'biSystemMenu'#10'biMinimize'#0#11'BorderStyle'#7
   +#8'bsDialog'#7'Caption'#6';TFTA Solver --- V0.1 --- 2008 SJS --- licensed un'
   +'der GPL v3'#12'ClientHeight'#3#188#2#11'ClientWidth'#3#232#3#10'ParentFont'

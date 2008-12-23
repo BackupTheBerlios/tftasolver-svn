@@ -538,18 +538,25 @@ begin
   begin
     oldterm := parentList[oldObjectListIndex];
 
-    { next calling of parentList[oldObjectListIndex] should be redirected to new term }
-    if oldterm = newTerm then
-    begin
-      parentList.Owner.CheckTermProperties;
-      {$IfDef TESTMODE}
-        if Assigned(oldterm.DEBUGMemo) then
-          oldterm.DEBUGPrint(true,eventList,callString);
-        eventlist.pointerToApplication.ProcessMessages;
-      {$ENDIF}
-    end else
-      ShowMessage('Fatal Error (081210.1221) while processing event ' +
-                  PointerAddrStr(oldTerm) + ' ( ' + oldTerm.TemporalExpr + ' ) ' );
+    parentList.Owner.CheckTermProperties;
+    {$IfDef TESTMODE}
+      if Assigned(oldterm.DEBUGMemo) then
+        oldterm.DEBUGPrint(true,eventList,callString);
+      eventlist.pointerToApplication.ProcessMessages;
+    {$ENDIF}
+
+    //{ next calling of parentList[oldObjectListIndex] should be redirected to new term }
+    //if oldterm = newTerm then
+    //begin
+      //parentList.Owner.CheckTermProperties;
+      //{$IfDef TESTMODE}
+        //if Assigned(oldterm.DEBUGMemo) then
+          //oldterm.DEBUGPrint(true,eventList,callString);
+        //eventlist.pointerToApplication.ProcessMessages;
+      //{$ENDIF}
+    //end else
+      //ShowMessage('Fatal Error (081210.1221) while processing event ' +
+    //              PointerAddrStr(oldTerm) + ' ( ' + oldTerm.TemporalExpr + ' ) ' + ' --- ' + callstring);
   end else
   begin  { case without parentList (mainly for SortOperands-routine) }
     {$IfDef TESTMODE}
@@ -656,7 +663,7 @@ begin
     newXORTerm.AddChild(bTerm);
     newXORTerm.AddChild(cTerm);
     newXORTerm.CheckTermProperties;
-    cExpr := newXORTerm.TemporalExpr;
+    //cExpr := newXORTerm.TemporalExpr;
     sortOccurred := SortOperands(newXORTerm,NIL,0,eventlist);
     { after SortOperands newXORTerm holds three possible Objects, see comments within
       uTFTALogic.PANDPANDTransform for more information }
@@ -664,12 +671,25 @@ begin
     begin
       if newXORTerm = tempXORTerm then
       begin
-        { the case 2) }
+        {$IfDef TESTMODE}
+          if Assigned(newXORTerm.DEBUGMemo) then
+            newXORTerm.DEBUGPrint(true,eventList,'LawOfCompleteness Sort (case 2)');
+        {$ENDIF}
       end else
       begin
         { the case 3) --> free useless element in eventlist }
         eventlist.Delete(tempXORTerm.PosInEventList);
+        {$IfDef TESTMODE}
+          if Assigned(newXORTerm.DEBUGMemo) then
+            newXORTerm.DEBUGPrint(true,eventList,'LawOfCompleteness Sort (case 3)');
+        {$ENDIF}
       end;
+    end else
+    begin
+      {$IfDef TESTMODE}
+        if Assigned(newXORTerm.DEBUGMemo) then
+          newXORTerm.DEBUGPrint(true,eventList,'LawOfCompleteness NoSort (case 1)');
+      {$ENDIF}
     end;
     { either way at thispoint newXORTerm holds the pointer to the correct XOR[...] }
     GenericUpdateObject(currentTerm,newXORTerm,eventlist,theParent,theIndex,'LawOfCompleteness 1');
@@ -860,6 +880,9 @@ begin
   currentTerm.Children.Clear;
   { set flag that this event is being built new }
   currentTerm.IsNotCompletelyBuildYet := true;
+  { set to SpeedSearch-Mode --> no changes to objects other than those with
+    IsNotCompletelyBuildYet = true or new objects... }
+  eventlist.SpeedSearchFlagOn:=true;
   { for each child do }
   numberOfChildren := theOldObject.Count;
   repeat
@@ -901,6 +924,7 @@ begin
   end;
   { set new type to theNEWType and }
   currentTerm.EventType := theNEWType;
+  eventlist.SpeedSearchFlagOn:=false;
   { unset flag as this event is complete }
   currentTerm.IsNotCompletelyBuildYet := false;
   currentTerm.CheckTermProperties;
@@ -1384,99 +1408,97 @@ var numberChildren : integer = 0;
   tempString : ansistring;
 begin
 
-  if not currentTerm.IsBasicEvent then
-  begin
-    numberChildren := currentTerm.Count;
-    Result := '';
-    if numberChildren > 1 then  { and, or, xor, pand, sand operators }
-    begin
-      expressionList := TTFTAStringList.Create;
-      i := 0;
-      repeat
-        tempString := ScanChildrenSorting(currentTerm[i],currentTerm.Children,i,eventlist,localIsChange);
-        expressionList.Add(tempString);
-        inc(i);
-      until (i = numberChildren);
-      { now sort the entries in expressionList,
-        if TTFTAStringList.sort returns false, then no sort was performed, i.e.
-        no sorting of the currentTerm-children is necessary; if sort returns
-        true, then sorting is necessary }
-      if currentTerm.IsCommutative and expressionList.Sort then
-      begin
-        { right now localIsChange is still set from the next iteration of ScanChildrenSort;
-          its value is irrelevant now, as possible changes of other descendants than the
-          direct children have already been handled at deeper levels of the iterative
-          walk-through; only changes at the current childrens' level are relevant }
-        localIsChange := true;
-        { if such an event already exists in eventlist, then take this, else
-          create a new one }
-        Result := currentTerm.EventTypeToString + '[' + expressionList.CSText + ']';
-        {$IfDef TESTMODE}
-          currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting (Aenderung) 1');
-        {$ENDIF}
-        tempObject := eventlist.ListHoldsObjectAt(Result);
-        { three possibilities: see PANDPANDTRansform }
-        if not Assigned(tempObject) then
-        begin
-          { possibility 1 --> sort the operands of currentTerm }
-          tempObject := currentTerm.Clone(eventlist);
-          currentTerm.Children.Clear;
-          { for each child ... }
-          numberChildren := tempObject.Count;
-          i := 0;
-          repeat
-            currentTerm.AddChild(tempObject[expressionList[i].FormerPosition]);
-            inc(i);
-          until (i = numberChildren);
-          currentTerm.CheckTermProperties;
-          {$IfDef TESTMODE}
-            currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting (Aenderung) 2');
-          {$ENDIF}
-          { we can free the cloned event (in tempObject) }
-          eventlist.Delete(eventlist.Count-1);
-        end else
-        begin
-          { possibilites 2 or 4 --> re-link currentTerm to existing event }
-          GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'ScanChildrenSorting 3');
-          localIsChange := true; { regardless of sorting a change (the re-link) has happened }
-        end;
-      end else
-      begin
-        { pand operator (its children could have been changed by sorting through them
-          iteratively (see above) even if operands itself must not be sorted in case of PANDs }
-        if localIsChange then { is set by iterative calls of ScanChildrenSort...
-                                 ... operator type PAND is implied by >1 children and not not PAND }
-        begin
-          { the children have been changed and thus we need to check, whether the PAND already
-            exists somewhere else ... }
-          tempObject := NIL;
-          if checkIfAlreadyListed(currentTerm,eventlist,tempObject) then
-            GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'ScanChildrenSorting 5');
-          {$IfDef TESTMODE}
-            if tempObject = currentTerm then {in this case checkIfAlreadyListed is false and thus no
-                                       debug output was created }
-              currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting 6');
-          {$ENDIF}
-        end;
-        { either way the following is the correct string... }
-        Result := currentTerm.EventTypeToString + '[' + expressionList.CSText + ']';
-      end;
-    end else
-    begin
-      { NOT operator or one of the above in rare cases, where
-        transformation results in only single parameter }
-      Result := ScanChildrenSorting(currentTerm[0],currentTerm.Children,0,eventlist,localIsChange);
-      Result := currentTerm.EventTypeToString + '[' + Result + ']';
-      { localIsChange is given by the iterative call of ScanChildrenSort (see one line above) }
-    end;
-  end else
+  if currentTerm.IsBasicEvent then
   begin;
     { is basic event }
-    Result := currentTerm.PlainTemporalExpr; { name is stored in VExpr at creation of basic event }
-    localIsChange := false; { BASIC: no change of the event }
+    Result   := currentTerm.PlainTemporalExpr; { name is stored in VExpr at creation of basic event }
+    isChange := false; { BASIC: no change of the event }
+    exit; { return from this iteration of ScanChildrenSorting }
   end;
 
-  isChange := isChange or localIsChange;
+  { test for NOT }
+  if currentTerm.IsTypeNOT then
+  begin
+    { NOT operator }
+    Result := ScanChildrenSorting(currentTerm[0],currentTerm.Children,0,eventlist,isChange);
+    Result := currentTerm.EventTypeToString + '[' + Result + ']';
+    { isChange is given by the iterative call of ScanChildrenSort (see two lines above) }
+    exit;
+  end;
+
+
+  { no basic event, no NOT -->  and, or, xor, pand, sand operators }
+  numberChildren := currentTerm.Count;
+  Result := '';
+  expressionList := TTFTAStringList.Create;
+  i := 0;
+  repeat
+    tempString := ScanChildrenSorting(currentTerm[i],currentTerm.Children,i,eventlist,localIsChange);
+    expressionList.Add(tempString);
+    isChange := isChange or localIsChange;
+    inc(i);
+  until (i = numberChildren);
+  { now sort the entries in expressionList,
+    if TTFTAStringList.sort returns false, then no sort was performed, i.e.
+    no sorting of the currentTerm-children is necessary; if sort returns
+    true, then sorting is necessary }
+  if currentTerm.IsTypePAND then
+  begin
+    { we need to check, whether the PAND already exists somewhere else ... }
+    tempObject := NIL;
+    if checkIfAlreadyListed(currentTerm,eventlist,tempObject) then
+      GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'ScanChildrenSorting 5');
+    {$IfDef TESTMODE}
+      if tempObject = currentTerm then { in this case checkIfAlreadyListed is false and thus no
+                                         debug output was created }
+        currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting 6');
+    {$ENDIF}
+    { either way the following is the correct string... }
+    Result := currentTerm.EventTypeToString + '[' + expressionList.CSText + ']';
+    exit;
+  end;
+
+  { should be commutative now }
+  if currentTerm.IsCommutative then
+  begin
+    expressionList.Sort ;
+    { if such an event already exists in eventlist, then take this, else
+      create a new one }
+    Result := currentTerm.EventTypeToString + '[' + expressionList.CSText + ']';
+    {$IfDef TESTMODE}
+      currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting (Aenderung) 1');
+    {$ENDIF}
+    tempObject := eventlist.ListHoldsObjectAt(Result);
+    { three possibilities: see PANDPANDTRansform }
+    if not Assigned(tempObject) then
+    begin
+      { possibility 1 --> sort the operands of currentTerm }
+      tempObject := currentTerm.Clone(eventlist);
+      currentTerm.Children.Clear;
+      { for each child ... }
+      numberChildren := tempObject.Count;
+      i := 0;
+      repeat
+        currentTerm.AddChild(tempObject[expressionList[i].FormerPosition]);
+        inc(i);
+      until (i = numberChildren);
+      currentTerm.CheckTermProperties;
+      {$IfDef TESTMODE}
+        currentTerm.DEBUGPrint(true,eventlist,'ScanChildrenSorting (Aenderung) 2');
+      {$ENDIF}
+      { we can free the cloned event (in tempObject) }
+      eventlist.Delete(eventlist.Count-1);
+    end else
+    begin
+      { possibilites 2 or 4 --> re-link currentTerm to existing event }
+      if tempObject <> currentTerm then
+      begin
+        GenericUpdateObject(currentTerm,tempObject,eventlist,theParent,theIndex,'ScanChildrenSorting 3');
+        localIsChange := true; { regardless of sorting a change (the re-link) has happened }
+      end;
+    end;
+    isChange := isChange or localIsChange;
+  end;
 
 end; { function ScanChildrenSorting }
 

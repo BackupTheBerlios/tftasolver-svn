@@ -118,7 +118,7 @@ begin
   Result := nil;
   for i:= 1 to self.Count do
   begin
-    if AnsiCompareStr(Text,self[i-1].TemporalExpr) <> 0 then
+    if (AnsiCompareStr(Text,self[i-1].TemporalExpr) <> 0) then
       Result := nil
     else
       Result := self[i-1];
@@ -199,4 +199,22 @@ begin
   inherited Items[Index] := Item;
 end;
 
-//  [include file EOF]
+{------------------------------------------------------------------------------
+  if set to false: run through all listed objects and unset their TTFTAObject.SpeedSearchIsSet
+------------------------------------------------------------------------------}
+procedure TTFTAEventLookupList.SetSpeedSearchFlagOn(SetTo : boolean);
+var i : Integer = 0;
+    numberOfItems : Integer;
+begin
+  self.VSpeedSearchFlagOn:=SetTo;
+  if SetTo = false then
+  begin
+    numberOfItems := self.Count;
+    repeat
+      self[i].SpeedSearchIsSet := False;
+      inc(i);
+    until i = numberOfItems;
+  end;
+end;
+
+// [include file EOF]

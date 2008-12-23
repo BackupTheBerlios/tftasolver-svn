@@ -70,6 +70,7 @@ type
     VmyApplication : TApplication;
     VtheFALSE : TTFTAObject;
     VtheTRUE  : TTFTAObject;
+    VSpeedSearchFlagOn : boolean;
 
     function  GetItem(Index: Integer): TTFTAObject;
     function  NewItemPrivate(EventType               : TTFTAOperatorType;
@@ -84,6 +85,7 @@ type
                             PointerToUpdateObject   : TTFTAObject;
                             TemporalExpr            : ansistring) : TTFTAObject;
     procedure SetItem(Index: Integer; Item: TTFTAObject);
+    procedure SetSpeedSearchFlagOn(SetTo : boolean);
 
   public
     {$IfDef TESTMODE}
@@ -130,6 +132,7 @@ type
     {$EndIf}
     property  Items[Index: Integer]: TTFTAObject read GetItem write SetItem; default;
     property  pointerToApplication : TApplication read VmyApplication write VmyApplication;
+    property  SpeedSearchFlagOn : boolean read VSpeedSearchFlagOn write SetSpeedSearchFlagOn;
     property  TheFALSEElement : TTFTAObject read VtheFALSE;
     property  TheTRUEElement : TTFTAObject read VtheTRUE;
 
@@ -189,6 +192,7 @@ type
     VNeedsToBeUpdated : boolean;  { true, if before an identical event was modified, then a update to this identical object is needed }
     VPointerToUpdateObject : TTFTAObject; { this points to the object the current object shall be updated to }
     VPosInEventList : Integer;   { allows to reference to my own pointer (within eventlist) }
+    VSpeepSearch : boolean;
     VType: TTFTAOperatorType;     { what type am I? }
 
     function  CheckIsCommutative : boolean;
@@ -273,6 +277,7 @@ type
     property  PlainTemporalExpr : ansistring read VExpr;
     property  PointerToUpdateObject : TTFTAObject read GetPointerToUpdateObject write VPointerToUpdateObject;
     property  PosInEventList : Integer read VPosInEventList write VPosInEventList;
+    property  SpeedSearchIsSet : boolean read VSpeepSearch write VSpeepSearch;
     property  TemporalExpr : ansistring read GetTempExpr write SetTempExpr;
 
   end;
