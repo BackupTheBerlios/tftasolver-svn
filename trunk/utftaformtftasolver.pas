@@ -30,7 +30,7 @@ uses
   { eigene Units }
   utftaexpression, utftaformabout,
   {$IFDEF TESTMODE}utftaformdebugmessages, sjspointertools, {$ENDIF}
-  utftaobject;
+  utftaobject, Menus;
 
 { ##############################################################################
   ##############################################################################
@@ -46,31 +46,50 @@ type
   { TTFTAMainWindow }
 
   TTFTAMainWindow = class(TForm)
-    BitBtnShowInputStructure: TBitBtn;
-    BitBtnShowOutputStructure: TBitBtn;
-    BitBtnCalculate: TBitBtn;
-    BitBtnSave: TBitBtn;
-    BitBtnLoad: TBitBtn;
-    BitBtnGetInputString: TBitBtn;
-    BitBtnSaveOutput: TBitBtn;
-    ButtonAbout: TButton;
-    Label1: TLabel;
+    ImageListToolbarOverall: TImageList;
+    ImageListMenuOverall: TImageList;
+    MainMenuOverall: TMainMenu;
     MemoInputString: TMemo;
     {$IFDEF TESTMODE} MemoDEBUG: TMemo; {$ENDIF}
     MemoOutputString: TMemo;
+    MenuItemSaveOutAs: TMenuItem;
+    MenuItem2: TMenuItem;
+    MenuItemSimplify: TMenuItem;
+    MenuItemHelp: TMenuItem;
+    MenuItemScan: TMenuItem;
+    MenuItemFile: TMenuItem;
+    MenuItemClear: TMenuItem;
+    MenuItemOpen: TMenuItem;
+    MenuItemExit: TMenuItem;
+    MenuItemSaveInAs: TMenuItem;
     ProgressBar1: TProgressBar;
-    Shape1: TShape;
     StatusBarHauptfenster: TStatusBar;
+    ToolBarOverall: TToolBar;
+    ToolButtonSaveOutAs: TToolButton;
+    ToolButton3: TToolButton;
+    ToolButton2: TToolButton;
+    ToolButton4: TToolButton;
+    ToolButton5: TToolButton;
+    ToolButton6: TToolButton;
+    ToolButtonShowTrees: TToolButton;
+    ToolButtonSimplify: TToolButton;
+    ToolButtonImportTerm: TToolButton;
+    ToolButtonExit: TToolButton;
+    ToolButtonSaveAs: TToolButton;
+    ToolButtonOpen: TToolButton;
+    ToolButtonClear: TToolButton;
+    ToolButtonHelp: TToolButton;
     TreeViewInputStructure: TTreeView;
     TreeViewOutputStructure: TTreeView;
-    procedure BitBtnShowOutputStructureClick(Sender: TObject);
-    procedure BitBtnCalculateClick(Sender: TObject);
-    procedure BitBtnGetInputStringClick(Sender: TObject);
-    procedure BitBtnShowInputStructureClick(Sender: TObject);
-    procedure BitBtnSaveOutputClick(Sender: TObject);
-    procedure BitBtnLoadClick(Sender: TObject);
-    procedure BitBtnSaveClick(Sender: TObject);
-    procedure ButtonAboutClick(Sender: TObject);
+    procedure MenuItemClearClick(Sender: TObject);
+    procedure MenuItemExitClick(Sender: TObject);
+    procedure MenuItemHelpClick(Sender: TObject);
+    procedure MenuItemOpenClick(Sender: TObject);
+    procedure MenuItemSaveInAsClick(Sender: TObject);
+    procedure MenuItemSaveOutAsClick(Sender: TObject);
+    procedure MenuItemScanClick(Sender: TObject);
+    procedure MenuItemSimplifyClick(Sender: TObject);
+    procedure ToolButtonShowTreesClick(Sender: TObject);
   private
       {$IFDEF TESTMODE}
       vDEBUGWindow : TFormDebugMessage;
@@ -139,106 +158,54 @@ begin
 end;
 {$ENDIF}
 
-{ ##############################################################################
-  ##############################################################################
-  TTFTAMainWindow.BitBtnAusdruckUbernehmenClick steuert die Uebernahme der
-  Eingaben und die Auswertung derselben.
-  ##############################################################################
-  #############################################################################}
-procedure TTFTAMainWindow.BitBtnGetInputStringClick(Sender: TObject);
-var s : ansistring;
+
+
+
+
+procedure TTFTAMainWindow.MenuItemClearClick(Sender: TObject);
 begin
-
-  { within the InputString all Blanks / Whitespaces and Newlines need to be
-    deleted; furthermore the user may use "[", "(" and the corresponding
-    colsing brackets, internally they are converted to "[" and "]";
-    all input is casted to uppercase }
-  s := Trim(MemoInputString.Lines.Text);
-  s := AnsiReplaceText(s,' ','');
-  s := AnsiReplaceText(s,sLineBreak,'');
-  s := AnsiReplaceText(s,'(','[');
-  s := AnsiReplaceText(s,')',']');
-  s := upCase(s);
-  
-  { write the "cleaned" string back to the input field }
-  MemoInputString.Lines.Text := s;
-
-  { create an initial TemporalExpression }
-  if assigned(TemporalExpression) then
-    //TemporalExpression.Reset
-  else
-    TemporalExpression := TTFTAExpression.Create;
-  {$IFDEF TESTMODE}TemporalExpression.SetDEBUGMemo(MemoDEBUG); {$ENDIF}
-
-  { give input string to TemporalExpression }
-  TemporalExpression.InputString := s  ;
-  TemporalExpression.pointerToApplication := pointerToApplication;
+  //TemporalExpression.Clear;
   TreeViewInputStructure.Items.Clear ;
   TreeViewOutputStructure.Items.Clear;
-  self.MemoOutputString.Clear;
-  { start building the TermporalTerm and the corresponding TreeView from the
-    input string }
-  TemporalExpression.ParseInput(TreeViewInputStructure.Items);
-  self.BitBtnCalculate.Enabled:=true;
+  MemoOutputString.Clear;
+
+  self.MenuItemSimplify.Enabled:=false;
+  self.ToolButtonSimplify.Enabled:=false;
 
 end;
 
-procedure TTFTAMainWindow.BitBtnShowOutputStructureClick(Sender: TObject);
+procedure TTFTAMainWindow.MenuItemExitClick(Sender: TObject);
 begin
-  TreeViewOutputStructure.Visible := TreeViewOutputStructure.Visible xor True;
-  if BitBtnShowOutputStructure.caption = 'Struktur anzeigen' then
-     BitBtnShowOutputStructure.caption := 'Struktur ausblenden'
-  else
-     BitBtnShowOutputStructure.caption := 'Struktur anzeigen' ;
+  close;
 end;
 
-{ ##############################################################################
-  ##############################################################################
-  ##############################################################################
-  #############################################################################}
-procedure TTFTAMainWindow.BitBtnCalculateClick(Sender: TObject);
+procedure TTFTAMainWindow.MenuItemHelpClick(Sender: TObject);
+var
+  FormAbout:TFormAbout;
 begin
-
-  self.BitBtnCalculate.Enabled:=false;
-
-  TemporalExpression.Simplify;
-
-  { TemporalExpression.TemporalTerm = the TOP event, thus we start with its
-    first - and only - child }
-  MemoOutputString.Text := TemporalExpression.OutputString;
-
-  { now build OutputTree from TemporalTerm.GetFirstChild }
-  TreeViewOutputStructure.Items.Clear;
-  TemporalExpression.BuildTreeNodes(TreeViewOutputStructure.Items);
+  FormAbout := TFormAbout.Create(Self);
+  try
+    FormAbout.ShowModal;
+  finally
+    FormAbout.Release;
+  end;
 end;
 
-
-{ ##############################################################################
-  ##############################################################################
-  TTFTAMainWindow.BitBtnAnzeigenStrukturClick schaltet die
-  Baumanzeige ein und aus.
-  ##############################################################################
-  #############################################################################}
-procedure TTFTAMainWindow.BitBtnShowInputStructureClick(Sender: TObject);
+procedure TTFTAMainWindow.MenuItemOpenClick(Sender: TObject);
 begin
+  StatusBarHauptfenster.Panels.Items[1].Text:='NOTE: NOT YET IMPLEMENTED8 ' + MenuItemOpen.Caption;
+end;
 
-  TreeViewInputStructure.Visible := TreeViewInputStructure.Visible xor True;
-  if BitBtnShowInputStructure.caption = 'Struktur anzeigen' then
-     BitBtnShowInputStructure.caption := 'Struktur ausblenden'
-  else
-     BitBtnShowInputStructure.caption := 'Struktur anzeigen' ;
-
+procedure TTFTAMainWindow.MenuItemSaveInAsClick(Sender: TObject);
+begin
+  StatusBarHauptfenster.Panels.Items[1].Text:='ACHTUNG: NOCH KEINE FUNKTION HINTER ' + MenuItemSaveInAs.Caption;
 end;
 
 
-{ ##############################################################################
-  ##############################################################################
-  ##############################################################################
-  #############################################################################}
-procedure TTFTAMainWindow.BitBtnSaveOutputClick(Sender: TObject);
+procedure TTFTAMainWindow.MenuItemSaveOutAsClick(Sender: TObject);
 var x : TTFTAObject;
     i : Integer;
-    
+
     procedure zaehle(Item : TTFTAObject; iterationlevel : integer);
     var i : Integer;
     begin
@@ -252,10 +219,10 @@ var x : TTFTAObject;
         inc(i);
       until i=Item.Count;
     end;
-    
+
 begin
   x := self.TemporalExpression.TemporalTerm;
-  
+
   if x.HasChildren then zaehle(x,0);
   {$IFDEF TESTMODE}
     WriteDEBUGMessage('EventListe mit ' + IntToStr(self.TemporalExpression.EventList.Count) + ' Eintraegen...');
@@ -267,53 +234,76 @@ end;
 
 
 
-{ ##############################################################################
-  ##############################################################################
-  ##############################################################################
-  #############################################################################}
-procedure TTFTAMainWindow.BitBtnLoadClick(Sender: TObject);
+
+
+
+procedure TTFTAMainWindow.MenuItemScanClick(Sender: TObject);
+var s : ansistring;
 begin
 
-  StatusBarHauptfenster.Panels.Items[1].Text:='NOTE: NOT YET IMPLEMENTED8 ' + BitBtnLoad.Caption;
+  { within the InputString all Blanks / Whitespaces and Newlines need to be
+    deleted; furthermore the user may use "[", "(" and the corresponding
+    colsing brackets, internally they are converted to "[" and "]";
+    all input is casted to uppercase }
+  s := Trim(MemoInputString.Lines.Text);
+  s := AnsiReplaceText(s,' ','');
+  s := AnsiReplaceText(s,sLineBreak,'');
+  s := AnsiReplaceText(s,'(','[');
+  s := AnsiReplaceText(s,')',']');
+  s := upCase(s);
+
+  { write the "cleaned" string back to the input field }
+  MemoInputString.Lines.Text := s;
+
+  { create an initial TemporalExpression }
+  if assigned(TemporalExpression) then
+    //TemporalExpression.Reset
+  else
+    TemporalExpression := TTFTAExpression.Create;
+  {$IFDEF TESTMODE}TemporalExpression.SetDEBUGMemo(MemoDEBUG); {$ENDIF}
+
+  { clear possible old data }
+  MenuItemClearClick(Sender);
+
+  { give input string to TemporalExpression }
+  TemporalExpression.InputString := s  ;
+  TemporalExpression.pointerToApplication := pointerToApplication;
+
+  { start building the TermporalTerm and the corresponding TreeView from the
+    input string }
+  TemporalExpression.ParseInput(TreeViewInputStructure.Items);
+
+  self.MenuItemSimplify.Enabled:=true;
+  self.ToolButtonSimplify.Enabled:=true;
 
 end;
 
 
-
-{ ##############################################################################
-  ##############################################################################
-  ##############################################################################
-  #############################################################################}
-procedure TTFTAMainWindow.BitBtnSaveClick(Sender: TObject);
+procedure TTFTAMainWindow.MenuItemSimplifyClick(Sender: TObject);
 begin
 
-  StatusBarHauptfenster.Panels.Items[1].Text:='ACHTUNG: NOCH KEINE FUNKTION HINTER ' + BitBtnSave.Caption;
+  self.MenuItemSimplify.Enabled:=false;
+  self.ToolButtonSimplify.Enabled:=false;
+
+  TemporalExpression.Simplify;
+
+  { TemporalExpression.TemporalTerm = the TOP event, thus we start with its
+    first - and only - child }
+  MemoOutputString.Text := TemporalExpression.OutputString;
+
+  { now build OutputTree from TemporalTerm.GetFirstChild }
+  TreeViewOutputStructure.Items.Clear;
+  TemporalExpression.BuildTreeNodes(TreeViewOutputStructure.Items);
 
 end;
 
-
-
-procedure TTFTAMainWindow.ButtonAboutClick(Sender: TObject);
-var
-  FormAbout:TFormAbout;
+procedure TTFTAMainWindow.ToolButtonShowTreesClick(Sender: TObject);
 begin
-  FormAbout := TFormAbout.Create(Self);
-  try
-    FormAbout.ShowModal;
-  finally
-    FormAbout.Release;
-  end;
+
+  TreeViewInputStructure.Visible := TreeViewInputStructure.Visible xor True;
+  TreeViewOutputStructure.Visible := TreeViewOutputStructure.Visible xor True;
 end;
 
-
-
-
-{ ##############################################################################
-  ##############################################################################
-  ##############################################################################
-  ##############################################################################
-  ##############################################################################
-  #############################################################################}
 initialization
   {$I utftaformtftasolver.lrs}
 
