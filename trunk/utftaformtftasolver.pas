@@ -30,7 +30,7 @@ uses
   { eigene Units }
   utftaexpression, utftaformabout,
   {$IFDEF TESTMODE}utftaformdebugmessages, sjspointertools, {$ENDIF}
-  utftaobject, Menus;
+  utftaobject, Menus, LazHelpHTML, IpHtml;
 
 { ##############################################################################
   ##############################################################################
@@ -46,12 +46,16 @@ type
   { TTFTAMainWindow }
 
   TTFTAMainWindow = class(TForm)
-    ImageListToolbarOverall: TImageList;
     ImageListMenuOverall: TImageList;
     MainMenuOverall: TMainMenu;
     MemoInputString: TMemo;
     {$IFDEF TESTMODE} MemoDEBUG: TMemo; {$ENDIF}
     MemoOutputString: TMemo;
+    MenuItemProgHomepage: TMenuItem;
+    MenuItemHelpUsage: TMenuItem;
+    MenuItemAddDoc: TMenuItem;
+    MenuItemAbout: TMenuItem;
+    MenuItem5: TMenuItem;
     MenuItemSaveOutAs: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItemSimplify: TMenuItem;
@@ -81,6 +85,7 @@ type
     ToolButtonHelp: TToolButton;
     TreeViewInputStructure: TTreeView;
     TreeViewOutputStructure: TTreeView;
+    procedure MenuItemAboutClick(Sender: TObject);
     procedure MenuItemClearClick(Sender: TObject);
     procedure MenuItemExitClick(Sender: TObject);
     procedure MenuItemHelpClick(Sender: TObject);
@@ -174,12 +179,7 @@ begin
 
 end;
 
-procedure TTFTAMainWindow.MenuItemExitClick(Sender: TObject);
-begin
-  close;
-end;
-
-procedure TTFTAMainWindow.MenuItemHelpClick(Sender: TObject);
+procedure TTFTAMainWindow.MenuItemAboutClick(Sender: TObject);
 var
   FormAbout:TFormAbout;
 begin
@@ -189,6 +189,16 @@ begin
   finally
     FormAbout.Release;
   end;
+end;
+
+procedure TTFTAMainWindow.MenuItemExitClick(Sender: TObject);
+begin
+  close;
+end;
+
+procedure TTFTAMainWindow.MenuItemHelpClick(Sender: TObject);
+begin
+
 end;
 
 procedure TTFTAMainWindow.MenuItemOpenClick(Sender: TObject);

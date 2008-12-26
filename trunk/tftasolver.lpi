@@ -26,17 +26,21 @@
         <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T 'Lazarus Run Output' -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="1">
+    <RequiredPackages Count="2">
       <Item1>
-        <PackageName Value="LCL"/>
+        <PackageName Value="TurboPowerIPro"/>
+        <MinVersion Major="1" Valid="True"/>
       </Item1>
+      <Item2>
+        <PackageName Value="LCL"/>
+      </Item2>
     </RequiredPackages>
-    <Units Count="26">
+    <Units Count="27">
       <Unit0>
         <Filename Value="tftasolver.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="tftasolver"/>
-        <CursorPos X="42" Y="15"/>
+        <CursorPos X="18" Y="21"/>
         <TopLine Value="1"/>
         <EditorIndex Value="9"/>
         <UsageCount Value="301"/>
@@ -122,8 +126,8 @@
         <ResourceBaseClass Value="Form"/>
         <ResourceFilename Value="utftaformtftasolver.lrs"/>
         <UnitName Value="utftaformtftasolver"/>
-        <CursorPos X="19" Y="81"/>
-        <TopLine Value="68"/>
+        <CursorPos X="111" Y="52"/>
+        <TopLine Value="10"/>
         <EditorIndex Value="8"/>
         <UsageCount Value="301"/>
         <Loaded Value="True"/>
@@ -213,7 +217,7 @@
         <Filename Value="../../../../../../../usr/lib/lazarus/lcl/include/custommemo.inc"/>
         <CursorPos X="1" Y="66"/>
         <TopLine Value="43"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="0"/>
       </Unit19>
       <Unit20>
         <Filename Value="utftaobject_list.pas"/>
@@ -221,7 +225,7 @@
         <CursorPos X="1" Y="157"/>
         <TopLine Value="134"/>
         <EditorIndex Value="6"/>
-        <UsageCount Value="85"/>
+        <UsageCount Value="98"/>
         <Loaded Value="True"/>
       </Unit20>
       <Unit21>
@@ -230,7 +234,7 @@
         <CursorPos X="1" Y="121"/>
         <TopLine Value="98"/>
         <EditorIndex Value="3"/>
-        <UsageCount Value="85"/>
+        <UsageCount Value="98"/>
         <Loaded Value="True"/>
       </Unit21>
       <Unit22>
@@ -246,13 +250,13 @@
         <Filename Value="utftaformdebugmessages.lrs"/>
         <CursorPos X="45" Y="11"/>
         <TopLine Value="1"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="0"/>
       </Unit23>
       <Unit24>
         <Filename Value="utftaformdebugmessages.lrs.bak"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="0"/>
         <SyntaxHighlighter Value="None"/>
       </Unit24>
       <Unit25>
@@ -260,129 +264,136 @@
         <UnitName Value="LResources"/>
         <CursorPos X="1" Y="2866"/>
         <TopLine Value="2843"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="2"/>
       </Unit25>
+      <Unit26>
+        <Filename Value="../../../../../../../usr/lib/lazarus/components/turbopower_ipro/iphtml.pas"/>
+        <UnitName Value="IpHtml"/>
+        <CursorPos X="6" Y="14887"/>
+        <TopLine Value="14864"/>
+        <UsageCount Value="10"/>
+      </Unit26>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="75" Column="30" TopLine="56"/>
+        <Caret Line="53" Column="35" TopLine="50"/>
       </Position1>
       <Position2>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="72" Column="20" TopLine="56"/>
+        <Caret Line="49" Column="39" TopLine="49"/>
       </Position2>
       <Position3>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="95" Column="54" TopLine="94"/>
+        <Caret Line="48" Column="33" TopLine="48"/>
       </Position3>
       <Position4>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="335" Column="1" TopLine="305"/>
+        <Caret Line="68" Column="52" TopLine="48"/>
       </Position4>
       <Position5>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="95" Column="52" TopLine="94"/>
+        <Caret Line="166" Column="5" TopLine="143"/>
       </Position5>
       <Position6>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="334" Column="1" TopLine="304"/>
+        <Caret Line="260" Column="29" TopLine="237"/>
       </Position6>
       <Position7>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="95" Column="2" TopLine="72"/>
+        <Caret Line="298" Column="1" TopLine="260"/>
       </Position7>
       <Position8>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="72" Column="30" TopLine="71"/>
+        <Caret Line="83" Column="3" TopLine="60"/>
       </Position8>
       <Position9>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="73" Column="30" TopLine="71"/>
+        <Caret Line="277" Column="3" TopLine="259"/>
       </Position9>
       <Position10>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="57" Column="41" TopLine="57"/>
+        <Caret Line="85" Column="50" TopLine="84"/>
       </Position10>
       <Position11>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="66" Column="21" TopLine="57"/>
+        <Caret Line="179" Column="9" TopLine="177"/>
       </Position11>
       <Position12>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="62" Column="26" TopLine="57"/>
+        <Caret Line="68" Column="24" TopLine="68"/>
       </Position12>
       <Position13>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="63" Column="26" TopLine="57"/>
+        <Caret Line="82" Column="38" TopLine="68"/>
       </Position13>
       <Position14>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="64" Column="26" TopLine="57"/>
+        <Caret Line="81" Column="19" TopLine="68"/>
       </Position14>
       <Position15>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="62" Column="22" TopLine="57"/>
+        <Caret Line="55" Column="26" TopLine="54"/>
       </Position15>
       <Position16>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="50" Column="40" TopLine="50"/>
+        <Caret Line="56" Column="26" TopLine="54"/>
       </Position16>
       <Position17>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="54" Column="31" TopLine="50"/>
+        <Caret Line="57" Column="26" TopLine="54"/>
       </Position17>
       <Position18>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="53" Column="35" TopLine="50"/>
+        <Caret Line="58" Column="26" TopLine="54"/>
       </Position18>
       <Position19>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="49" Column="39" TopLine="49"/>
+        <Caret Line="57" Column="26" TopLine="54"/>
       </Position19>
       <Position20>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="48" Column="33" TopLine="48"/>
+        <Caret Line="89" Column="5" TopLine="88"/>
       </Position20>
       <Position21>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="68" Column="52" TopLine="48"/>
+        <Caret Line="202" Column="5" TopLine="174"/>
       </Position21>
       <Position22>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="166" Column="5" TopLine="143"/>
+        <Caret Line="55" Column="25" TopLine="54"/>
       </Position22>
       <Position23>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="260" Column="29" TopLine="237"/>
+        <Caret Line="254" Column="3" TopLine="251"/>
       </Position23>
       <Position24>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="298" Column="1" TopLine="260"/>
+        <Caret Line="49" Column="52" TopLine="33"/>
       </Position24>
       <Position25>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="83" Column="3" TopLine="60"/>
+        <Caret Line="48" Column="33" TopLine="33"/>
       </Position25>
       <Position26>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="277" Column="3" TopLine="259"/>
+        <Caret Line="51" Column="32" TopLine="33"/>
       </Position26>
       <Position27>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="85" Column="50" TopLine="84"/>
+        <Caret Line="50" Column="38" TopLine="33"/>
       </Position27>
       <Position28>
-        <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="179" Column="9" TopLine="177"/>
+        <Filename Value="tftasolver.lpr"/>
+        <Caret Line="21" Column="34" TopLine="1"/>
       </Position28>
       <Position29>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="68" Column="24" TopLine="68"/>
+        <Caret Line="49" Column="52" TopLine="33"/>
       </Position29>
       <Position30>
         <Filename Value="utftaformtftasolver.pas"/>
-        <Caret Line="82" Column="38" TopLine="68"/>
+        <Caret Line="48" Column="33" TopLine="33"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
@@ -412,7 +423,7 @@
     </Other>
   </CompilerOptions>
   <Debugging>
-    <BreakPoints Count="8">
+    <BreakPoints Count="7">
       <Item1>
         <Source Value="utftaobject.pas"/>
         <Line Value="339"/>
@@ -441,10 +452,6 @@
         <Source Value="utftaobject.pas"/>
         <Line Value="331"/>
       </Item7>
-      <Item8>
-        <Source Value="utftalogic.pas"/>
-        <Line Value="372"/>
-      </Item8>
     </BreakPoints>
     <Watches Count="3">
       <Item1>

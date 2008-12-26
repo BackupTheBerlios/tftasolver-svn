@@ -18,7 +18,7 @@ uses
   {$IFDEF TESTMODE}
   utftaformdebugmessages,
   {$ENDIF}
-  utftastringlist;
+  utftastringlist, TurboPowerIPro;
   
 
 //{$R tftasolver.res}
