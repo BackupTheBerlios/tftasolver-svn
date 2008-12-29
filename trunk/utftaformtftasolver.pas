@@ -47,10 +47,13 @@ type
 
   TTFTAMainWindow = class(TForm)
     ImageListMenuOverall: TImageList;
+    ImageListMenuOverallInactive: TImageList;
     MainMenuOverall: TMainMenu;
     MemoInputString: TMemo;
     {$IFDEF TESTMODE} MemoDEBUG: TMemo; {$ENDIF}
     MemoOutputString: TMemo;
+    MenuItemShowTrees: TMenuItem;
+    MenuItemView: TMenuItem;
     MenuItemProgHomepage: TMenuItem;
     MenuItemHelpUsage: TMenuItem;
     MenuItemAddDoc: TMenuItem;
@@ -93,8 +96,8 @@ type
     procedure MenuItemSaveInAsClick(Sender: TObject);
     procedure MenuItemSaveOutAsClick(Sender: TObject);
     procedure MenuItemScanClick(Sender: TObject);
+    procedure MenuItemShowTreesClick(Sender: TObject);
     procedure MenuItemSimplifyClick(Sender: TObject);
-    procedure ToolButtonShowTreesClick(Sender: TObject);
   private
       {$IFDEF TESTMODE}
       vDEBUGWindow : TFormDebugMessage;
@@ -213,32 +216,25 @@ end;
 
 
 procedure TTFTAMainWindow.MenuItemSaveOutAsClick(Sender: TObject);
-var x : TTFTAObject;
-    i : Integer;
-
-    procedure zaehle(Item : TTFTAObject; iterationlevel : integer);
-    var i : Integer;
-    begin
-      i:=0;
-      repeat
-        {$IFDEF TESTMODE}WriteDEBUGMessage(Item[i].WriteStatus(iterationlevel));  {$ENDIF}
-        if Item[i].HasChildren then
-          begin
-            zaehle(Item[i],iterationlevel+2);
-          end;
-        inc(i);
-      until i=Item.Count;
-    end;
-
+var i : Integer;
+    numberOfItems : Integer;
+    tempString : ansistring;
+    tempTerm : TTFTAObject;
 begin
-  x := self.TemporalExpression.TemporalTerm;
-
-  if x.HasChildren then zaehle(x,0);
   {$IFDEF TESTMODE}
-    WriteDEBUGMessage('EventListe mit ' + IntToStr(self.TemporalExpression.EventList.Count) + ' Eintraegen...');
-    for i := 1 to self.TemporalExpression.EventList.Count do
-      WriteDEBUGMessage(PointerAddrStr(self.TemporalExpression.EventList.Items[i-1])+ ' === ' +
-                                          self.TemporalExpression.EventList.Items[i-1].TemporalExpr);
+    i := 0;
+    numberOfItems := self.TemporalExpression.EventList.Count;
+
+    WriteDEBUGMessage('EventListe mit ' + IntToStr(numberOfItems) + ' Eintraegen...');
+    repeat
+      tempTerm := self.TemporalExpression.EventList.Items[i];
+      tempString := PointerAddrStr(tempTerm);
+      if tempTerm.NeedsToBeUpdated then
+        tempString := tempString + '(redirected to ' + PointerAddrStr(tempTerm.PointerToUpdateObject) + ')';
+      tempString := tempString + ' === ' + tempTerm.PlainTemporalExpr;
+      WriteDEBUGMessage(tempString);
+      inc(i);
+    until i = numberOfItems;
   {$ENDIF}
 end;
 
@@ -288,6 +284,14 @@ begin
 
 end;
 
+procedure TTFTAMainWindow.MenuItemShowTreesClick(Sender: TObject);
+begin
+  TreeViewInputStructure.Visible := TreeViewInputStructure.Visible xor True;
+  TreeViewOutputStructure.Visible := TreeViewInputStructure.Visible;
+  ToolButtonShowTrees.Down:= TreeViewInputStructure.Visible;
+  MenuItemShowTrees.Checked:=TreeViewInputStructure.Visible;
+end;
+
 
 procedure TTFTAMainWindow.MenuItemSimplifyClick(Sender: TObject);
 begin
@@ -305,13 +309,9 @@ begin
   TreeViewOutputStructure.Items.Clear;
   TemporalExpression.BuildTreeNodes(TreeViewOutputStructure.Items);
 
-end;
+  { print the eventlist }
+  {$IFDEF TESTMODE}MenuItemSaveOutAsClick(Sender); {$ENDIF}
 
-procedure TTFTAMainWindow.ToolButtonShowTreesClick(Sender: TObject);
-begin
-
-  TreeViewInputStructure.Visible := TreeViewInputStructure.Visible xor True;
-  TreeViewOutputStructure.Visible := TreeViewOutputStructure.Visible xor True;
 end;
 
 initialization

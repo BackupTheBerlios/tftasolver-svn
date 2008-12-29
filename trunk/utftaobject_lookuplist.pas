@@ -66,6 +66,7 @@ begin
                                 NIL,   {PointerToUpdateObject}
                                 BoolToString(true)  { temporal Expression }
                                );
+  self.SpeedSearchFlagOn := false;
 end;
 {------------------------------------------------------------------------------
   Class-Destructor
@@ -84,20 +85,95 @@ end;
 {------------------------------------------------------------------------------
 ------------------------------------------------------------------------------}
 procedure TTFTAEventLookupList.Delete(Index : Integer);
+var numberOfItems : Integer;
+    i             : Integer;
 begin
-  self[Index].Free;
+  if self.OwnsObjects then
+    self[Index].Free;
   self.List.Delete(Index);
-end;
-{------------------------------------------------------------------------------
-------------------------------------------------------------------------------}
-function TTFTAEventLookupList.Extract(Item: TTFTAObject):TTFTAObject;
-begin
-  Result := TTFTAObject(inherited Extract(TObject(Item)));
-  if Assigned(Result) and Result.NeedsToBeUpdated then
+  { now decrement all TTFTAObject.PosInEventList of the objects after the deleted }
+  i := Index;
+  numberOfItems := self.Count;
+  if i < numberOfItems then { there are no further objects after the last }
   begin
-    Result := Result.PointerToUpdateObject;
+    repeat
+      dec(self[i].PosInEventList);
+      inc(i);
+    until i = numberOfItems;
   end;
 end;
+//{------------------------------------------------------------------------------
+//------------------------------------------------------------------------------}
+//function TTFTAEventLookupList.Extract(Item: TTFTAObject):TTFTAObject;
+//begin
+  //Result := TTFTAObject(inherited Extract(TObject(Item)));
+  //if Assigned(Result) and Result.NeedsToBeUpdated then
+  //begin
+    //Result := Result.PointerToUpdateObject;
+  //end;
+//end;
+
+{------------------------------------------------------------------------------
+------------------------------------------------------------------------------}
+function TTFTAEventLookupList.FindIdenticalExisting(Item: TTFTAObject) : TTFTAObject;
+var tempString : ansistring;
+    SpeedSearchWasAlreadySet : boolean;
+begin
+
+  tempString := Item.TemporalExpr;
+
+  {$IfDef TESTMODE}Item.DEBUGPrint(true,self,'Entered FindIdenticalExisting');{$ENDIF}
+
+  { temporarily mask the Item from the eventlist, in order to not find itself }
+  Item.Mask;
+  { set speedsearch and check whether it was already set }
+  SpeedSearchWasAlreadySet := self.SpeedSearchFlagOn;
+  self.SpeedSearchFlagOn := true;
+  { now look whether there is another object with the same TemporalExpr }
+  Result := self.FindIdenticalExisting(tempString);
+  {$IfDef TESTMODE}if assigned(Result) then Item.DEBUGPrint(true,self,'(FindIdenticalExisting) equals ' + PointerAddrStr(Result));{$ENDIF}
+  { unmask the Item at old position }
+  Item.Unmask;
+
+  { if speedsearch was not set before, reset it, else hold it }
+  self.SpeedSearchFlagOn := SpeedSearchWasAlreadySet;
+end;
+
+{------------------------------------------------------------------------------
+------------------------------------------------------------------------------}
+function  TTFTAEventLookupList.FindIdenticalExisting(Text : ansistring) : TTFTAObject;
+var i : Integer;
+    numberOfItems : Integer;
+    SpeedSearchWasAlreadySet : boolean;
+begin
+  i := 0;
+  numberOfItems := self.Count;
+
+  { set speedsearch and check whether it was already set }
+  SpeedSearchWasAlreadySet := self.SpeedSearchFlagOn;
+  self.SpeedSearchFlagOn := true;
+
+  { for each child do compare and return first match, if any }
+  repeat
+    if (AnsiCompareStr(Text,self[i].TemporalExpr) <> 0) then
+      Result := nil
+    else
+      Result := self[i];
+    inc(i);
+  until Assigned(Result) or (i = numberOfItems);
+
+  { if speedsearch was not set before, reset it, else hold it }
+  self.SpeedSearchFlagOn := SpeedSearchWasAlreadySet;
+end;
+
+{------------------------------------------------------------------------------
+------------------------------------------------------------------------------}
+procedure TTFTAEventLookupList.FreeTerm(theTerm : TTFTAObject);
+begin
+  {$IfDef TESTMODE}theTerm.DEBUGPrint(true,self,'FreeTerm');{$ENDIF}
+  self.Delete(theTerm.PosInEventList);
+end;
+
 {------------------------------------------------------------------------------
 ------------------------------------------------------------------------------}
 function TTFTAEventLookupList.GetItem(Index: Integer): TTFTAObject;
@@ -110,21 +186,7 @@ procedure TTFTAEventLookupList.Insert(Index: Integer; Item: TTFTAObject);
 begin
   inherited Insert(Index, Item);
 end;
-{------------------------------------------------------------------------------
-------------------------------------------------------------------------------}
-function  TTFTAEventLookupList.ListHoldsObjectAt(Text : ansistring) : TTFTAObject;
-var i : Integer = 0;
-begin
-  Result := nil;
-  for i:= 1 to self.Count do
-  begin
-    if (AnsiCompareStr(Text,self[i-1].TemporalExpr) <> 0) then
-      Result := nil
-    else
-      Result := self[i-1];
-    if Assigned(Result) then break;
-  end;
-end;
+
 {------------------------------------------------------------------------------
 ------------------------------------------------------------------------------}
 function TTFTAEventLookupList.NewItem: TTFTAObject;
@@ -192,6 +254,31 @@ begin
   Result.TemporalExpr               :=  TemporalExpr              ;
 
 end;
+
+{------------------------------------------------------------------------------
+  replace a term in eventlist:
+  free the oldterm and replace it by newterm
+------------------------------------------------------------------------------}
+procedure TTFTAEventLookupList.Replace(var oldTerm : TTFTAObject; newTerm : TTFTAObject);
+begin
+  self.FreeTerm(oldTerm);
+  oldTerm := newTerm;
+end;
+
+{------------------------------------------------------------------------------
+  replace a term in eventlist with an identical alreay existing (if there is one)
+------------------------------------------------------------------------------}
+procedure TTFTAEventLookupList.ReplaceWithIdentical(var oldTerm : TTFTAObject);
+var existingTerm : TTFTAObject;
+begin
+  existingTerm := self.FindIdenticalExisting(oldTerm);
+  if Assigned(existingTerm) then
+  begin
+    self.Replace(oldTerm,existingTerm);
+    {$IfDef TESTMODE}oldTerm.DEBUGPrint(true,self,'(ReplaceWithIdentical) ' + PointerAddrStr(oldTerm) + ' -> ' + PointerAddrStr(existingTerm));{$ENDIF}
+  end;
+end;
+
 {------------------------------------------------------------------------------
 ------------------------------------------------------------------------------}
 procedure TTFTAEventLookupList.SetItem(Index: Integer; Item: TTFTAObject);
@@ -206,7 +293,8 @@ procedure TTFTAEventLookupList.SetSpeedSearchFlagOn(SetTo : boolean);
 var i : Integer = 0;
     numberOfItems : Integer;
 begin
-  self.VSpeedSearchFlagOn:=SetTo;
+  self.VSpeedSearchFlagOn := SetTo;
+
   if SetTo = false then
   begin
     numberOfItems := self.Count;

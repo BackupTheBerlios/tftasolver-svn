@@ -396,14 +396,10 @@ begin
   if Assigned(self.DEBUGMemo) then
     if isUpdate then
     begin
-      self.DEBUGMemo.Append(thestring);
-      self.DEBUGMemo.Append('Update: ' + PointerAddrStr(eventlist[self.PosInEventList]) +
-                            ' ::: ' + self.TemporalExpr );
+      self.DEBUGMemo.Append(thestring + 'Update: ' + PointerAddrStr(self) + ' ::: ' + self.GetTempExprDEBUG );
     end else
     begin
-      self.DEBUGMemo.Append(thestring);
-      self.DEBUGMemo.Append('New   : ' + PointerAddrStr(eventlist[self.PosInEventList]) +
-                            ' ::: ' + self.TemporalExpr ) ;
+      self.DEBUGMemo.Append(thestring + 'New   : ' + PointerAddrStr(self) + ' ::: ' + self.GetTempExprDEBUG ) ;
     end;
   eventlist.pointerToApplication.ProcessMessages;
 end;
@@ -420,7 +416,11 @@ end;
 ------------------------------------------------------------------------------}
 function TTFTAObject.EventTypeToString : string;
 begin
-  Result := cEventTypeStringArray[ord(self.EventType)]
+  { if term is outdated, get type of redirection-term }
+  if not self.NeedsToBeUpdated then
+    Result := cEventTypeStringArray[ord(self.EventType)]  { get own }
+  else
+    Result := self.PointerToUpdateObject.EventTypeToString;  { get of redirection }
 end;
 {------------------------------------------------------------------------------
   Extract a child
@@ -438,10 +438,10 @@ end;
 function TTFTAObject.GetChild(Index: Integer): TTFTAObject;
 begin
   if Assigned(self.Children) then
-    if (self.Count-1 < Index) or (Index < 0) then
+    {if (self.Count-1 < Index) or (Index < 0) then
       ShowMessage('Fatal Error (081223.1811) while processing event ' +
                    {PointerAddrStr(self) + ' ( ' + self.TemporalExpr + ' ) ' +} ' with Index=' + IntToStr(Index))
-    else Result := self.Children[Index]
+    else} Result := self.Children[Index]
   else
     Result := NIL;
 end;
@@ -478,60 +478,136 @@ end;
   use with care and as seldom as possible
 ------------------------------------------------------------------------------}
 function TTFTAObject.GetTempExpr : ansistring;
-var i,j : Integer;
-    tempObject : TTFTAObject;
-    doubleObject : TTFTAObject;
+var i                : Integer;
+    numberOfChildren : Integer;
+    tempObject       : TTFTAObject;
+    tempString       : ansistring;
+    maskedByChild    : boolean = False;
 begin
-
   { for all parts concerning the scanning and changing of TTFTAObject.IsSorted
     within this function see the algorithm documentation (look for "sorting") }
-  if (not self.IsBasicEvent) and (not self.NeedsToBeUpdated) then
+
+  { check masking state }
+  if self.VIsMasked then
   begin
-    if not self.IsNotCompletelyBuildYet then
-    begin
-      //if not self.SpeedSearchIsSet then
-      //begin
-        j := self.Count;
-        Result := '';
-        if j > 1 then  { and, or, xor, pand, sand operators }
-        begin
-          for i:=0 to j-2 do
-          begin
-            Result := Result + self[i].TemporalExpr + ',';
-          end;
-          Result := Result + self[i+1].TemporalExpr;
-        end else  { not operator or one of the above in rare cases, where
-                    transformation results in only single parameter }
-        begin
-          Result := self[0].TemporalExpr;
-          { set own prestored value to the new string derived from the children}
-          self.VExpr := Result;
-          { no sort necessary, as only one child }
-        end;
-        Result := self.EventTypeToString + '[' + Result + ']';
-        { if in EventList the SpeedSearchFlag is set then store the Result in
-          self.VExpr and set self.SpeedSearchIsSet in order to minimize efforts
-          necessary for next scan (until eventlist.SpeedSearchFlag is unset }
-        if self.EventLookupList.SpeedSearchFlagOn then
-        begin
-          self.TemporalExpr := Result;
-          self.SpeedSearchIsSet := true;
-        end;
-      //end else
-      //Result := self.PlainTemporalExpr;
-    end else
-    begin
-     Result := ''; { if object is just in built-up then it has no TempExpr (because it is still changing) }
-    end;
-  end else
-  begin;
-    { basic event or outdated event (NeedsToBeUpdated = true).
-      Name of basic event is stored in VExpr at creation of basic event;
-      "out of order" is stored if NeedsToBeUpdated = true }
+    Result := 'IaMaMaSk';
+    exit;
+  end;
+
+  { first check for speed search set, if so, then take the string stored in VExpr (=PlainTemporalExpr) }
+  if self.SpeedSearchIsSet then
+  begin
     Result := self.PlainTemporalExpr;
+    exit;
+  end;
+
+  { second check, whether event is still in the build-process }
+  if self.IsNotCompletelyBuildYet then
+  begin
+    Result := ''; { if object is just in built-up then it has no TempExpr (because it is still changing) }
+    exit;
+  end;
+
+  { third check, whether event is basic event or event is outdated }
+  if self.IsBasicEvent or self.NeedsToBeUpdated then
+  begin
+    { Name of basic event is stored in VExpr at creation of basic event }
+    Result := self.PlainTemporalExpr;
+    exit;
+  end;
+
+  { forth check, whether event is NOT or TOP event (both with only one child) }
+  if self.IsTypeNOT or self.IsTypeTOP then
+  begin
+    tempObject := self[0];
+    if assigned(tempObject) then
+      Result := self.EventTypeToString + '[' + tempObject.TemporalExpr + ']'
+    else
+      ShowMessage('Fatal Error (081227.1555) while processing event ' + PointerAddrStr(self) + ': NOT term without child ?');
+  end else
+  begin
+    if not ( self.IsTypeAND or self.IsTypePAND or self.IsTypeSAND or self.IsTypeOR or self.IsTypeXOR ) then
+      ShowMessage('Fatal Error (081227.1600) while processing event ' + PointerAddrStr(self) + ': No basic event, NOT, AND, OR, XOR, PAND, SAND?');
+    { being here without error implies that self.Count > 1 }
+    { now scan through the children }
+    i := 0;
+    numberOfChildren := self.Count;
+
+    if numberOfChildren < 2 then
+      ShowMessage('Fatal Error (081227.1608) while processing event ' + PointerAddrStr(self) + ': AND, OR, XOR, PAND, SAND without >1 children?');
+
+    Result := '';
+    repeat
+      tempString := self[i].TemporalExpr;
+      if AnsiCompareStr(tempString,'IaMaMaSk') <> 0 then
+      begin
+        Result := Result + ',' + tempString;
+        inc(i);
+      end else
+      begin
+        maskedByChild := True;
+        Result := 'IaMaMaSk';
+      end;
+    until maskedByChild or (i = numberOfChildren);
+    if not maskedByChild then
+    begin
+      Result[1] := '[';
+      Result := self.EventTypeToString + Result + ']';
+    end;
+  end;
+
+  { if eventlist is in speedsearch mode, but self is not then set the flag and
+    store REsult for quicker future searches }
+  if self.EventLookupList.SpeedSearchFlagOn and not maskedByChild then
+  begin
+    { this implies that self.SpeedSearchIsSet is still false, see first check above }
+    self.SpeedSearchIsSet := true;
+    self.TemporalExpr := Result;
   end;
 
 end;
+
+{ Debug Version of GetTempExpr, which does not interfere with the term itself }
+function TTFTAObject.GetTempExprDEBUG : ansistring;
+var i                : Integer;
+    numberOfChildren : Integer;
+    tempObject       : TTFTAObject;
+    tempString       : ansistring;
+begin
+  if self.VIsMasked then
+  begin
+    Result := 'IaMaMaSk';
+    exit;
+  end;
+  if self.IsNotCompletelyBuildYet then
+  begin
+    Result := '';
+    exit;
+  end;
+  if self.IsBasicEvent or self.NeedsToBeUpdated then
+  begin
+    Result := self.PlainTemporalExpr;
+    exit;
+  end;
+  if self.IsTypeNOT or self.IsTypeTOP then
+  begin
+    tempObject := self[0];
+    if assigned(tempObject) then
+      Result := self.EventTypeToString + '[' + tempObject.TemporalExprDEBUG + ']'
+  end else
+  begin
+    i := 0;
+    numberOfChildren := self.Count;
+    Result := '';
+    repeat
+      Result := Result + ',' + self[i].TemporalExprDEBUG;
+      inc(i);
+    until i = numberOfChildren;
+    Result[1] := '[';
+    Result := self.EventTypeToString + Result + ']';
+  end;
+end;
+
 {------------------------------------------------------------------------------
   True, if there are entries in Children, false otherwise
 ------------------------------------------------------------------------------}
@@ -547,36 +623,12 @@ begin
   if Assigned(self.Children) then self.Children.Insert(Index, Item);
 end;
 
-//{------------------------------------------------------------------------------
-  //Compares itself with a given other TTFTAObject; returns True, if both are
-  //identical and false otherwise.
-//------------------------------------------------------------------------------}
-//function TTFTAObject.IsIdenticalTo(theOtherItem: TTFTAObject) : boolean;
-//var numberOfChildren : integer;
-    //i : integer = 0;
-//begin
-  //{ before actually starting the time consuming iterative walkthrough some
-    //quick checks are performed. }
-  //Result := (self.EventType = theOtherItem.EventType);
-  //numberofChildren := self.Count;
-  //Result := Result and (numberofChildren = theOtherItem.Count);
-  //{ only continue if the quick checks gave true }
-  //if Result then
-  //begin
-    //if (numberofChildren > 0) then
-    //begin { now walkthrough the children iteratively }
-      //{ both have the same number of children, see second check from above }
-      //repeat
-        //Result := Result and self[i].IsIdenticalTo(theOtherItem[i]);
-        //inc(i);
-      //until (not result) or (i = numberOfChildren);
-    //end else
-    //begin { no children in both events --> compare the names (aka TemporalExpr) }
-      //Result := Result and (self.TemporalExpr = theOtherItem.TemporalExpr);
-    //end;
-  //end;
-//end;
-
+{------------------------------------------------------------------------------
+------------------------------------------------------------------------------}
+procedure TTFTAObject.Mask;
+begin
+  self.VIsMasked := true;
+end;
 
 {------------------------------------------------------------------------------
   Redirects (updates) object to newItem and sets properties accordingly
@@ -584,8 +636,9 @@ end;
 procedure TTFTAObject.RedirectMe(newItem : TTFTAObject);
 begin
   self.PointerToUpdateObject:=newItem;
+  self.EventType := tftaEventTypeBASIC;
   self.Children.Clear;
-  self.TemporalExpr:='redirected to ' + PointerAddrStr(newItem);
+  self.TemporalExpr := 'redirected to ' + PointerAddrStr(newItem);
   self.NeedsToBeUpdated:=true;
 end;
 {------------------------------------------------------------------------------
@@ -635,13 +688,13 @@ begin
     self.VIsTrueFalse := -1;
 end;
 {------------------------------------------------------------------------------
-  Sets the logical expression represented by the term / object
-  Only possible with basic events!
+  Sets the string describing the logical expression represented by the term / object
+  This is used mainly for Basic Events, Searches (is quicker than rescanning
+  over and over again) and Sorting (dito).
 ------------------------------------------------------------------------------}
 procedure TTFTAObject.SetTempExpr(theExpr : ansistring);
 begin
-  if (not self.HasChildren) or (self.SpeedSearchIsSet) then
-    self.VExpr:=theExpr;
+  self.VExpr:=theExpr;
 end;
 procedure TTFTAObject.SetVType(Parameter : TTFTAOperatorType);
 begin
@@ -654,6 +707,12 @@ begin
     self.IsNegated := true
   else
     self.IsNegated := false;
+end;
+{------------------------------------------------------------------------------
+------------------------------------------------------------------------------}
+procedure TTFTAObject.Unmask;
+begin
+  self.VIsMasked := false;
 end;
 {------------------------------------------------------------------------------
   Liefert als String eine Uebersicht ueber die Eigenschaften des Objekts.

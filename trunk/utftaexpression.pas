@@ -191,6 +191,7 @@ begin
                                       NIL,   {PointerToUpdateObject}
                                       'TOP'
                                      );
+
     {$IfDef TESTMODE}
     if Assigned( DEBUGMemo) then DEBUGMemo.Append('TOP Levels created' + sLineBreak +
                      '  @ Address TemporalTerm: ' + PointerAddrStr(TemporalTerm) + sLineBreak +
@@ -327,7 +328,7 @@ begin
   { first step of simplification is to sort all commutative terms; all such terms
     which are created during simplification are then again sorted (see uTFTALogic) }
   SortOperands(self.TemporalTerm[0], self.TemporalTerm.Children, 0, self.EventList);
-
+  {$IfDef TESTMODE}self.TemporalTerm[0].DEBUGPrint(true,self.EventList,'############################ Start Simplification ####################');{$ENDIF}
   // SimplificationLoop is part of uTFTALogic
   SimplificationLoop(self.TemporalTerm[0], self.TemporalTerm.Children, 0, self.EventList);
 end;
@@ -466,7 +467,7 @@ begin
         EventList. This is timeconsuming. But pointing to the same objects if there
         are multiple occurences of the same event (object) saves (potentially)
         huge amounts of time as term transformations only happen once }
-      theTempObject := EventList.ListHoldsObjectAt(theNewString);
+      theTempObject := EventList.FindIdenticalExisting(theNewString);
 
       if not Assigned(theTempObject) then
       begin
@@ -513,7 +514,7 @@ begin
       //SetObjectProps(currentObject,theNewString,tftaEventTypeNOT);
       currentObject.EventType:=tftaEventTypeNOT;
       { create actual new object or link existing one (see comments from above) }
-      theTempObject := EventList.ListHoldsObjectAt(theNewString);
+      theTempObject := EventList.FindIdenticalExisting(theNewString);
       if not Assigned(theTempObject) then
       begin
         { object is NOT part of EventList yet }

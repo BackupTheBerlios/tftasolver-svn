@@ -95,11 +95,12 @@ type
     {$EndIf}
     destructor  Destroy;
 
-
     function  Add(Item: TTFTAObject): Integer;
-    function  ListHoldsObjectAt(Text : ansistring) : TTFTAObject;
-    function  Extract(Item: TTFTAObject):TTFTAObject;
     procedure Delete(Index : Integer);
+    // function  Extract(Item: TTFTAObject):TTFTAObject;
+    function  FindIdenticalExisting(Item : TTFTAObject) : TTFTAObject;
+    function  FindIdenticalExisting(Text : ansistring) : TTFTAObject;
+    procedure FreeTerm(theTerm : TTFTAObject);
     procedure Insert(Index: Integer; Item: TTFTAObject);
     function  NewItem: TTFTAObject;
     function  NewItem(      EventType               : TTFTAOperatorType;
@@ -126,6 +127,8 @@ type
                   		      NeedsToBeUpdated        : boolean;
                   		      PointerToUpdateObject   : TTFTAObject;
                   		      TemporalExpr            : ansistring) : TTFTAObject;
+    procedure Replace(var oldTerm : TTFTAObject; newTerm : TTFTAObject);
+    procedure ReplaceWithIdentical(var oldTerm : TTFTAObject);
 
     {$IfDef TESTMODE}
     property  DEBUGMemo : TMemo read VDEBUGMemo write VDEBUGMemo;
@@ -184,6 +187,7 @@ type
     VIsDisjunct : boolean ;
     VIsEventSequence : boolean ;
     VIsExtendedSequence : boolean;
+    VIsMasked : boolean;
     VIsMinimal : boolean;
     VIsNegated : boolean;
     VIsNotCompletelyBuildYet : boolean; { during built-up of an object (from InputString) no TempExpr checking must be performed }
@@ -209,6 +213,7 @@ type
     function  GetChildrenBasicState : boolean;
     function  GetPointerToUpdateObject : TTFTAObject;
     function  GetTempExpr : ansistring;
+    function  GetTempExprDEBUG : ansistring;
 
     procedure CheckForCoreEvent;
     procedure CheckForDisjunctEvent;
@@ -239,10 +244,12 @@ type
     {$EndIf}
     procedure DeleteChild(Index: Integer);
     procedure InsertChild(Index: Integer; Item: TTFTAObject);
+    procedure Mask;
     procedure RedirectMe(newItem : TTFTAObject);
     procedure SetChild(Index: Integer; Item: TTFTAObject);
     procedure SetLogicalValue (Parameter : boolean);
     procedure SetLogicalValue (Parameter : pointer);
+    procedure Unmask;
 
     property  Children : TTFTAList read VChildren write VChildren;
     {$IfDef TESTMODE}
@@ -279,6 +286,8 @@ type
     property  PosInEventList : Integer read VPosInEventList write VPosInEventList;
     property  SpeedSearchIsSet : boolean read VSpeepSearch write VSpeepSearch;
     property  TemporalExpr : ansistring read GetTempExpr write SetTempExpr;
+    property  TemporalExprDEBUG : ansistring read GetTempExprDEBUG;
+
 
   end;
 
