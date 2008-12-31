@@ -1,0 +1,54 @@
+
+
+Allgemeines zu den Vereinfachungsroutinen:
+
+* Kein Term außer "currentTerm" darf verändert werden (, da es an anderer Stelle des Gesamtterms in anderem Kontext enthalten sein kann).
+* Es ist zu unterscheiden, ob 
+  - Kinder, Typ und Eigenschaften eines Terms verändert werden, der Term selbst aber nicht verändert wird, (aka. "Belegen des Terms") oder
+  - der Term selbst verändert wird (aka. "Weiterleitung des Terms" / "Ersetzen des Termes", s.u.).
+* "Belegen" eines Terms umfasst
+  - Belegen von Kind-Termen und
+  - Hinzufügen von Kind-Termen und
+  - Entfernen von Kind-Termen und
+  - Umstellen von Kind-Termen (Reihenfolge) und
+  - Setzen der Eigenschaften des Terms und
+  - Setzen des Operator-Types des Terms und
+* Es ist zu unterscheiden, ob
+  - ein vorher bereits existierender Term weitergeleitet wird ("Weiterleitung") oder
+  - ein temporär neu erzeugter Term weitergeleitet wird - und anschließend damit überflüssig ist, d.h. wieder gelöscht werden kann - ("Ersetzen").
+* Es ist zu unterscheiden zwischen 
+  - "Erstellen eines Terms", d.h. verknüpfen eines neuen Terms in "eventlist" (inkl. Reservierung neuen Speicherplatzes) und
+  - "Hinzufügen eines Terms", d.h. verknüpfen eines in "eventlist" existierende Terms in einer der "Children"-Listen eines anderen Terms 
+    (ohne Reservierung neuen Speicherplatzes).
+* Es ist zu unterscheiden zwischen
+  - dem Erstellen eines neuen leeren Terms ("tempTerm") und
+  - dem Erstellen eines "Clons" eines existierenden Terms ("cloneTerm").
+* "Freigeben von Termen" bedeutet das Löschen des Terms aus der "eventlist" (mit Rückgabe des Speicherplatzes).
+* "Entfernen von Termen" bedeutet das Löschen des Terms aus einer der "Children"-Listen eines anderen Terms (ohne Rückgabe des Speicherplatzes, 
+  der Term ist weiterhin in "eventlist" geführt).
+
+
+
+Grundlegendes Vorgehen in den Vereinfachungsroutinen:
+
+1) Prüfe, ob das aktuelle Objekt ("currentTerm") der richtigen Form entspricht.
+2) Erstelle einen Clon von "currentTerm" -> "cloneTerm".
+3) Belege "currentTerm" gemäß der Logikregel, benutze dafür ggf. die Kind-Ereignisse aus "cloneTerm".
+4) Wenn ein dem veränderten "currentTerm" identisches Ereignis in "eventlist" bereits existiert ("existingTerm"), dann leite "currentTerm" auf "existingTerm" weiter.
+5) Gebe den vorher erstellten Clon ("cloneTerm") wieder frei. 
+
+
+
+Details zu 3):
+3A) Wenn im Rahmen der logischen Umformung ein neuer Term (außer "currentTerm") erstellt werden muss, dann ist folgender Ablauf einzuhalten:
+3A1) Erstellen eines leeren temporären Ereignisses -> "tempTerm".
+3A2) Belegen von "tempTerm", d.h.
+     - Verknüpfen der Kind-Ereignisse und
+     - Setzen der Eigenschaften von "tempTerm".
+3A3) Wenn ein dem veränderten "tempTerm" identisches Ereignis in "eventlist" bereits existiert ("existingTerm"), dann 
+     - gebe "tempTerm" wieder frei und
+     - ersetze "tempTerm" durch "existingTerm".
+ "tempTerm" auf "existingTerm".
+3C) Wenn  "currentTerm" verändert werden muss (d.h. sonst keine Terme zu verändern sind), dann ist folgender Ablauf einzuhalten:
+3C1) 
+     

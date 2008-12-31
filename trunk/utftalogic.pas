@@ -999,6 +999,132 @@ end;
 
 {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
  IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  negation of a PAND term  NOT[PAND[X,Y]]
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII}
+function NOTPAND(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+var aTerm        : TTFTAObject; { AND[NOT[X], NOT[Y]] }
+    bTerm        : TTFTAObject; { AND[NOT[X], Y] }
+    cTerm        : TTFTAObject; { AND[NOT[Y], X] }
+    dTerm        : TTFTAObject; { PAND[Y,X] }
+    eTerm        : TTFTAObject; { SAND[X,Y] }
+    xTerm        : TTFTAObject;
+    yTerm        : TTFTAObject;
+    notXTerm     : TTFTAObject;
+    notYTerm     : TTFTAObject;
+    existingTerm : TTFTAObject;
+    pandTerm     : TTFTAObject;
+    flagSpeedSearchWasAlreadOn : boolean;
+begin
+  Result := False;
+{ ....check currentTerm .......................................................}
+  if (currentTerm.IsTypeNOT) and (currentTerm[0].IsTypePAND) then
+  begin
+    Result := True;
+    {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'Entered NOTPAND');{$ENDIF}
+{ ....configure currentTerm ...................................................}
+    pandTerm := currentTerm[0];
+    { if currentTerm.Count > 2 then split currentTerm first }
+    if pandTerm.Count > 2 then
+    begin
+      PANDSplit(pandTerm, currentTerm.Children, 0, eventList);
+      pandTerm := currentTerm[0];
+    end;
+    { a total of seven objects has to be created and checked for already existing }
+    xTerm := pandTerm[0];
+    yTerm := pandTerm[1];
+{.... clone currentTerm is not necessary ......................................}
+{.... create new terms 1.......................................................}
+    notXTerm := eventlist.NewItem;
+    notYTerm := eventlist.NewItem;
+{.... configure new terms 1....................................................}
+    notXTerm.EventType := tftaEventTypeNOT;
+    notXTerm.AddChild(xTerm);
+    notXTerm.CheckTermProperties;
+    {$IfDef TESTMODE}notXTerm.DEBUGPrint(false,eventlist,' (NOTPAND) created new NOTX');{$ENDIF}
+    notYTerm.EventType := tftaEventTypeNOT;
+    notYTerm.AddChild(xTerm);
+    notYTerm.CheckTermProperties;
+    {$IfDef TESTMODE}aTerm.DEBUGPrint(false,eventlist,' (NOTPAND) created new NOTY');{$ENDIF}
+{.... replace newTerms 1.......................................................}
+    currentTerm.Mask;
+    flagSpeedSearchWasAlreadOn := eventlist.SpeedSearchFlagOn; { remember prior state }
+    eventlist.SpeedSearchFlagOn:=true;
+    eventlist.ReplaceWithIdentical(notXTerm);
+    eventlist.ReplaceWithIdentical(notYTerm);
+    eventlist.SpeedSearchFlagOn := flagSpeedSearchWasAlreadOn; { restor prior state }
+    currentTerm.Unmask;
+{.... create new terms 2.......................................................}
+    aTerm    := eventlist.NewItem;
+    bTerm    := eventlist.NewItem;
+    cTerm    := eventlist.NewItem;
+    dTerm    := eventlist.NewItem;
+    eTerm    := eventlist.NewItem;
+{.... configure new terms 2....................................................}
+    aTerm.EventType := tftaEventTypeAND;
+    aTerm.AddChild(notXTerm);
+    aTerm.AddChild(notYTerm);
+    aTerm.CheckTermProperties;
+    {$IfDef TESTMODE}aTerm.DEBUGPrint(false,eventlist,' (NOTPAND) created new NOTXNOTY');{$ENDIF}
+    bTerm.EventType := tftaEventTypeAND;
+    bTerm.AddChild(notXTerm);
+    bTerm.AddChild(xTerm);
+    bTerm.CheckTermProperties;
+    {$IfDef TESTMODE}bTerm.DEBUGPrint(false,eventlist,' (NOTPAND) created new NOTXY');{$ENDIF}
+    cTerm.EventType := tftaEventTypeAND;
+    cTerm.AddChild(notYTerm);
+    cTerm.AddChild(xTerm);
+    cTerm.CheckTermProperties;
+    {$IfDef TESTMODE}cTerm.DEBUGPrint(false,eventlist,' (NOTPAND) created new NOTYX');{$ENDIF}
+    dTerm.EventType := tftaEventTypePAND;
+    dTerm.AddChild(yTerm);
+    dTerm.AddChild(xTerm);
+    dTerm.CheckTermProperties;
+    {$IfDef TESTMODE}dTerm.DEBUGPrint(false,eventlist,' (NOTPAND) created new PANDYX');{$ENDIF}
+    eTerm.EventType := tftaEventTypeSAND;
+    eTerm.AddChild(xTerm);
+    eTerm.AddChild(yTerm);
+    eTerm.CheckTermProperties;
+    {$IfDef TESTMODE}eTerm.DEBUGPrint(false,eventlist,' (NOTPAND) created new SANDXY');{$ENDIF}
+{.... replace newTerms 2.......................................................}
+    { no sorting necessary as original AND was sorted, thus xTerm < yTerm and
+      thus aTerm < bTerm < cTerm }
+    currentTerm.Mask;
+    flagSpeedSearchWasAlreadOn := eventlist.SpeedSearchFlagOn; { remember prior state }
+    eventlist.SpeedSearchFlagOn:=true;
+    eventlist.ReplaceWithIdentical(aTerm);
+    eventlist.ReplaceWithIdentical(bTerm);
+    eventlist.ReplaceWithIdentical(cTerm);
+    eventlist.ReplaceWithIdentical(dTerm);
+    eventlist.ReplaceWithIdentical(eTerm);
+    eventlist.SpeedSearchFlagOn := flagSpeedSearchWasAlreadOn; { restor prior state }
+{.... configure currentTerm ...................................................}
+    currentTerm.Children.Clear;
+    currentTerm.EventType:= tftaEventTypeXOR;
+    currentTerm.AddChild(aTerm);
+    currentTerm.AddChild(bTerm);
+    currentTerm.AddChild(cTerm);
+    currentTerm.AddChild(dTerm);
+    currentTerm.AddChild(eTerm);
+    currentTerm.Unmask;
+    currentTerm.CheckTermProperties;
+    {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,' (NOTPAND) configured ');{$ENDIF}
+{.... redirect currentTerm ....................................................}
+    existingTerm := eventlist.FindIdenticalExisting(currentTerm);
+    if Assigned(existingTerm) then
+    begin
+      RedirectTerm(currentTerm,existingTerm,eventlist,theParent,theIndex,'NOTPAND 1');
+    end;
+  end; { check that overall term is a AND }
+end;
+
+
+
+
+
+
+{IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
   split OR with more than two operands
   This function is only a wrapper arround GenericSplit.
  IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
