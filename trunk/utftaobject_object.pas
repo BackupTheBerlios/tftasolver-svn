@@ -70,8 +70,7 @@ begin
   if Assigned(self.Children) then self.Children.Assign(Obj);
 end;
 {------------------------------------------------------------------------------
-  prueft, ob das uebergebene Ereignis ein Kernereignis ist und setzt die
-  Eigenschaften entsprechend
+  check whether self is an (extended) core event
 ------------------------------------------------------------------------------}
 procedure TTFTAObject.CheckForCoreEvent;
 var tempObject          : TTFTAObject;
@@ -458,6 +457,26 @@ begin
   else
     Result := False; { no children -> children cant be basic events }
 end;
+
+function TTFTAObject.GetIsNegatedExtendedCoreEvent : boolean;
+var numberOfChildren : Integer;
+    i                : Integer;
+begin
+  { 1. self has to be extended sequence AND core event AND
+    2. at least one child has to be negated;
+    3. the check for type NOT of children is not sufficient as: NOT[NOT[X]] shows }
+  Result := (self.IsExtendedSequence) and (self.IsCoreEvent);
+  if Result then
+  begin
+    numberOfChildren := self.count;
+    i := 0;
+    repeat
+      Result := self[i].IsNegated;
+    until Result or (i=numberOfChildren);
+  end;
+
+end;
+
 {------------------------------------------------------------------------------
   Reads VPointerToUpdateObject, but if the object VPointerToUpdateObject points
   to itself has NeedsToBeUpdated set, then return

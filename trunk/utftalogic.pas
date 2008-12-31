@@ -603,7 +603,9 @@ var aTerm : TTFTAObject;
 begin
   Result := False;
 { ....check currentTerm .......................................................}
-  if (currentTerm.IsTypeAND) and (not currentTerm.IsAllChildrenAreBasic) then
+  if (currentTerm.IsTypeAND) and
+     (not currentTerm.IsAllChildrenAreBasic) and
+     (not currentTerm.IsNegatedExtendedCoreEvent) then
   begin
     Result := True;
     {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'Entered LawOfCompleteness');{$ENDIF}
