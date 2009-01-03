@@ -211,6 +211,7 @@ type
     function  CheckLogicFalse    : boolean;
     function  CheckLogicTrue     : boolean;
     function  GetChildrenBasicState : boolean;
+    function  GetIsNegatedExtendedCoreEvent : boolean;
     function  GetPointerToUpdateObject : TTFTAObject;
     function  GetTempExpr : ansistring;
     function  GetTempExprDEBUG : ansistring;

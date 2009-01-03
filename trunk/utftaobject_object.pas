@@ -79,7 +79,13 @@ var tempObject          : TTFTAObject;
     LoopStatus     : boolean;
     i                   : Integer;
 begin
-  { Ein Ereignis ist genau dann ein Kernereignis (KE), wenn
+  { self is a non-negated core event iff either:
+    - it is a basic event or
+    - it is a SAND term with only basic events as children
+    self is a negated core event iff either
+    - it is a negated
+
+  Ein Ereignis ist genau dann ein Kernereignis (KE), wenn
     - es ein nicht-negiertes Basisereignis ist.
     - es ein sand-Term ist, dessen Kinder (Operanden) alle nicht-negierte
       Kernereignisse sind.
@@ -189,9 +195,23 @@ var tempObject          : TTFTAObject;
     NumberOfSequenceChildren  : Integer;
     i                   : Integer;
 begin
+  { self is a (non-extended) event sequence iff
+    - self is a basic-event (always non-negated) or
+    - self is a PAND of non-negated core events or
+    - self is a PAND with
+      - the first child event is a negated extended sequence and
+      - all other children events are non-negated core events
+
+    self is an (extended) event sequence iff
+    - self is a (non-extended) event sequence or
+    - self is a PAND of non-negated core events or
+    - self is a PAND with
+      - the first child event is a negated extended sequence and
+      - all other children events are non-negated core events }
+
   { eine EReignissequenz ist es genau dann, wenn
     - es ein nicht-negiertes Kernereignis ist.
-    - ein pand aus EReignissequenzen ist.
+    - ein pand aus Eeignissequenzen ist.
     - ein oder mehrere negierte Kernereignisse AND eine Ereignissequenz ist. }
 
   NumberOfNegatedChildren := 0;
@@ -618,11 +638,20 @@ begin
     i := 0;
     numberOfChildren := self.Count;
     Result := '';
-    repeat
-      Result := Result + ',' + self[i].TemporalExprDEBUG;
-      inc(i);
-    until i = numberOfChildren;
-    Result[1] := '[';
+    { as DEBUG messages are generated also of terms which are just being transformed,
+      it is necessary to check, whether a term has children at all! }
+    if numberOfChildren > 0 then
+    begin
+      repeat
+        Result := Result + ',' + self[i].TemporalExprDEBUG;
+        inc(i);
+      until i = numberOfChildren;
+      Result[1] := '[';
+    end else
+    begin
+      { no children... }
+      Result := '[';
+    end;
     Result := self.EventTypeToString + Result + ']';
   end;
 end;
