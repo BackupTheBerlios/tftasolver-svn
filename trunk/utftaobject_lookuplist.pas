@@ -122,7 +122,7 @@ begin
 
   tempString := Item.TemporalExpr;
 
-  {$IfDef TESTMODE}Item.DEBUGPrint(true,self,'Entered FindIdenticalExisting');{$ENDIF}
+  //{$IfDef TESTMODE}Item.DEBUGPrint(true,self,'Entered FindIdenticalExisting');{$ENDIF}
 
   { temporarily mask the Item from the eventlist, in order to not find itself }
   Item.Mask;

@@ -50,8 +50,8 @@ type
     ImageListMenuOverallInactive: TImageList;
     MainMenuOverall: TMainMenu;
     MemoInputString: TMemo;
-    {$IFDEF TESTMODE} MemoDEBUG: TMemo; {$ENDIF}
     MemoOutputString: TMemo;
+    {$IFDEF TESTMODE} MemoDEBUG: TMemo; {$ENDIF}
     MenuItemShowTrees: TMenuItem;
     MenuItemView: TMenuItem;
     MenuItemProgHomepage: TMenuItem;
@@ -69,8 +69,15 @@ type
     MenuItemOpen: TMenuItem;
     MenuItemExit: TMenuItem;
     MenuItemSaveInAs: TMenuItem;
+    PageControl1: TPageControl;
     ProgressBar1: TProgressBar;
+    StaticText1: TStaticText;
+    StaticText2: TStaticText;
     StatusBarHauptfenster: TStatusBar;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    TabSheet3: TTabSheet;
+    TabSheet4: TTabSheet;
     ToolBarOverall: TToolBar;
     ToolButtonSaveOutAs: TToolButton;
     ToolButton3: TToolButton;
@@ -287,7 +294,7 @@ end;
 procedure TTFTAMainWindow.MenuItemShowTreesClick(Sender: TObject);
 begin
   TreeViewInputStructure.Visible := TreeViewInputStructure.Visible xor True;
-  TreeViewOutputStructure.Visible := TreeViewInputStructure.Visible;
+  //TreeViewOutputStructure.Visible := TreeViewInputStructure.Visible;
   ToolButtonShowTrees.Down:= TreeViewInputStructure.Visible;
   MenuItemShowTrees.Checked:=TreeViewInputStructure.Visible;
 end;

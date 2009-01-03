@@ -50,10 +50,16 @@ implementation
   function  ANDTrue             (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  DistributeANDORXOR  (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  DistributeORPAND    (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
+  function  DistributePANDOR    (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  DistributePANDXOR   (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  DistributeSANDAND   (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
+  function  DistributeSANDOR    (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
+  function  DistributeSANDXOR   (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  GenericCombine      (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
+  function  GenericNOTBoolean   (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; flagANDtoOR : boolean) : boolean; forward;
+  function  GenericSplit        (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; theType : TTFTAOperatorType) : boolean; forward;
   function  LawOfCompleteness   (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
+  function  LawOfComplInternal  (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; alsoBasics : boolean = false) : boolean; forward;
   function  LawOfIdempotency    (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  LawOfNonrecurrence  (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   function  NOTANDORXOR         (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
@@ -75,9 +81,7 @@ implementation
   function  XORSplit            (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
 
   { also private but not primary simplification routines but internal "helper" routines }
-  function  CheckForPrematStop  (changedChild:TTFTAObject; currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; flagANDtoOR : boolean) : boolean; forward;
-  function  GenericNOTBoolean   (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; flagANDtoOR : boolean) : boolean; forward;
-  function  GenericSplit        (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; theType : TTFTAOperatorType) : boolean; forward;
+  function  CheckForPrematStop  (changedChild :TTFTAObject; currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean; forward;
   procedure RedirectTerm        (oldTerm     :TTFTAObject; newTerm   : TTFTAObject; eventlist : TTFTAEventLookupList; parentList : TTFTAList; oldObjectListIndex : Integer; callString : ansistring = ''); forward;
   function  ScanChildrenSorting (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; var isChange : boolean) : ansistring; forward;
 
@@ -321,10 +325,10 @@ begin
     until foundORXOR or (i = numberOfChildren);
     if foundORXOR then
     begin
-      {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'Entered DistributeANDORXOR');{$ENDIF}
+      {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'Entered DistributeANDORXOR ');{$ENDIF}
 {.....clone currentTerm........................................................}
       cloneTerm := currentTerm.Clone(eventlist);
-      {$IfDef TESTMODE}cloneTerm.DEBUGPrint(false,eventlist,'DistributeANDORXOR Created Clone');{$ENDIF}
+      {$IfDef TESTMODE}cloneTerm.DEBUGPrint(false,eventlist,'(DistributeANDORXOR) Created Clone ');{$ENDIF}
       currentTerm.Children.Clear;
       currentTerm.Mask;
 {.....create newTerm ..........................................................}
@@ -351,7 +355,7 @@ begin
         newTerm2.AddChild(tempTerm1[i]);
         newTerm2.AddChild(cloneTerm);
         newTerm2.CheckTermProperties;
-        {$IfDef TESTMODE}newTerm2.DEBUGPrint(false,eventlist,'DistributeANDORXOR Created New' + IntToStr(i));{$ENDIF}
+        {$IfDef TESTMODE}newTerm2.DEBUGPrint(false,eventlist,'(DistributeANDORXOR) Created New' + IntToStr(i) +' ');{$ENDIF}
 {.....replace newTerm .........................................................}
         eventlist.ReplaceWithIdentical(newTerm2);
 {.....configure currentTerm ...................................................}
@@ -361,7 +365,7 @@ begin
       currentTerm.Unmask;
       currentTerm.EventType:= tempTerm1.EventType;
       currentTerm.CheckTermProperties;
-      {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'DistributeANDORXOR currentTerm intermediate');{$ENDIF}
+      {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'(DistributeANDORXOR) currentTerm intermediate ');{$ENDIF}
       { for each of the new children of currentTerm do }
       i := 0;
       numberOfChildren := currentTerm.Count;
@@ -369,12 +373,10 @@ begin
         GenericCombine(currentTerm[i], currentTerm.Children , i, eventlist);
         inc(i);
       until (i = numberOfChildren);
-{.....redirection .............................................................}
-      existingTerm := eventlist.FindIdenticalExisting(currentTerm);
-      if Assigned(existingTerm) then
-      begin
-        RedirectTerm(currentTerm,existingTerm,eventlist,theParent,theIndex,'DistributeANDORXOR 1');
-      end;
+{.....configuration (sorting) and redirection .................................}
+      SortOperands(currentTerm,theParent,theIndex,eventlist);
+      currentTerm := theParent[theIndex];
+      {$IfDef TESTMODE}currentTerm.DEBUGPrint(false,eventlist,'(DistributeANDORXOR) configured currentTerm (sorted) ');{$ENDIF}
 {.....free the clone (if not already done above) ..............................}
       if not flagCloneAlreadyFreed then eventlist.FreeTerm(cloneTerm);
     end;
@@ -439,6 +441,18 @@ begin
       RedirectTerm(currentTerm,existingTerm,eventlist,theParent,theIndex,'DistributeORPAND 1');
     end;
   end;
+end;
+
+
+
+
+{IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  Temporal Disributive Law between PAND and OR
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII}
+function  DistributePANDOR    (currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+begin
 end;
 
 
@@ -550,14 +564,17 @@ end;
 
 {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
  IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-  Boolean Disributive Law between SAND and AND (e.g. SAND[AND[A,B],C]
+  Boolean Disributive Law between SAND and AND
+  SAND[AND[A,B],C] --> XOR[ PAND[B,SAND[A,C]] , PAND[C,SAND[A,B]] , SAND[A,B,C] ]
  IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
  IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII}
 function DistributeSANDAND(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
 var i                : integer;
     numberOfChildren : integer;
     foundAND         : boolean;
-    cloneTerm        : TTFTAObject;
+    tempTerm         : TTFTAObject;
+    flagLOCchange    : boolean;
+
     tempTerm1        : TTFTAObject;
     newTerm2         : TTFTAObject;
     existingTerm     : TTFTAObject;
@@ -577,16 +594,104 @@ begin
     until foundAND or (i = numberOfChildren);
     if foundAND then
     begin
-      {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'Entered DistributeSANDAND ');{$ENDIF}
+      Result := True;
+      dec(i);
+      {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'Entered DistributeSANDAND >>>>>>>>>>');{$ENDIF}
+{.....clone the found ANDterm..................................................}
+      { the original AND may only be changed, if it's children are not all Basics! }
+      if currentTerm[i].IsAllChildrenAreBasic then
+      begin { clone the AND and only modify the clone }
+        tempTerm := currentTerm[i].Clone(eventlist);
+        {$IfDef TESTMODE}tempTerm.DEBUGPrint(false,eventlist,'(DistributeSANDAND) Created Clone of AND ');{$ENDIF}
+        currentTerm.DeleteChild(i);
+        currentTerm.InsertChild(i,tempTerm);
+      end else
+      begin { we may change the original AND term directly in order to save efforts for later }
+        tempTerm := currentTerm[i];
+      end;
+{.....configure tempANDTerm ...................................................}
+      { split the AND into its three possibilities }
+      if not LawOfComplInternal(currentTerm[i],currentTerm.Children,i,eventlist,TRUE) then
+      begin { there was no AND?! }
+        ShowMessage('Fatal Error (090103.2314) while processing event ' + PointerAddrStr(currentTerm[i]) + ': No AND?');
+      end else
+      begin
+        { now distribute the SAND-XOR ( at the end of this DistributeSANDXOR calls sorting, so term is sorted
+          afterwards }
+        if not DistributeSANDXOR(currentTerm,theParent,theIndex,eventlist) then
+        begin { there was an AND but subsequently no possibility to distribute?! }
+          ShowMessage('Fatal Error (090103.2313) while processing event ' + PointerAddrStr(currentTerm) + ': AND but subsequently no possibility to distribute?');
+        end else
+        begin
+          currentTerm := theParent[theIndex];
+          { currentTerm now has three children, two SAND-PANDs and one SAND (originally SAND-SAND, but already
+            handled by GenericCombine called from the DistributeSANDXOR ) }
+        end;       { DistributeSANDXOR }
+      end;         { LawOfCompleteness }
+{.....configuration (sorting) and redirection .................................}
+      SortOperands(currentTerm,theParent,theIndex,eventlist);
+      currentTerm := theParent[theIndex];
+    end;  { foundAND }
+  end;    { type = SAND }
+end;
+
+
+
+
+
+{IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  Boolean Disributive Law between SAND and OR (e.g. SAND[OR[A,B],C]
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII}
+function  DistributeSANDOR(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+begin
+end;
+
+
+
+
+
+
+{IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  Boolean Disributive Law between SAND and XOR (e.g. SAND[XOR[A,B],C]
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII}
+function  DistributeSANDXOR(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+var i                : integer;
+    numberOfChildren : integer;
+    foundXOR         : boolean;
+    cloneTerm        : TTFTAObject;
+    tempTerm1        : TTFTAObject;
+    newTerm2         : TTFTAObject;
+    existingTerm     : TTFTAObject;
+    flagCloneAlreadyFreed : boolean;
+begin
+  Result := False;
+  flagCloneAlreadyFreed := false;
+{.....check currentTerm .......................................................}
+  if (currentTerm.IsTypeSAND) and (currentTerm.Count > 1) then
+  begin
+    { scan all children for first occurrence of an XOR }
+    i := 0;
+    numberOfChildren := currentTerm.Count;
+    repeat
+      foundXOR := currentTerm[i].IsTypeXOR;
+      inc(i);
+    until foundXOR or (i = numberOfChildren);
+    if foundXOR then
+    begin
+      {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'Entered DistributeSANDXOR ');{$ENDIF}
 {.....clone currentTerm........................................................}
       cloneTerm := currentTerm.Clone(eventlist);
-      {$IfDef TESTMODE}cloneTerm.DEBUGPrint(false,eventlist,'DistributeSANDAND Created Clone ');{$ENDIF}
+      {$IfDef TESTMODE}cloneTerm.DEBUGPrint(false,eventlist,'DistributeSANDXOR Created Clone ');{$ENDIF}
       currentTerm.Children.Clear;
       currentTerm.Mask;
 {.....create newTerm ..........................................................}
       Result := True;
       dec(i);
-      { Extract the found term (first occurrence of an AND) }
+      { Extract the found term (first occurrence of an XOR) }
       tempTerm1 := cloneTerm[i];
       cloneTerm.DeleteChild(i);
       { it is possible that only one child is left: SAND[ child ] --> child }
@@ -607,7 +712,7 @@ begin
         newTerm2.AddChild(tempTerm1[i]);
         newTerm2.AddChild(cloneTerm);
         newTerm2.CheckTermProperties;
-        {$IfDef TESTMODE}newTerm2.DEBUGPrint(false,eventlist,'DistributeANDORXOR Created New' + IntToStr(i));{$ENDIF}
+        {$IfDef TESTMODE}newTerm2.DEBUGPrint(false,eventlist,'DistributeSANDXOR Created New ' + IntToStr(i) + ' ');{$ENDIF}
 {.....replace newTerm .........................................................}
         eventlist.ReplaceWithIdentical(newTerm2);
 {.....configure currentTerm ...................................................}
@@ -617,7 +722,7 @@ begin
       currentTerm.Unmask;
       currentTerm.EventType:= tempTerm1.EventType;
       currentTerm.CheckTermProperties;
-      {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'DistributeANDORXOR currentTerm intermediate');{$ENDIF}
+      {$IfDef TESTMODE}currentTerm.DEBUGPrint(true,eventlist,'DistributeSANDXOR currentTerm intermediate ');{$ENDIF}
       { for each of the new children of currentTerm do }
       i := 0;
       numberOfChildren := currentTerm.Count;
@@ -625,12 +730,10 @@ begin
         GenericCombine(currentTerm[i], currentTerm.Children , i, eventlist);
         inc(i);
       until (i = numberOfChildren);
-{.....redirection .............................................................}
-      existingTerm := eventlist.FindIdenticalExisting(currentTerm);
-      if Assigned(existingTerm) then
-      begin
-        RedirectTerm(currentTerm,existingTerm,eventlist,theParent,theIndex,'DistributeANDORXOR 1');
-      end;
+{.....configuration (sorting) and redirection .................................}
+      SortOperands(currentTerm,theParent,theIndex,eventlist);
+      currentTerm := theParent[theIndex];
+      {$IfDef TESTMODE}currentTerm.DEBUGPrint(false,eventlist,'(DistributeSANDXOR) configured currentTerm (sorted) ');{$ENDIF}
 {.....free the clone (if not already done above) ..............................}
       if not flagCloneAlreadyFreed then eventlist.FreeTerm(cloneTerm);
     end;
@@ -832,12 +935,33 @@ end;
 
 
 
+
 {IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
  IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
   law of completeness and[x,y] = pand[x,y] xor pand[y,x] xor sand[x,y]
  IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
  IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII}
 function LawOfCompleteness(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList) : boolean;
+begin
+  Result := LawOfComplInternal(currentTerm,theParent,theIndex,eventlist,FALSE);
+end;
+
+
+
+
+
+
+{IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  law of completeness and[x,y] = pand[x,y] xor pand[y,x] xor sand[x,y]
+  the internal version which allows an additional parameter:
+  if alsoBasics = true then also AND terms with isAllChildrenAreBasic are
+  transformed.
+  The "outside" (public) version "LawOfCompleteness" calls the internal one with
+  alsoBasics = false.
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII}
+function LawOfComplInternal(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; eventlist : TTFTAEventLookupList; alsoBasics : boolean = false) : boolean;
 var aTerm : TTFTAObject;
     bTerm : TTFTAObject;
     cTerm : TTFTAObject;
@@ -849,7 +973,7 @@ begin
   Result := False;
 { ....check currentTerm .......................................................}
   if (currentTerm.IsTypeAND) and
-     (not currentTerm.IsAllChildrenAreBasic) {and
+     ( (alsoBasics) or (not currentTerm.IsAllChildrenAreBasic) )  {and
      (not currentTerm.IsNegatedExtendedCoreEvent)} then
   begin
     Result := True;
@@ -1930,7 +2054,7 @@ end; { function ScanChildrenSorting }
   main loop for simplifications; calls all other routines
  IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
  IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII}
-function SimplificationLoop(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; theEventList : TTFTAEventLookupList) : boolean;
+function SimplificationLoop999(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; theEventList : TTFTAEventLookupList) : boolean;
 var i               : Integer;
     numberOfChildren: Integer;
     changedSelf     : boolean;
@@ -1945,6 +2069,8 @@ begin
       changedSelf := false; { flag whether in the inner loop a change happend }
 
       If (not changedSelf) and GenericCombine(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and LawOfIdempotency(currentTerm, theParent , theIndex, theEventList ) then
         changedSelf := true;
       If (not changedSelf) and ANDTrue(currentTerm, theParent, theIndex, theEventList) then
         changedSelf := true;
@@ -1978,8 +2104,6 @@ begin
         changedSelf := true;
       If (not changedSelf) and LawOfNonrecurrence(currentTerm, theParent , theIndex, theEventList) then
         changedSelf := true;
-      If (not changedSelf) and LawOfIdempotency(currentTerm, theParent , theIndex, theEventList ) then
-        changedSelf := true;
       If (not changedSelf) and LawOfCompleteness(currentTerm, theParent , theIndex, theEventList ) then
         changedSelf := true;
       If (not changedSelf) and PANDPANDTransform(currentTerm, theParent , theIndex, theEventList) then
@@ -1989,6 +2113,8 @@ begin
       If (not changedSelf) and DistributePANDXOR(currentTerm, theParent , theIndex, theEventList) then
         changedSelf := true;
       If (not changedSelf) and DistributeORPAND(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and DistributeSANDXOR(currentTerm, theParent , theIndex, theEventList) then
         changedSelf := true;
 
 
@@ -2017,6 +2143,113 @@ begin
       Result := Result or changedChildren; { true, if self changed or child changed }
     end;
   until not changedChildren;
+end;  { function SimplificationLoop }
+
+
+
+
+
+{IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+  main loop for simplifications; calls all other routines
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII}
+function SimplificationLoop(currentTerm :TTFTAObject; theParent : TTFTAList; theIndex : Integer; theEventList : TTFTAEventLookupList) : boolean;
+var i               : Integer;
+    numberOfChildren: Integer;
+    changedSelf     : boolean;   { flag indicating changes on currentTerm }
+    changedChildren : boolean;   { flag indicating changes on (at least one of the) currentTerm[i] }
+    changedSomething: boolean;   { flag indicating either a change on itself or a child happened }
+    isPrematureStop : boolean;
+begin
+  Result := false;
+  repeat { outer loop, continue until neither change in oneself nor in children }
+
+    changedChildren := False; { flag for change in children }
+    isPrematureStop := False; { flag indicating that it is not necessary to scan the further children }
+    if currentTerm.HasChildren then
+    begin
+      i := 0;
+      numberOfChildren := currentTerm.Count ;
+      repeat
+        if SimplificationLoop( currentTerm[i] , currentTerm.Children, i, theEventList) then
+        begin
+          changedChildren := true; { flag, that at least one child was changed }
+          { necessary to scan the further children? }
+          //isPrematureStop := CheckForPrematStop(currentTerm[i],currentTerm,theParent,theIndex,theEventList)
+        end;
+        inc(i);
+      until isPrematureStop or (i = numberOfChildren);
+      Result := Result or changedChildren; { true, if self changed or child changed }
+    end;
+
+    changedSomething := changedChildren;
+
+    repeat  { inner loop, continue until no chnage in oneself }
+      changedSelf := false; { flag whether in the inner loop a change happend }
+
+      If (not changedSelf) and GenericCombine(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and LawOfIdempotency(currentTerm, theParent , theIndex, theEventList ) then
+        changedSelf := true;
+      If (not changedSelf) and ANDTrue(currentTerm, theParent, theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and ORXORFalse(currentTerm, theParent, theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and DistributeANDORXOR(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and ANDContradict(currentTerm, theParent, theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and ANDFalse(currentTerm, theParent, theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and ORXORTrue(currentTerm, theParent, theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and NOTANDORXOR(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and NOTNOT(currentTerm, theParent , theIndex, theEventList ) then
+        changedSelf := true;
+      If (not changedSelf) and NOTFalseTrue(currentTerm, theParent, theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and PANDSplit(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and PANDFalse(currentTerm, theParent, theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and PANDNegated(currentTerm, theParent, theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and SANDNegated(currentTerm, theParent, theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and SANDFalse(currentTerm, theParent, theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and PANDMultiples(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and LawOfNonrecurrence(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and LawOfCompleteness(currentTerm, theParent , theIndex, theEventList ) then
+        changedSelf := true;
+      If (not changedSelf) and PANDPANDTransform(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and SANDPANDTransform(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and DistributePANDXOR(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and DistributeORPAND(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and DistributeSANDXOR(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+      If (not changedSelf) and DistributeSANDAND(currentTerm, theParent , theIndex, theEventList) then
+        changedSelf := true;
+
+
+      If changedSelf then
+      begin
+        currentTerm := theParent[theIndex];
+        changedSomething := true;
+      end;
+    until not changedSelf;
+
+    Result := Result or changedSomething { Result is flag that ANY change has happened during whole iterative call}
+
+  until not changedSomething;
 end;  { function SimplificationLoop }
 
 

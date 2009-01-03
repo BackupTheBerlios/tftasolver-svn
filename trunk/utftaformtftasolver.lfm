@@ -1,9 +1,9 @@
 object TFTAMainWindow: TTFTAMainWindow
-  Left = 363
+  Left = 379
   Height = 732
   Top = 289
   Width = 1000
-  ActiveControl = TreeViewInputStructure
+  ActiveControl = PageControl1
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
   Caption = 'TFTA Solver --- V0.1 --- 2008 SJS --- licensed under GPL v3'
@@ -52,7 +52,7 @@ object TFTAMainWindow: TTFTAMainWindow
     Position = 50
     Smooth = True
     Step = 1
-    TabOrder = 5
+    TabOrder = 3
     Visible = False
   end
   object MemoInputString: TMemo
@@ -68,35 +68,6 @@ object TFTAMainWindow: TTFTAMainWindow
     ScrollBars = ssAutoVertical
     TabOrder = 1
   end
-  object TreeViewOutputStructure: TTreeView
-    Left = 505
-    Height = 500
-    Top = 165
-    Width = 490
-    AutoExpand = True
-    BackgroundColor = 11796403
-    BorderStyle = bsNone
-    BorderWidth = 2
-    Color = clWhite
-    Ctl3D = True
-    DefaultItemHeight = 18
-    ScrollBars = ssAutoBoth
-    TabOrder = 2
-    Options = [tvoAutoExpand, tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips]
-  end
-  object MemoOutputString: TMemo
-    Left = 505
-    Height = 130
-    Hint = 'Ein temporallogischer Ausdruck besteht '#10'aus folgenden Konstrukten, die auch '#10'geschachtet sein können:'#10#10'OPERATOREN:'#10'and, or, xor, pand, sand, not'#10'Bis auf not haben alle Operatoren'#10'zwei oder mehr Operanden; not hat'#10'genau einen Operanden.'#10#10'Es gelten die all'
-    Top = 30
-    Width = 490
-    Color = 11796403
-    Lines.Strings = (
-      ''
-    )
-    ScrollBars = ssAutoVertical
-    TabOrder = 3
-  end
   object ToolBarOverall: TToolBar
     Height = 26
     Width = 1000
@@ -111,10 +82,11 @@ object TFTAMainWindow: TTFTAMainWindow
     Images = ImageListMenuOverall
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 6
+    TabOrder = 4
     Wrapable = False
     object ToolButtonClear: TToolButton
       Left = 1
+      Hint = 'Clear input and output fields.'
       Caption = 'New'
       ImageIndex = 0
       MenuItem = MenuItemClear
@@ -122,6 +94,7 @@ object TFTAMainWindow: TTFTAMainWindow
     end
     object ToolButtonOpen: TToolButton
       Left = 30
+      Hint = 'Open a file.'
       Caption = 'Open'
       Enabled = False
       ImageIndex = 1
@@ -130,6 +103,7 @@ object TFTAMainWindow: TTFTAMainWindow
     end
     object ToolButtonSaveAs: TToolButton
       Left = 59
+      Hint = 'Save the input temporal term into a file.'
       Caption = 'Save Input As'
       Enabled = False
       ImageIndex = 2
@@ -138,6 +112,7 @@ object TFTAMainWindow: TTFTAMainWindow
     end
     object ToolButtonExit: TToolButton
       Left = 112
+      Hint = 'Exit the program.'
       Caption = 'Exit'
       ImageIndex = 3
       MenuItem = MenuItemExit
@@ -157,6 +132,7 @@ object TFTAMainWindow: TTFTAMainWindow
     end
     object ToolButtonImportTerm: TToolButton
       Left = 165
+      Hint = 'Scan the input string containing '#10'the user''s temporal term.'
       Caption = 'Scan Input Term'
       ImageIndex = 4
       MenuItem = MenuItemScan
@@ -164,7 +140,9 @@ object TFTAMainWindow: TTFTAMainWindow
     end
     object ToolButtonSimplify: TToolButton
       Left = 194
+      Hint = 'Start the simplification according to the rules of the temporal logic.'
       Caption = 'Simplify'
+      Enabled = False
       ImageIndex = 5
       MenuItem = MenuItemSimplify
       OnClick = MenuItemSimplifyClick
@@ -193,6 +171,7 @@ object TFTAMainWindow: TTFTAMainWindow
     end
     object ToolButtonSaveOutAs: TToolButton
       Left = 300
+      Hint = 'Save the output temporal term into a file.'
       Caption = 'Save Output As'
       Enabled = False
       ImageIndex = 7
@@ -211,6 +190,74 @@ object TFTAMainWindow: TTFTAMainWindow
       Caption = 'Help / About'
       ImageIndex = 8
       OnClick = MenuItemAboutClick
+    end
+    object StaticText2: TStaticText
+      Left = 381
+      Height = 25
+      Width = 259
+      Caption = '                        Output'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 0
+    end
+  end
+  object PageControl1: TPageControl
+    Left = 499
+    Height = 635
+    Top = 30
+    Width = 496
+    ActivePage = TabSheet1
+    TabIndex = 0
+    TabOrder = 5
+    object TabSheet1: TTabSheet
+      Caption = 'String'
+      ClientHeight = 597
+      ClientWidth = 492
+      object MemoOutputString: TMemo
+        Height = 598
+        Hint = 'Ein temporallogischer Ausdruck besteht '#10'aus folgenden Konstrukten, die auch '#10'geschachtet sein können:'#10#10'OPERATOREN:'#10'and, or, xor, pand, sand, not'#10'Bis auf not haben alle Operatoren'#10'zwei oder mehr Operanden; not hat'#10'genau einen Operanden.'#10#10'Es gelten die all'
+        Width = 490
+        Color = 11796403
+        Lines.Strings = (
+          ''
+        )
+        ScrollBars = ssAutoVertical
+        TabOrder = 0
+      end
+      object StaticText1: TStaticText
+        Height = 30
+        Top = -66
+        Width = 100
+        Caption = 'Output'
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 1
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = 'Tree'
+      ClientHeight = 635
+      ClientWidth = 496
+      object TreeViewOutputStructure: TTreeView
+        Height = 598
+        Width = 490
+        AutoExpand = True
+        BackgroundColor = 11796403
+        BorderStyle = bsNone
+        BorderWidth = 2
+        Color = clWhite
+        Ctl3D = True
+        DefaultItemHeight = 18
+        ScrollBars = ssAutoBoth
+        TabOrder = 0
+        Options = [tvoAutoExpand, tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips]
+      end
+    end
+    object TabSheet3: TTabSheet
+      Caption = 'MCSS'
+    end
+    object TabSheet4: TTabSheet
+      Caption = 'MCSS (without SAND)'
     end
   end
   object MainMenuOverall: TMainMenu
@@ -855,6 +902,88 @@ object TFTAMainWindow: TTFTAMainWindow
         AutoCheck = True
         Caption = 'Show / Hide tree structures'
         Checked = True
+        Bitmap.Data = {
+          FA090000424DFA09000000000000360000002800000019000000190000000100
+          200000000000C409000064000000640000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          00000000000000000000661900006A1A00FF6A1A00FF6A1A00FF6A1A00FF6A1A
+          00FF6A1A00FF6A1A00FF6A1A00FF6A1A00FF6A1A00FF6A1A00FF6A1A00FF6A1A
+          00FF6A1A00FF6A1A00FF6A1A00FF6A1A00FF6A1A00FF6A1A00FF6A1A00FF6A1A
+          00FF6619000000000000000000006E1B00FFCF3300FFFF541BFFFF541BFFFF54
+          1BFFFF541BFFFF541BFFFF541BFFFF541BFFFF541BFFFF541BFFFF541BFFFF54
+          1BFFFF541BFFFF541BFFFF541BFFFF541BFFFF541BFFFF541BFFFF541BFFFF54
+          1BFFEE3B00FF661900FF6218000000000000671900FFFF5E29FFFFAF94FFFFAF
+          94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFF9D
+          7DFFFF6532FFFF6430FFFF6430FFFF8B64FFFFAF94FFFFAF94FFFFAF94FFFFAF
+          94FFFFAF94FFFF875FFF621800FF6218000000000000671900FFFF5E29FFFFAF
+          94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF
+          94FFC63100FFB92E00FFC63100FFC63100FF962500FFFFAF94FFFFAF94FFFFAF
+          94FFFFAF94FFFFAF94FFFF875FFF621800FF6218000000000000671900FFFF5E
+          29FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFF5B24FFFF4609FFFF46
+          09FFFF8259FFAC2B00FFF13C00FFFC3F00FFFC3F00FF962500FFFFAF94FFFFAF
+          94FFFFAF94FFFFAF94FFFFAF94FFFF875FFF621800FF62180000000000006719
+          00FFFF5E29FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FF7B1E00FFFF64
+          30FFFF6430FFFF8E69FFAC2B00FFF13C00FFFC3F00FFFC3F00FF962500FFFFAF
+          94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFF875FFF621800FF621800000000
+          0000671900FFFF5E29FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFAC2B
+          00FFFFAF94FFFFAF94FFFFAF94FFC43100FFB72D00FFBC2F00FFBC2F00FF9124
+          00FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFF875FFF621800FF6218
+          000000000000671900FFFF5E29FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF
+          94FFAC2B00FFFFAF94FFFFAF94FFFFAF94FFFF9774FFFF571FFFFF541BFFFF54
+          1BFFFF855DFFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFF875FFF6218
+          00FF6218000000000000671900FFFF5E29FFFFAF94FFFFAF94FFFFAF94FFFFAF
+          94FFFFAF94FFAC2B00FFFFAF94FFFFAF94FFFFAF94FFFF5B24FF9F2700FFA128
+          00FFA12800FFE63900FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFF87
+          5FFF621800FF6218000000000000671900FFFF5E29FFFFAF94FFFFAF94FFFFAF
+          94FFFFAF94FFFFAF94FFAC2B00FFFFAF94FFFFAF94FFFFAF94FFAC2B00FFEF3B
+          00FFFC3F00FFFC3F00FF962500FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF
+          94FFFF875FFF621800FF6218000000000000671900FFFF5E29FFFFAF94FFFFAF
+          94FFFFAF94FFFFAF94FFFFAF94FF621800FFB42D00FFB42D00FFFF571FFFAC2B
+          00FFF13C00FFFC3F00FFFC3F00FF962500FFFFAF94FFFFAF94FFFFAF94FFFFAF
+          94FFFFAF94FFFF875FFF621800FF6218000000000000671900FFFF5E29FFFFAF
+          94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFAC2B00FFFFAF94FFFFAF94FFFFAF
+          94FFAC2B00FFF13C00FFFC3F00FFFC3F00FF962500FFFFAF94FFFFAF94FFFFAF
+          94FFFFAF94FFFFAF94FFFF875FFF621800FF6218000000000000671900FFFF5E
+          29FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFAC2B00FFFFAF94FFFFAF
+          94FFFFAF94FFFF490DFF8F2300FF8F2300FF8F2300FFCE3300FFFFAF94FFFFAF
+          94FFFFAF94FFFFAF94FFFFAF94FFFF875FFF621800FF62180000000000006719
+          00FFFF5E29FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFAC2B00FFFFAF
+          94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF
+          94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFF875FFF621800FF621800000000
+          0000671900FFFF5E29FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFF70
+          40FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF
+          94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFFAF94FFFF875FFF621800FF6218
+          000000000000671900FFFF5C26FFFFA080FFFFA080FFFFA080FFFFA080FFFFA0
+          80FFFFA080FFFFA080FFFFA080FFFFA080FFFFA080FFFFA080FFFFA080FFFFA0
+          80FFFFA080FFFFA080FFFFA080FFFFA080FFFFA080FFFFA080FFFF855DFF6218
+          00FF6218000000000000671900FF6F1B00FF621800FF621800FF621800FF6218
+          00FF621800FF621800FF621800FF621800FF621800FF621800FF621800FF6218
+          00FF621800FF621800FF621800FF621800FF621800FF621800FF621800FF6E1B
+          00FF621800FF6218000000000000661900FF7A1E00FFB42D00FFB42D00FFB42D
+          00FFB42D00FFB42D00FFB42D00FFB42D00FFB42D00FFB42D00FFB42D00FFB42D
+          00FFB42D00FFB42D00FFB42D00FFB42D00FFB42D00FFB42D00FFA92A00FF9F27
+          00FF812000FF621800FF6218000000000000661900FF8F2300FFFC3F00FFFC3F
+          00FFFC3F00FFFC3F00FFFC3F00FFFC3F00FFFC3F00FFFC3F00FFFC3F00FFFC3F
+          00FFFC3F00FFFC3F00FFFC3F00FFFC3F00FFFC3F00FFFC3F00FFFC3F00FFC130
+          00FF621800FF972500FF621800FF6218000000000000661900FF7B1E00FFBC2F
+          00FFBC2F00FFBC2F00FFBC2F00FFBC2F00FFBC2F00FFBC2F00FFBC2F00FFBC2F
+          00FFBC2F00FFBC2F00FFBC2F00FFBC2F00FFBC2F00FFBC2F00FFBC2F00FFBC2F
+          00FFAC2B00FF9E2700FF842100FF661900FF5E17000000000000621800FF6619
+          00FF621800FF621800FF621800FF621800FF621800FF621800FF621800FF6218
+          00FF621800FF621800FF621800FF621800FF621800FF621800FF621800FF6218
+          00FF621800FF621800FF621800FF661900FF621800FF00000000000000000000
+          0000731C00006619000066190000661900006619000066190000661900006619
+          0000661900006619000066190000661900006619000066190000661900006619
+          000066190000661900006619000066190000671900000000000000000000
+        }
         ImageIndex = 6
         ShowAlwaysCheckable = True
         OnClick = MenuItemShowTreesClick
