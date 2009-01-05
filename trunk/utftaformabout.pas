@@ -22,6 +22,7 @@ type
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     procedure ButtonCloseClick(Sender: TObject);
+    procedure Label1Click(Sender: TObject);
 
   private
     { private declarations }
@@ -40,6 +41,11 @@ implementation
 procedure TFormAbout.ButtonCloseClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TFormAbout.Label1Click(Sender: TObject);
+begin
+
 end;
 
 

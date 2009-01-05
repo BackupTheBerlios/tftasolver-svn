@@ -30,7 +30,7 @@ uses
   { eigene Units }
   utftaexpression, utftaformabout,
   {$IFDEF TESTMODE}utftaformdebugmessages, sjspointertools, {$ENDIF}
-  utftaobject, Menus, LazHelpHTML, IpHtml;
+  utftaobject, Menus, LazHelpHTML, IpHtml, Grids;
 
 { ##############################################################################
   ##############################################################################
@@ -46,6 +46,8 @@ type
   { TTFTAMainWindow }
 
   TTFTAMainWindow = class(TForm)
+    ButtonMCCSCopy: TButton;
+    ButtonMCCSCopysl: TButton;
     ImageListMenuOverall: TImageList;
     ImageListMenuOverallInactive: TImageList;
     MainMenuOverall: TMainMenu;
@@ -71,13 +73,17 @@ type
     MenuItemSaveInAs: TMenuItem;
     PageControl1: TPageControl;
     ProgressBar1: TProgressBar;
+    RadioGroupMCSSFormat: TRadioGroup;
+    RadioGroupMCSSFormatsl: TRadioGroup;
     StaticText1: TStaticText;
     StaticText2: TStaticText;
     StatusBarHauptfenster: TStatusBar;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
-    TabSheet3: TTabSheet;
-    TabSheet4: TTabSheet;
+    StringGridMCSS: TStringGrid;
+    StringGridMCSSsl: TStringGrid;
+    TabSheetOutMCSSsl: TTabSheet;
+    TabSheetOutString: TTabSheet;
+    TabSheetOutTree: TTabSheet;
+    TabSheetOutMCSS: TTabSheet;
     ToolBarOverall: TToolBar;
     ToolButtonSaveOutAs: TToolButton;
     ToolButton3: TToolButton;
@@ -105,6 +111,7 @@ type
     procedure MenuItemScanClick(Sender: TObject);
     procedure MenuItemShowTreesClick(Sender: TObject);
     procedure MenuItemSimplifyClick(Sender: TObject);
+
   private
       {$IFDEF TESTMODE}
       vDEBUGWindow : TFormDebugMessage;
@@ -320,6 +327,7 @@ begin
   {$IFDEF TESTMODE}MenuItemSaveOutAsClick(Sender); {$ENDIF}
 
 end;
+
 
 initialization
   {$I utftaformtftasolver.lrs}

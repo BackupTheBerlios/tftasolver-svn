@@ -1,7 +1,7 @@
 object FormAbout: TFormAbout
-  Left = 422
+  Left = 426
   Height = 400
-  Top = 383
+  Top = 407
   Width = 600
   ActiveControl = PageControl1
   BorderIcons = [biSystemMenu]
@@ -21,8 +21,9 @@ object FormAbout: TFormAbout
     Width = 293
     Alignment = taCenter
     AutoSize = False
-    Caption = 'TFTASolver'#10'http://tftasolver.berlios.de'#10'Copyright 2008 (Version 0.1.) '
+    Caption = 'TFTASolver'#10'http://tftasolver.berlios.de'#10'Copyright 2008, 2009 (Version 0.1.) '
     ParentColor = False
+    OnClick = Label1Click
   end
   object Label3: TLabel
     Left = 302
@@ -53,8 +54,8 @@ object FormAbout: TFormAbout
     TabOrder = 1
     object TabSheet2: TTabSheet
       Caption = 'Using TFTASolver'
-      ClientHeight = 264
-      ClientWidth = 586
+      ClientHeight = 302
+      ClientWidth = 590
       object Label2: TLabel
         Left = 16
         Height = 17

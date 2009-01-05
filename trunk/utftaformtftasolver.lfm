@@ -1,12 +1,12 @@
 object TFTAMainWindow: TTFTAMainWindow
-  Left = 379
+  Left = 203
   Height = 732
-  Top = 289
+  Top = 187
   Width = 1000
   ActiveControl = PageControl1
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
-  Caption = 'TFTA Solver --- V0.1 --- 2008 SJS --- licensed under GPL v3'
+  Caption = 'TFTA Solver (v0.1)'
   ClientHeight = 700
   ClientWidth = 1000
   Menu = MainMenuOverall
@@ -206,10 +206,10 @@ object TFTAMainWindow: TTFTAMainWindow
     Height = 635
     Top = 30
     Width = 496
-    ActivePage = TabSheet1
+    ActivePage = TabSheetOutString
     TabIndex = 0
     TabOrder = 5
-    object TabSheet1: TTabSheet
+    object TabSheetOutString: TTabSheet
       Caption = 'String'
       ClientHeight = 597
       ClientWidth = 492
@@ -234,10 +234,10 @@ object TFTAMainWindow: TTFTAMainWindow
         TabOrder = 1
       end
     end
-    object TabSheet2: TTabSheet
+    object TabSheetOutTree: TTabSheet
       Caption = 'Tree'
-      ClientHeight = 635
-      ClientWidth = 496
+      ClientHeight = 597
+      ClientWidth = 492
       object TreeViewOutputStructure: TTreeView
         Height = 598
         Width = 490
@@ -253,11 +253,163 @@ object TFTAMainWindow: TTFTAMainWindow
         Options = [tvoAutoExpand, tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips]
       end
     end
-    object TabSheet3: TTabSheet
+    object TabSheetOutMCSS: TTabSheet
       Caption = 'MCSS'
+      ClientHeight = 597
+      ClientWidth = 492
+      object StringGridMCSS: TStringGrid
+        Left = 3
+        Height = 526
+        Top = 38
+        Width = 488
+        ColCount = 2
+        Columns = <        
+          item
+            Title.Caption = 'MCSS'
+            Width = 424
+          end>
+        ExtendedSelect = True
+        FixedColor = clBtnFace
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goSmoothScroll, goFixedRowNumbering]
+        ParentColor = False
+        RowCount = 5
+        TabOrder = 0
+        Cells = (
+          6
+          0
+          0
+          'Number'
+          0
+          1
+          '1'
+          0
+          2
+          '2'
+          0
+          3
+          '3'
+          0
+          4
+          '4'
+          1
+          0
+          'MCSS'
+        )
+      end
+      object RadioGroupMCSSFormat: TRadioGroup
+        Left = 3
+        Height = 30
+        Top = 3
+        Width = 488
+        AutoFill = True
+        ChildSizing.LeftRightSpacing = 6
+        ChildSizing.TopBottomSpacing = 6
+        ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+        ChildSizing.EnlargeVertical = crsHomogenousChildResize
+        ChildSizing.ShrinkHorizontal = crsScaleChilds
+        ChildSizing.ShrinkVertical = crsScaleChilds
+        ChildSizing.Layout = cclTopToBottomThenLeftToRight
+        ChildSizing.ControlsPerLine = 1
+        ClientHeight = 30
+        ClientWidth = 488
+        ColumnLayout = clVerticalThenHorizontal
+        Columns = 2
+        ItemIndex = 0
+        Items.Strings = (
+          'Format as readable'
+          'Format as parseable'
+        )
+        TabOrder = 1
+      end
+      object ButtonMCCSCopy: TButton
+        Left = 3
+        Height = 25
+        Top = 569
+        Width = 488
+        Caption = 'Copy all to clipboard'
+        Enabled = False
+        TabOrder = 2
+      end
     end
-    object TabSheet4: TTabSheet
+    object TabSheetOutMCSSsl: TTabSheet
       Caption = 'MCSS (without SAND)'
+      ClientHeight = 597
+      ClientWidth = 492
+      Enabled = False
+      TabVisible = False
+      object StringGridMCSSsl: TStringGrid
+        Left = 3
+        Height = 526
+        Top = 38
+        Width = 488
+        ColCount = 2
+        Columns = <        
+          item
+            Title.Caption = 'MCSS'
+            Width = 424
+          end>
+        ExtendedSelect = True
+        FixedColor = clBtnFace
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goSmoothScroll, goFixedRowNumbering]
+        ParentColor = False
+        RowCount = 5
+        TabOrder = 0
+        Cells = (
+          6
+          0
+          0
+          'Number'
+          0
+          1
+          '1'
+          0
+          2
+          '2'
+          0
+          3
+          '3'
+          0
+          4
+          '4'
+          1
+          0
+          'MCSS'
+        )
+      end
+      object RadioGroupMCSSFormatsl: TRadioGroup
+        Left = 3
+        Height = 30
+        Top = 3
+        Width = 488
+        AutoFill = True
+        ChildSizing.LeftRightSpacing = 6
+        ChildSizing.TopBottomSpacing = 6
+        ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+        ChildSizing.EnlargeVertical = crsHomogenousChildResize
+        ChildSizing.ShrinkHorizontal = crsScaleChilds
+        ChildSizing.ShrinkVertical = crsScaleChilds
+        ChildSizing.Layout = cclTopToBottomThenLeftToRight
+        ChildSizing.ControlsPerLine = 1
+        ClientHeight = 30
+        ClientWidth = 488
+        ColumnLayout = clVerticalThenHorizontal
+        Columns = 2
+        ItemIndex = 0
+        Items.Strings = (
+          'Format as readable'
+          'Format as parseable'
+        )
+        TabOrder = 1
+      end
+      object ButtonMCCSCopysl: TButton
+        Left = 3
+        Height = 25
+        Top = 569
+        Width = 488
+        Caption = 'Copy all to clipboard'
+        Enabled = False
+        TabOrder = 2
+      end
     end
   end
   object MainMenuOverall: TMainMenu
